@@ -1,0 +1,68 @@
+#
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# <mj@casalogic.dk> wrote this file. As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you
+# think
+# this stuff is worth it, you can buy me a beer in return Martin Juhl
+# ----------------------------------------------------------------------------
+#
+
+#    This file is part of bumblebee.
+#
+#    bumblebee is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    bumblebee is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#   
+#    You should have received a copy of the GNU General Public License
+#    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+This project is containing bumblebee (Formerly known as prime-ng)..
+
+bumblebee is Optimus support for Linux, with real offloading, and not
+switchable graphics.. More important.. it works on Optimus Laptops without a
+graphical multiplexer..
+
+Version 1.0 of the bumblebee project has been release!!! (version number has
+been reset from the prime-ng project)
+
+The Installation should now be completely automatic...
+
+
+Now 3D is enabled on both the Intel and the nVidia at the same time..
+
+The Intel card is running the Desktop and the nVidia card can be used for
+the thougher applications with the command "optirun32 <application>" or
+"optirun64 <application>"...
+
+So now we just need somebody to write an application for automatically
+balance which applications should be run on which card.. and shut the nVidia
+card down, when not used..
+
+But still I think it is a good step forward...
+
+Just download the install.sh and the install-files folder..
+
+I left the old releases up there in the old/ folder.. if someone needs it..
+
+Machines Confirmed Working:
+
+Machine			User
+Alienware M11X R2	Martin Juhl
+Asus N82Jv		André Ventura
+Asus EeePC 1215N	Ellington Santos
+Asus N61Jv (X64Jv)	Ted
+Acer Aspire 5745PG	Miguel Belmonte
+Dell Vostro 3300	Peter Liedler
+Acer EeePC 1215N	Fedor Indutny
+Dell XPS 15 (L502x)	Sunil Mujumdar
+
+Status updates can be found here: http://www.martin-juhl.dk or on twitter
+http://twitter.com/martinjuhl

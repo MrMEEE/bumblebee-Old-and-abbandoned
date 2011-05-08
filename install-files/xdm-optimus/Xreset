@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# This script is run as root after the user's X session ends.
+
+# Use common Xreset framework if it exist
+if [ -x /etc/X11/Xreset ] ; then
+    /etc/X11/Xreset
+fi
+
+# Remove the utmp entry for the session.
+if grep -qs '^use-sessreg' /etc/X11/xdm/xdm.options \
+  && which sessreg >/dev/null 2>&1; then
+    sessreg -d -l "$DISPLAY" -u /var/run/utmp -x /etc/X11/xdm/Xservers "$USER"
+fi
+
+exit 0
+
+# vim:set ai et sts=4 sw=4 tw=80:

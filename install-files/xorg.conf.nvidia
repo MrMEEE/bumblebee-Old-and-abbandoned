@@ -1,0 +1,61 @@
+Section "DRI"
+	Mode 0666
+EndSection
+
+Section "ServerLayout"
+    Identifier     "Layout0"
+    Screen         "Screen1"
+    InputDevice    "Keyboard0" "SendCoreEvents"
+    InputDevice    "Mouse0" "SendCoreEvents"
+EndSection
+
+Section "Module"
+	Load  "dbe"
+	Load  "extmod"
+	Load  "glx"
+	Load  "record"
+	Load  "freetype"
+	Load  "type1"
+EndSection
+
+Section "Files"
+EndSection
+
+Section "InputDevice"
+    Identifier     "Mouse0"
+    Driver         "mouse"
+    Option         "Protocol" "auto"
+    Option         "Device" "/dev/psaux"
+    Option         "Emulate3Buttons" "no"
+    Option         "ZAxisMapping" "4 5"
+EndSection
+
+Section "InputDevice"
+    # generated from default
+    Identifier     "Keyboard0"
+    Driver         "kbd"
+EndSection
+
+Section "Device"
+    Identifier     "Device1"
+    Driver         "nvidia"
+    VendorName     "NVIDIA Corporation"
+    BusID          "REPLACEWITHBUSID"
+    Option         "IgnoreEDID"
+    Option 	   "ConnectedMonitor" "REPLACEWITHCONNECTEDMONITOR"
+EndSection
+
+Section "Screen"
+    Identifier     "Screen1"
+    Device         "Device1"
+    Monitor        "Monitor0"
+    DefaultDepth    24
+    SubSection     "Display"
+        Depth       24
+        Modes      "1366x768" "1360x768" "1024x768" "800x600" "640x480"
+    EndSubSection
+EndSection
+
+Section "Extensions"
+Option "Composite" "Disable"
+EndSection

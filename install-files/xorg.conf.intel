@@ -1,0 +1,74 @@
+Section "DRI"
+	Mode 0666
+EndSection
+
+Section "ServerLayout"
+    Identifier     "Layout0"
+    Screen         "Screen0"
+    InputDevice    "Keyboard0" "SendCoreEvents"
+    #InputDevice    "Keyboard0" "CoreKeyboard"
+    InputDevice    "Mouse0" "SendCoreEvents"
+    #InputDevice    "Mouse0" "CorePointer"
+EndSection
+
+Section "Module"
+	Load  "GLcore"
+	Load  "dbe"
+	Load  "dri"
+	Load  "extmod"
+	Load  "glx"
+	Load  "record"
+	Load  "xtrap"
+	Load  "freetype"
+	Load  "type1"
+EndSection
+
+#Section "ServerFlags"
+#    Option "AllowEmptyInput" "no"
+#EndSection
+
+Section "Files"
+EndSection
+
+Section "InputDevice"
+    # generated from default
+    Identifier     "Mouse0"
+    Driver         "mouse"
+    Option         "Protocol" "auto"
+    Option         "Device" "/dev/psaux"
+    Option         "Emulate3Buttons" "no"
+    Option         "ZAxisMapping" "4 5"
+EndSection
+
+Section "InputDevice"
+    # generated from default
+    Identifier     "Keyboard0"
+    Driver         "kbd"
+EndSection
+
+Section "Monitor"                                                       
+    Identifier "Monitor0"
+    VendorName     "Unknown"
+    ModelName      "Unknown"
+    HorizSync       28.0 - 73.0
+    VertRefresh     43.0 - 72.0
+    Option         "DPMS"
+EndSection
+
+Section "Device"
+    Identifier     "Device0"
+    Driver         "intel"
+    VendorName     "onboard"
+    BusID          "REPLACEWITHBUSID"
+EndSection
+
+Section "Screen"
+    Identifier     "Screen0"   
+    Device         "Device0"
+    Monitor        "Monitor0"
+    DefaultDepth    24
+    SubSection     "Display"
+        Depth       24
+    EndSubSection
+EndSection
+

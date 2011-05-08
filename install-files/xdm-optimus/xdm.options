@@ -1,0 +1,7 @@
+# configuration options for xdm
+# See xdm.options(5) for an explanation of the available options.
+
+no-ignore-nologin
+no-restart-on-upgrade
+no-start-on-install
+use-sessreg

@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# This script is run as root after the user logs in.  If this script exits with
+# a return code other than 0, the user's session will not be started.
+
+if [ -e /etc/nologin ]; then
+  # always display the nologin message, if possible
+  if [ -s /etc/nologin ] && which xmessage > /dev/null 2>&1; then
+    xmessage -file /etc/nologin -geometry 640x480
+  fi
+  if [ "$(id -u $USER)" != "0" ] && \
+     ! grep -qs '^ignore-nologin' /etc/X11/xdm/xdm.options; then
+    exit 1
+  fi
+fi
+
+# Insert a utmp entry for the session.
+if grep -qs '^use-sessreg' /etc/X11/xdm/xdm.options \
+  && which sessreg >/dev/null 2>&1; then
+    exec sessreg -a -l "$DISPLAY" -u /var/run/utmp \
+                 -x /etc/X11/xdm/Xservers "$USER"
+  # NOTREACHED
+fi
+
+exit 0
+
+# vim:set ai et sts=2 sw=2 tw=0:

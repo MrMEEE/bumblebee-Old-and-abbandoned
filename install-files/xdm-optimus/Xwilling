@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+
+# The output of this script is displayed in the chooser window.
+# (instead of "Willing to manage")
+
+load="`uptime|sed -e 's/^.*load[^0-9]*//'`"
+nrusers="`who|cut -c 1-8|sort -u|wc -l|sed 's/^[ 	]*//'`"
+s=""; [ "$nrusers" != 1 ] && s=s
+
+echo "${nrusers} user${s}, load: ${load}"
