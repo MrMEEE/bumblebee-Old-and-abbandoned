@@ -22,7 +22,7 @@ DisplayManager.willing:		su nobody -c /etc/X11/xdm-optimus/Xwilling
 ! require individual resource settings.
 DisplayManager*authorize:	false
 !
-!DisplayManager*chooser:		/usr/lib/X11/xdm/chooser
+!DisplayManager*chooser:		/etc/X11/xdm-optimus/chooser
 DisplayManager*startup:		/etc/X11/xdm-optimus/Xstartup
 DisplayManager*session:		/etc/X11/xdm-optimus/Xsession
 DisplayManager*setup:		/etc/X11/xdm-optimus/Xsetup

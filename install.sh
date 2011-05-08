@@ -41,7 +41,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.2.0"
+echo "Welcome to the bumblebee installation v.1.0.1"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -103,10 +103,12 @@ echo
 echo "Installing Optimus Configuration and files"
 cp install-files/xorg.conf.intel /etc/X11/xorg.conf
 cp install-files/xorg.conf.nvidia /etc/X11/
+rm -rf /etc/X11/xdm-optimus
 cp -a install-files/xdm-optimus /etc/X11/
 cp install-files/xdm-optimus.script /etc/init.d/xdm-optimus
 cp install-files/xdm-optimus.bin /usr/bin/xdm-optimus
 cp install-files/virtualgl.conf /etc/modprobe.d/
+cp install-files/optimusXserver /usr/local/bin/
 dpkg -i install-files/VirtualGL_amd64.deb
 chmod +x /etc/init.d/xdm-optimus
 chmod +x /usr/bin/xdm-optimus
@@ -230,9 +232,57 @@ echo
 echo "Setting up Enviroment variables"
 echo
 
+IMAGETRANSPORT="UNDEFINED"
+
+while [ "$IMAGETRANSPORT" = "UNDEFINED" ]; do
+
+clear
+
+echo
+echo "The Image Transport is how the images are transferred from the"
+echo "nVidia card to the Intel card, people has different experiences of"
+echo "performance, but just select the default if you are in doubt"
+echo "1) YUV (default)"  
+echo "2) JPEG"     
+echo "3) PROXY"
+echo "4) XV"  
+
+echo
+read machine
+echo
+
+case "$machine" in
+
+1)
+IMAGETRANSPORT="yuv"
+;;
+
+2)
+IMAGETRANSPORT="jpeg"    
+;;
+
+3)
+IMAGETRANSPORT="proxy"    
+;;
+
+4)
+IMAGETRANSPORT="xv"    
+;;
+*)
+echo
+echo "Please choose a valid option, Press any key to try again"
+read
+clear
+  
+;;
+     
+esac
+done
+
+
 echo "VGL_DISPLAY=:1
 export VGL_DISPLAY
-VGL_COMPRESS=jpeg
+VGL_COMPRESS=$IMAGETRANSPORT
 export VGL_COMPRESS
 VGL_READBACK=fbo
 export VGL_READBACK
@@ -246,7 +296,9 @@ chmod +x /usr/bin/vglclient-service
 if [ -d $HOME/.kde/Autostart ]; then
  ln -s /usr/bin/vglclient-service $HOME/.kde/Autostart/vglclient-service
 fi
-
+echo
+echo
+echo
 echo "Ok... Installation complete..."
 echo
 echo "Now you need to make sure that the command \"vglclient -gl\" is run after your Desktop Enviroment is started"

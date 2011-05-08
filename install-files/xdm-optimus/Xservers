@@ -31,4 +31,4 @@
 # Examples for multiple local X displays:
 # :0 local /usr/bin/X :0 vt9 -depth 15 -nolisten tcp -tst
 # :1 local /usr/bin/X :1 vt10 -depth 8 -nolisten tcp -tst
-:1 local /usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /opt/bumblebee/lib64/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9
+:1 local /usr/local/bin/optimusXserver -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /opt/prime-ng/lib64/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9

@@ -10,22 +10,22 @@
 #
 # This is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License with
-# the Debian operating system, in /usr/share/common-licenses/GPL;  if
+# the Debian operating system, in /usr/share/common-licenses/GPL; if
 # not, write to the Free Software Foundation, Inc., 59 Temple Place,
 # Suite 330, Boston, MA 02111-1307 USA
 
 ### BEGIN INIT INFO
-# Provides:          xdm-optimus
-# Required-Start:    $local_fs $remote_fs
-# Required-Stop:     $local_fs $remote_fs
-# Should-Start:      xfs $named slapd hal
-# Should-Stop:       xfs $named slapd hal
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
+# Provides: xdm-optimus
+# Required-Start: $local_fs $remote_fs
+# Required-Stop: $local_fs $remote_fs
+# Should-Start: xfs $named slapd hal
+# Should-Stop: xfs $named slapd hal
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
 # Short-Description: The X Display Manager for Optimus
 ### END INIT INFO
 
@@ -49,10 +49,10 @@ test -x $DAEMON || exit 0
 
 # If we have upgraded the daemon since we last started it, we can't use the
 # --exec argument to start-stop-daemon, because the daemon's inode will have
-# changed.  The risk here is that in a situation where the daemon died, its
+# changed. The risk here is that in a situation where the daemon died, its
 # pidfile was not cleaned up, we've upgraded it, *and* some other process is now
 # running under that pid, start-stop-daemon will send signals to an innocent
-# process.  However, this seems like a corner case.  C'est la vie!
+# process. However, this seems like a corner case. C'est la vie!
 # Update: --name should prevent signalling innocent processes.
 SSD_START_ARGS="--pidfile $PIDFILE --name $(basename $DAEMON) --startas $DAEMON"
 SSD_STOP_ARGS="--pidfile $PIDFILE --name $(basename $DAEMON) --retry TERM/5/TERM/5"
@@ -75,9 +75,9 @@ case "$1" in
   reload)
     log_daemon_msg "Reloading X display manager configuration..."
     if ! start-stop-daemon --stop --quiet $SSD_RELOAD_ARGS; then
-      log_progress_msg "not running."
+log_progress_msg "not running."
     fi
-    log_end_msg 0
+log_end_msg 0
   ;;
 
   force-reload)
@@ -87,27 +87,27 @@ case "$1" in
   stop)
     log_daemon_msg "Stopping X display manager" "xdm-optimus"
     if ! [ -f $PIDFILE ]; then
-      log_progress_msg "not running ($PIDFILE not found)"
+log_progress_msg "not running ($PIDFILE not found)"
     else
-      start-stop-daemon --stop --quiet $SSD_STOP_ARGS
+start-stop-daemon --stop --quiet $SSD_STOP_ARGS
       SSD_RES=$?
       if [ $SSD_RES -eq 1 ]; then
-        log_progress_msg "not running"
+log_progress_msg "not running"
       fi
-      if [ $SSD_RES -eq 2 ]; then
-        log_progress_msg "not responding to TERM signals"
+if [ $SSD_RES -eq 2 ]; then
+log_progress_msg "not responding to TERM signals"
       else
-	if [ -f $PIDFILE ]; then
-	  log_progress_msg "(removing stale $PIDFILE)"
-	  rm $PIDFILE
-	fi
-      fi
-    fi
-    log_end_msg 0
+if [ -f $PIDFILE ]; then
+log_progress_msg "(removing stale $PIDFILE)"
+rm $PIDFILE
+fi
+fi
+fi
+log_end_msg 0
   ;;
 
   status)
-	status_of_proc -p $PIDFILE $DAEMON xdm-optimus && exit 0 || exit $?
+status_of_proc -p $PIDFILE $DAEMON xdm-optimus && exit 0 || exit $?
   ;;
 
   *)
@@ -119,3 +119,5 @@ esac
 exit 0
 
 # vim:set ai et sts=2 sw=2 tw=80:
+
+
