@@ -25,6 +25,22 @@
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+ROOT_UID=0
+
+if [ $UID != $ROOT_UID ]; then
+    echo "You don't have sufficient privileges to run this script."
+    echo
+    echo "Please run the script with: sudo install.sh"
+    exit 1
+fi
+
+if [ $HOME = /root ]; then
+    echo "Do not run this script as the root user"
+    echo
+    echo "Please run the script with: sudo install.sh"
+    exit 2
+fi
+
 echo "Welcome to the bumblebee installation v.2.0"
 echo "Licensed under BEER-WARE License and GPL"
 echo
@@ -35,7 +51,7 @@ echo "and has only been tested on Ubuntu Natty 11.04 but should work on others a
 echo "I will add support for RPM-based and 32-bit later.. or somebody else might..."
 echo "Remember... This is OpenSource :D"
 echo
-echo "THIS SCRIPT MUST BE RUN AS THE ROOT USER OR SUDO"
+echo "THIS SCRIPT MUST BE RUN WITH SUDO"
 echo
 echo "Are you sure you want to proceed?? (Y/N)"
 echo
@@ -224,11 +240,18 @@ export VGL_READBACK
 alias optirun32='vglrun -ld /opt/bumblebee/lib32'
 alias optirun64='vglrun -ld /opt/bumblebee/lib64'" >> /etc/bash.bashrc
 
+echo '#!/bin/sh' > /usr/bin/vglclient-service
+echo 'vglclient -gl' >> /usr/bin/vglclient-service
+chmod +x /usr/bin/vglclient-service
+if [ -d $HOME/.kde/Autostart ]; then
+ ln -s /usr/bin/vglclient-service $HOME/.kde/Autostart/vglclient-service
+fi
+
 echo "Ok... Installation complete..."
 echo
 echo "Now you need to make sure that the command \"vglclient -gl\" is run after your Desktop Enviroment is started"
 echo
-echo "In KDE this is done by placing a shortcut in ~/.kde/Autostart or in ~/.kde/share/autostart"
+echo "In KDE this is done by this script.. Thanks to Peter Liedler.."
 echo
 echo "In GNOME this is done by placing a shortcut in ~/.config/autostart/ or using the Adminstration->Sessions GUI"
 echo
