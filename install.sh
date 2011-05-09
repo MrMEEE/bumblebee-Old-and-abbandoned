@@ -251,11 +251,18 @@ clear
 echo
 echo "The Image Transport is how the images are transferred from the"
 echo "nVidia card to the Intel card, people has different experiences of"
-echo "performance, but just select the default if you are in doubt"
-echo "1) YUV (default)"  
+echo "performance, but just select the default if you are in doubt."
+echo 
+echo "I recently found out that yuv and jpeg both has some lagging"
+echo "this is only noticable in fast moving games, such as 1st person"
+echo "shooters and for me, its only good enough with xv, even though"
+echo "xv sets down performance a little bit."
+echo
+echo "1) YUV"  
 echo "2) JPEG"     
 echo "3) PROXY"
-echo "4) XV"  
+echo "4) XV (default)"
+echo "5) RGB"  
 
 echo
 read machine
@@ -277,6 +284,10 @@ IMAGETRANSPORT="proxy"
 
 4)
 IMAGETRANSPORT="xv"    
+;;
+
+5)
+IMAGETRANSPORT="rgb"
 ;;
 *)
 echo
