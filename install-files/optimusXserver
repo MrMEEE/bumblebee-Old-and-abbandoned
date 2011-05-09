@@ -1,2 +1,2 @@
 #!/bin/bash
-LD_LIBRARY_PATH=/opt/bumblebee/lib64/ /usr/bin/X $@
+LD_LIBRARY_PATH=/usr/lib64/nvidia-current /usr/bin/X $@

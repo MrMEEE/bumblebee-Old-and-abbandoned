@@ -69,25 +69,9 @@ exit 0
 esac
 
 clear
+echo
 echo "Installing needed packages"
 apt-get -y install nvidia-current
-
-echo
-echo "Copying nVidia Libraries and drivers"
-mkdir -p /opt/bumblebee/lib64
-mkdir -p /opt/bumblebee/lib32
-mkdir -p /opt/bumblebee/driver
-
-cp -a /usr/lib/nvidia-current/* /opt/bumblebee/lib64/
-cp -a /usr/lib32/nvidia-current/* /opt/bumblebee/lib32/
-
-cp /lib/modules/`uname -r`/updates/dkms/nvidia-current.ko /opt/bumblebee/driver
-
-echo
-echo "Removing conflicting nVidia files"
-echo
-
-apt-get -y purge nvidia-current
 
 echo
 echo "Backing up Configuration"
@@ -113,8 +97,14 @@ dpkg -i install-files/VirtualGL_amd64.deb
 chmod +x /etc/init.d/xdm-optimus
 chmod +x /usr/bin/xdm-optimus
 
-cp /opt/bumblebee/driver/nvidia-current.ko /lib/modules/`uname -r`/updates/dkms/
 depmod -a
+
+update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
+rm /etc/alternatives/xorg_extra_modules 
+ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
+
+ldconfig
+
 if [ "`cat /etc/modprobe.d/blacklist.conf |grep "blacklist nouveau" |wc -l`" -eq "0" ]; then
 echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
 fi
@@ -128,6 +118,9 @@ modprobe nvidia-current
 
 INTELBUSID=`echo "PCI:"\`lspci |grep VGA |grep Intel |cut -f1 -d:\`":"\`lspci |grep VGA |grep Intel |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep VGA |grep Intel |cut -f2 -d. |cut -f1 -d" "\``
 NVIDIABUSID=`echo "PCI:"\`lspci |grep VGA |grep nVidia |cut -f1 -d:\`":"\`lspci |grep VGA |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep VGA |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``
+
+clear
+
 echo
 echo "Changing Configuration to match your Machine"
 echo 
@@ -139,7 +132,6 @@ CONNECTEDMONITOR="UNDEFINED"
 
 while [ "$CONNECTEDMONITOR" = "UNDEFINED" ]; do
 
-clear
 
 echo
 echo "Select your Laptop:"
@@ -308,14 +300,17 @@ export VGL_COMPRESS
 VGL_READBACK=fbo
 export VGL_READBACK
 
-alias optirun32='vglrun -ld /opt/bumblebee/lib32'
-alias optirun64='vglrun -ld /opt/bumblebee/lib64'" >> /etc/bash.bashrc
+alias optirun32='vglrun -ld /usr/lib32/nvidia-current'
+alias optirun64='vglrun -ld /usr/lib64/nvidia-current'" >> /etc/bash.bashrc
 
 echo '#!/bin/sh' > /usr/bin/vglclient-service
 echo 'vglclient -gl' >> /usr/bin/vglclient-service
 chmod +x /usr/bin/vglclient-service
 if [ -d $HOME/.kde/Autostart ]; then
- ln -s /usr/bin/vglclient-service $HOME/.kde/Autostart/vglclient-service
+   if [ -f $HOME/.kde/Autostart/vlgclient-service ]; then
+   	rm $HOME/.kde/Autostart/vglclient-service
+   fi
+   ln -s /usr/bin/vglclient-service $HOME/.kde/Autostart/vglclient-service
 fi
 echo
 echo
