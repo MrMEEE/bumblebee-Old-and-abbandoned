@@ -109,8 +109,8 @@ if [ "`cat /etc/modprobe.d/blacklist.conf |grep "blacklist nouveau" |wc -l`" -eq
 echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
 fi
 
-if [ "`cat /etc/modules |grep "nvidia" |wc -l`" -eq "0" ]; then
-echo "nvidia" >> /etc/modules
+if [ "`cat /etc/modules |grep "nvidia-current" |wc -l`" -eq "0" ]; then
+echo "nvidia-current" >> /etc/modules
 fi
 
 modprobe -r nouveau
