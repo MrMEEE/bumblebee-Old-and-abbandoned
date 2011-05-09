@@ -30,7 +30,7 @@ bumblebee is Optimus support for Linux, with real offloading, and not
 switchable graphics.. More important.. it works on Optimus Laptops without a
 graphical multiplexer..
 
-Version 1.0.1 of the bumblebee project has been release!!! (version number has
+Version 1.0.2 of the bumblebee project has been release!!! (version number has
 been reset from the prime-ng project)
 
 The Installation should now be completely automatic...
@@ -54,15 +54,17 @@ I left the old releases up there in the old/ folder.. if someone needs it..
 
 Machines Confirmed Working:
 
-Machine			User
-Alienware M11X R2	Martin Juhl
-Asus N82Jv		André Ventura
-Asus EeePC 1215N	Ellington Santos
-Asus N61Jv (X64Jv)	Ted
-Acer Aspire 5745PG	Miguel Belmonte
-Dell Vostro 3300	Peter Liedler
-Acer EeePC 1215N	Fedor Indutny
-Dell XPS 15 (L502x)	Sunil Mujumdar
+Machine					User
+Alienware M11X R2			Martin Juhl
+Asus N82Jv				André Ventura
+Asus EeePC 1215N			Ellington Santos
+Asus N61Jv (X64Jv)			Ted
+Acer Aspire 5745PG			Miguel Belmonte
+Dell Vostro 3300			Peter Liedler
+Acer EeePC 1215N			Fedor Indutny
+Dell XPS 15 (L502x)			Sunil Mujumdar
+Dell Vostro 3400			Sunil Mujumdar
+Toshiba Satellite M645-SP4132L		Leonard Camacho
 
 Status updates can be found here: http://www.martin-juhl.dk or on twitter
 http://twitter.com/martinjuhl

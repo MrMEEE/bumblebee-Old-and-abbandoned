@@ -70,7 +70,7 @@ esac
 
 clear
 echo "Installing needed packages"
-apt-get -y install nvidia-current aptitude
+apt-get -y install nvidia-current
 
 echo
 echo "Copying nVidia Libraries and drivers"
@@ -87,7 +87,7 @@ echo
 echo "Removing conflicting nVidia files"
 echo
 
-aptitude -y --purge remove nvidia-current
+apt-get -y purge nvidia-current
 
 echo
 echo "Backing up Configuration"
@@ -150,6 +150,8 @@ echo "4) Asus EeePC 1215N"
 echo "5) Acer Aspire 5745PG"
 echo "6) Dell Vostro 3300"
 echo "7) Dell XPS 15 (L502x)"
+echo "8) Dell Vostro 3400"
+echo "9) Toshiba Satellite M645-SP4132L"
 echo
 echo "97) Manually Set Output to CRT-0"
 echo "98) Manually Set Output to DFP-0"
@@ -186,6 +188,14 @@ CONNECTEDMONITOR="DFP-0"
 ;;
 
 7)
+CONNECTEDMONITOR="CRT-0"
+;;
+
+8)
+CONNECTEDMONITOR="CRT-0"
+;;
+
+9)
 CONNECTEDMONITOR="CRT-0"
 ;;
     
