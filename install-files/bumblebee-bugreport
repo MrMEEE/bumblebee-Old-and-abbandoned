@@ -99,7 +99,9 @@ tar zcf $HOME/bumblebee-bugreport-`date +%x`.tar.gz /tmp/bug-report/
 echo "Bug report generated"
 echo
 echo "The bug report has been saved as "$HOME/bumblebee-bugreport-`date +%x`.tar.gz
-echo "Please E-mail this bug report to mj@casalogic.dk or create a bugreport on github:"
+echo "Please create a bugreport on github and email me the bug report along with the"
+echo "issue number to mj@casalogic.dk"
+echo
 echo "https://github.com/MrMEEE/bumblebee/issues"
 echo 
 echo "This really makes bugfixing much easier for me and faster for you"
