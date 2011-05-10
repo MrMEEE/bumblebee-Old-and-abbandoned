@@ -35,6 +35,14 @@ been reset from the prime-ng project)
 
 The Installation should now be completely automatic...
 
+First of all: If you have any problem... please create a bug report package
+with the bumblebee-bugreport tool..
+
+Then create and issue on github...
+
+This project have had great succes and I need to have a way to easily manage
+support problems..
+
 
 Now 3D is enabled on both the Intel and the nVidia at the same time..
 
