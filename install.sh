@@ -44,7 +44,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.1.1"
+echo "Welcome to the bumblebee installation v.1.1.2"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -322,9 +322,6 @@ export VGL_COMPRESS
 VGL_READBACK=fbo
 export VGL_READBACK" >> /etc/bash.bashrc
 
-echo "alias optirun32='vglrun -ld /usr/lib32/nvidia-current'
-alias optirun64='vglrun -ld /usr/lib64/nvidia-current'" >> /etc/bash.bashrc
-
 if [ "$ARCH" = "x86_64" ]; then
  echo
  echo "64-bit system detected - Configuring"
@@ -361,10 +358,10 @@ echo
 if [ "$ARCH" = "x86_64" ]; then
 echo "After that you should be able to start applications with \"optirun32 <application>\" or \"optirun64 <application>\""
 echo "optirun32 can be used for legacy 32-bit applications and Wine Games.. Everything else should work on optirun64"
+echo "But... if one doesn't work... try the other"
 elif [ "$ARCH" = "i686" ]; then
 echo "After that you should be able to start applications with \"optirun <application>\"."
 fi
-echo "But... if one doesn't work... try the other"
 echo
 echo "Good luck... MrMEEE / Martin Juhl"
 echo
