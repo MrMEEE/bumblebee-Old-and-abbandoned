@@ -44,7 +44,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.1"
+echo "Welcome to the bumblebee installation v.1.1.1"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -94,7 +94,6 @@ cp install-files/xorg.conf.nvidia /etc/X11/
 rm -rf /etc/X11/xdm-optimus
 cp -a install-files/xdm-optimus /etc/X11/
 cp install-files/xdm-optimus.script /etc/init.d/xdm-optimus
-cp install-files/xdm-optimus.bin /usr/bin/xdm-optimus
 cp install-files/virtualgl.conf /etc/modprobe.d/
 cp install-files/optimusXserver /usr/local/bin/
 
@@ -102,11 +101,13 @@ if [ "$ARCH" = "x86_64" ]; then
 echo
 echo "64-bit system detected"
 echo
+cp install-files/xdm-optimus-64.bin /usr/bin/xdm-optimus
 dpkg -i install-files/VirtualGL_amd64.deb
 elif [ "$ARCH" = "i686" ]; then
 echo
 echo "32-bit system detected"
 echo
+cp install-files/xdm-optimus-32.bin /usr/bin/xdm-optimus
 dpkg -i install-files/VirtualGL_i386.deb
 fi
 
