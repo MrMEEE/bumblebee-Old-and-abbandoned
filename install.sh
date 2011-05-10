@@ -27,6 +27,9 @@
 
 ROOT_UID=0
 
+#Determine Arch x86_64 or i686
+ARCH=`uname -m`
+
 if [ $UID != $ROOT_UID ]; then
     echo "You don't have sufficient privileges to run this script."
     echo
@@ -41,14 +44,15 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.0.1"
+echo "Welcome to the bumblebee installation v.1.1"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
 echo
 echo "Please note that this script will only work with 64-bit Debian Based machines"
 echo "and has only been tested on Ubuntu Natty 11.04 but should work on others as well"
-echo "I will add support for RPM-based and 32-bit later.. or somebody else might..."
+echo "from version v1.1 support for 32-bit Ubuntu has been added"
+echo "I will add support for RPM-based distributions later.. or somebody else might..."
 echo "Remember... This is OpenSource :D"
 echo
 echo "THIS SCRIPT MUST BE RUN WITH SUDO"
@@ -93,7 +97,19 @@ cp install-files/xdm-optimus.script /etc/init.d/xdm-optimus
 cp install-files/xdm-optimus.bin /usr/bin/xdm-optimus
 cp install-files/virtualgl.conf /etc/modprobe.d/
 cp install-files/optimusXserver /usr/local/bin/
+
+if [ "$ARCH" = "x86_64" ]; then
+echo
+echo "64-bit system detected"
+echo
 dpkg -i install-files/VirtualGL_amd64.deb
+elif [ "$ARCH" = "i686" ]; then
+echo
+echo "32-bit system detected"
+echo
+dpkg -i install-files/VirtualGL_i386.deb
+fi
+
 chmod +x /etc/init.d/xdm-optimus
 chmod +x /usr/bin/xdm-optimus
 
@@ -144,6 +160,7 @@ echo "6) Dell Vostro 3300"
 echo "7) Dell XPS 15 (L502x)"
 echo "8) Dell Vostro 3400"
 echo "9) Toshiba Satellite M645-SP4132L"
+echo "10) Asus U43JC"
 echo
 echo "97) Manually Set Output to CRT-0"
 echo "98) Manually Set Output to DFP-0"
@@ -188,6 +205,10 @@ CONNECTEDMONITOR="CRT-0"
 ;;
 
 9)
+CONNECTEDMONITOR="CRT-0"
+;;
+
+10)
 CONNECTEDMONITOR="CRT-0"
 ;;
     
@@ -298,10 +319,23 @@ export VGL_DISPLAY
 VGL_COMPRESS=$IMAGETRANSPORT
 export VGL_COMPRESS
 VGL_READBACK=fbo
-export VGL_READBACK
+export VGL_READBACK" >> /etc/bash.bashrc
 
-alias optirun32='vglrun -ld /usr/lib32/nvidia-current'
+echo "alias optirun32='vglrun -ld /usr/lib32/nvidia-current'
 alias optirun64='vglrun -ld /usr/lib64/nvidia-current'" >> /etc/bash.bashrc
+
+if [ "$ARCH" = "x86_64" ]; then
+ echo
+ echo "64-bit system detected - Configuring"
+ echo 
+ echo "alias optirun32='vglrun -ld /usr/lib32/nvidia-current'
+ alias optirun64='vglrun -ld /usr/lib64/nvidia-current'" >> /etc/bash.bashrc
+elif [ "$ARCH" = "i686" ]; then
+ echo
+ echo "32-bit system detected - Configuring"
+ echo
+ echo "alias optirun='vglrun -ld /usr/lib/nvidia-current'" >> /etc/bash.bashrc
+fi
 
 echo '#!/bin/sh' > /usr/bin/vglclient-service
 echo 'vglclient -gl' >> /usr/bin/vglclient-service
@@ -323,8 +357,12 @@ echo "In KDE this is done by this script.. Thanks to Peter Liedler.."
 echo
 echo "In GNOME this is done by placing a shortcut in ~/.config/autostart/ or using the Adminstration->Sessions GUI"
 echo
+if [ "$ARCH" = "x86_64" ]; then
 echo "After that you should be able to start applications with \"optirun32 <application>\" or \"optirun64 <application>\""
 echo "optirun32 can be used for legacy 32-bit applications and Wine Games.. Everything else should work on optirun64"
+elif [ "$ARCH" = "i686" ]; then
+echo "After that you should be able to start applications with \"optirun <application>\"."
+fi
 echo "But... if one doesn't work... try the other"
 echo
 echo "Good luck... MrMEEE / Martin Juhl"
