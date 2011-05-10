@@ -44,7 +44,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.1.2"
+echo "Welcome to the bumblebee installation v.1.2"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -96,6 +96,8 @@ cp -a install-files/xdm-optimus /etc/X11/
 cp install-files/xdm-optimus.script /etc/init.d/xdm-optimus
 cp install-files/virtualgl.conf /etc/modprobe.d/
 cp install-files/optimusXserver /usr/local/bin/
+cp install-files/bumblebee-bugreport /usr/local/bin/
+cp install-files/bumblebee-uninstall /usr/local/bin/
 
 if [ "$ARCH" = "x86_64" ]; then
 echo
@@ -113,6 +115,8 @@ fi
 
 chmod +x /etc/init.d/xdm-optimus
 chmod +x /usr/bin/xdm-optimus
+chmod +x /usr/local/bin/optimusXserver
+chmod +x /usr/local/bin/bumblebee-bugreport
 
 depmod -a
 
@@ -343,7 +347,16 @@ if [ -d $HOME/.kde/Autostart ]; then
    	rm $HOME/.kde/Autostart/vglclient-service
    fi
    ln -s /usr/bin/vglclient-service $HOME/.kde/Autostart/vglclient-service
+elif [ -d $HOME/.config/autostart ]; then
+   if [ -f $HOME/.config/autostart/vlgclient-service ]; then
+        rm $HOME/.config/autostart/vglclient-service
+   fi
+   ln -s /usr/bin/vglclient-service $HOME/.config/autostart/vglclient-service
 fi
+
+/etc/init.d/xdm-optimus start
+/usr/bin/vglclient-service &
+
 echo
 echo
 echo
@@ -353,7 +366,7 @@ echo "Now you need to make sure that the command \"vglclient -gl\" is run after 
 echo
 echo "In KDE this is done by this script.. Thanks to Peter Liedler.."
 echo
-echo "In GNOME this is done by placing a shortcut in ~/.config/autostart/ or using the Adminstration->Sessions GUI"
+echo "In GNOME this is done by this script.. Thanks to Peter Liedler.."
 echo
 if [ "$ARCH" = "x86_64" ]; then
 echo "After that you should be able to start applications with \"optirun32 <application>\" or \"optirun64 <application>\""
@@ -362,6 +375,11 @@ echo "But... if one doesn't work... try the other"
 elif [ "$ARCH" = "i686" ]; then
 echo "After that you should be able to start applications with \"optirun <application>\"."
 fi
+echo
+echo "If you have any problems in or after the installation, please try to run the bumblebee-uninstall script and then"
+echo "rerun this script... if that doesn't work: please run the bumblebee-bugreport tool and send me a bugreport."
+echo 
+echo "Or even better.. create an issue on github... this really makes bugfixing much easier for me and faster for you"
 echo
 echo "Good luck... MrMEEE / Martin Juhl"
 echo

@@ -1,0 +1,115 @@
+#!/bin/bash
+ 
+#
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# <mj@casalogic.dk> wrote this file. As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return Martin Juhl 
+# ----------------------------------------------------------------------------
+#
+
+#    This file is part of bumblebee.
+#
+#    bumblebee is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    bumblebee is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
+#
+  
+
+ROOT_UID=0
+
+if [ $UID != $ROOT_UID ]; then
+    echo "You don't have sufficient privileges to run this script."
+    echo
+    echo "Please run the script with: sudo bumblebee-uninstall"
+    exit 1
+fi
+
+if [ $HOME = /root ]; then
+    echo "Do not run this script as the root user"
+    echo
+    echo "Please run the script with: sudo bumblebee-uninstall"
+    exit 2
+fi
+
+echo "Welcome to the bumblebee uninstallation"
+echo "Licensed under BEER-WARE License and GPL"
+echo
+echo "This scripts will remove bumblebee completely"
+echo "and also clean up after earlier versions"
+echo
+echo "Are you sure you want to proceed?? (Y/N)"
+echo
+
+read answer
+
+case "$answer" in
+
+y | Y )
+;;
+  
+*)
+exit 0
+;;
+esac
+
+#Kill the nvidia X server
+
+echo 
+echo "Removing nVidia driver package"
+apt-get -y --purge remove nvidia-current
+
+echo
+echo "Restoring old configuration"
+mv /etc/bash.bashrc.optiorig /etc/bash.bashrc
+mv /etc/modprobe.d/blacklist.conf.optiorig /etc/modprobe.d/blacklist.conf
+mv /etc/modules.optiorig /etc/modules
+rm /etc/X11/xorg.conf
+mv /etc/X11/xorg.conf.optiorig /etc/X11/xorg.conf
+rm /etc/X11/xorg.conf.nvidia
+rm -rf /etc/X11/xdm-optimus
+rm /etc/init.d/xdm-optimus
+rm /etc/modprobe.d/virtualgl.conf
+rm /usr/local/bin/optimusXserver
+rm /usr/local/bin/bumblebee-bugreport
+rm /usr/bin/xdm-optimus
+if [ -d /opt/prime-ng ]; then
+rm -rf /opt/prime-ng
+fi
+if [ -d /opt/bumblebee ]; then
+rm -rf /opt/bumblebee
+fi
+
+rm /etc/alternatives/xorg_extra_modules-bumblebee 
+ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules
+
+ldconfig
+
+if [ -f $HOME/.kde/Autostart/vlgclient-service ]; then
+ rm $HOME/.kde/Autostart/vglclient-service
+fi
+
+if [ -f $HOME/.config/autostart/vlgclient-service ]; then
+ rm $HOME/.config/autostart/vglclient-service
+fi
+
+grep -Ev 'VGL|optirun' $HOME/.bashrc > $HOME/.oldbashrc
+mv $HOME/.oldbashrc $HOME/.bashrc
+
+killall -9 vglclient
+
+echo
+echo "bumblebee has been uninstalled :("
+echo
+
+rm /usr/local/bin/bumblebee-uninstall
