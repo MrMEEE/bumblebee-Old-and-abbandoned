@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 
 #
 # ----------------------------------------------------------------------------
@@ -30,6 +30,16 @@ ROOT_UID=0
 #Determine Arch x86_64 or i686
 ARCH=`uname -m`
 
+if [ `cat /etc/issue |grep -nir fedora |wc -l` -gt 0 ]; then
+  DISTRO=FEDORA
+elif [ `cat /etc/issue |grep -nir ubuntu |wc -l` -gt 0 ]; then
+  DISTRO=UBUNTU
+fi
+
+echo
+echo $DISTRO" distribution found"
+echo
+
 if [ $UID != $ROOT_UID ]; then
     echo "You don't have sufficient privileges to run this script."
     echo
@@ -44,18 +54,13 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.2.2"
+echo "Welcome to the bumblebee installation v.1.3"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
 echo
-echo "Please note that this script will only work with 64-bit Debian Based machines"
-echo "and has only been tested on Ubuntu Natty 11.04 but should work on others as well"
-echo "from version v1.1 support for 32-bit Ubuntu has been added"
-echo "I will add support for RPM-based distributions later.. or somebody else might..."
-echo "Remember... This is OpenSource :D"
-echo
-echo "THIS SCRIPT MUST BE RUN WITH SUDO"
+echo "Please note that this script will only work with Ubuntu and Fedora Based machines"
+echo "and has (by me) only been tested on Ubuntu Natty 11.04 and Fedora 14 but should work on others as well"
 echo
 echo "Are you sure you want to proceed?? (Y/N)"
 echo
@@ -73,16 +78,66 @@ exit 0
 esac
 
 clear
+
+BUMBLEBEEPWD=$PWD
 echo
 echo "Installing needed packages"
-apt-get -y install nvidia-current
+if [ $DISTRO = UBUNTU  ]; then
+  apt-get -y install nvidia-current
+  modprobe -r nouveau
+  modprobe nvidia-current
+elif [ $DISTRO = FEDORA  ]; then
+  yum -y install wget binutils gcc kernel-devel mesa-libGL mesa-libGLU
+  rm -rf /tmp/NVIDIA*
+  if [ "$ARCH" = "x86_64" ]; then  
+    wget http://us.download.nvidia.com/XFree86/Linux-x86_64/270.41.06/NVIDIA-Linux-x86_64-270.41.06.run -O /tmp/NVIDIA-Linux-driver.run    
+  elif [ "$ARCH" = "i686" ]; then
+    wget http://us.download.nvidia.com/XFree86/Linux-x86/270.41.06/NVIDIA-Linux-x86-270.41.06.run -O /tmp/NVIDIA-Linux-driver.run
+  fi
+  chmod +x /tmp/NVIDIA-Linux-driver.run
+  /tmp/NVIDIA-Linux-driver.run --no-x-check -a -K
+  cd /tmp/
+  /tmp/NVIDIA-Linux-driver.run -x
+  cd $BUMBLEBEEPWD
+  depmod -a
+  ldconfig 
+  modprobe -r nouveau
+  modprobe nvidia
+  if [ "$ARCH" = "x86_64" ]; then
+   rm -rf /usr/lib64/nvidia-current/
+   rm -rf /usr/lib/nvidia-current/
+   mkdir -p /usr/lib64/nvidia-current/
+   mv /tmp/NVIDIA-Linux-x86_64-270.41.06/* /usr/lib64/nvidia-current/
+   ln -s /usr/lib64/nvidia-current/32 /usr/lib/nvidia-current
+   mkdir -p /usr/lib64/nvidia-current/xorg
+   ln -s /usr/lib64/nvidia-current/libglx.so.270.41.06 /usr/lib64/nvidia-current/xorg/libglx.so
+   ln -s /usr/lib64/nvidia-current/nvidia_drv.so /usr/lib64/nvidia-current/xorg/nvidia_drv.so
+   ln -s /usr/lib64/nvidia-current/xorg /usr/lib/nvidia-current/xorg
+   ln -s /usr/lib64/xorg/ /usr/lib/xorg
+  elif [ "$ARCH" = "i686" ]; then
+   rm -rf /usr/lib/nvidia-current/
+   mkdir -p /usr/lib/nvidia-current/
+   mv /tmp/NVIDIA-Linux-x86-270.41.06/* /usr/lib/nvidia-current/
+   mkdir -p /usr/lib/nvidia-current/xorg
+   ln -s /usr/lib/nvidia-current/libglx.so.270.41.06 /usr/lib/nvidia-current/xorg/libglx.so
+   ln -s /usr/lib/nvidia-current/nvidia_drv.so /usr/lib/nvidia-current/xorg/nvidia_drv.so
+  fi
+
+fi
+
 
 echo
 echo "Backing up Configuration"
+if [ $DISTRO = UBUNTU ]; then
 if [ `cat /etc/bash.bashrc |grep VGL |wc -l` -ne 0 ]; then
    cp /etc/bash.bashrc.optiorig /etc/bash.bashrc
 fi 
-cp -n /etc/bash.bashrc /etc/bash.bashrc.optiorig
+elif [ $DISTRO = FEDORA ]; then
+if [ `cat /etc/bashrc |grep VGL |wc -l` -ne 0 ]; then
+   cp /etc/bashrc.optiorig /etc/bashrc
+fi 
+fi
+
 cp -n /etc/modprobe.d/blacklist.conf /etc/modprobe.d/blacklist.conf.optiorig
 cp -n /etc/modules /etc/modules.optiorig
 cp -n /etc/X11/xorg.conf /etc/X11/xorg.conf.optiorig
@@ -91,40 +146,57 @@ echo
 echo "Installing Optimus Configuration and files"
 cp install-files/xorg.conf.intel /etc/X11/xorg.conf
 cp install-files/xorg.conf.nvidia /etc/X11/
+
+if [ $DISTRO = UBUNTU  ]; then
 rm -rf /etc/X11/xdm-optimus
 cp -a install-files/xdm-optimus /etc/X11/
 cp install-files/xdm-optimus.script /etc/init.d/xdm-optimus
+cp -n /etc/bash.bashrc /etc/bash.bashrc.optiorig
+elif [ $DISTRO = FEDORA  ]; then
+cp install-files/xdm-optimus.script.fedora /etc/init.d/xdm-optimus
+cp -n /etc/bashrc /etc/bashrc.optiorig
+fi 
 cp install-files/virtualgl.conf /etc/modprobe.d/
 cp install-files/optimusXserver /usr/local/bin/
 cp install-files/bumblebee-bugreport /usr/local/bin/
 cp install-files/bumblebee-uninstall /usr/local/bin/
 
-if [ "$ARCH" = "x86_64" ]; then
-echo
-echo "64-bit system detected"
-echo
-cp install-files/xdm-optimus-64.bin /usr/bin/xdm-optimus
-dpkg -i install-files/VirtualGL_amd64.deb
-elif [ "$ARCH" = "i686" ]; then
-echo
-echo "32-bit system detected"
-echo
-cp install-files/xdm-optimus-32.bin /usr/bin/xdm-optimus
-dpkg -i install-files/VirtualGL_i386.deb
+if [ $DISTRO = UBUNTU  ]; then
+ if [ "$ARCH" = "x86_64" ]; then
+  echo
+  echo "64-bit system detected"
+  echo
+  cp install-files/xdm-optimus-64.bin /usr/bin/xdm-optimus
+  dpkg -i install-files/VirtualGL_amd64.deb
+ elif [ "$ARCH" = "i686" ]; then
+  echo
+  echo "32-bit system detected"
+  echo
+  cp install-files/xdm-optimus-32.bin /usr/bin/xdm-optimus
+  dpkg -i install-files/VirtualGL_i386.deb
+ fi
+ chmod +x /usr/bin/xdm-optimus
+ update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
+ rm /etc/alternatives/xorg_extra_modules 
+ ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
+elif [ $DISTRO = FEDORA  ]; then
+ if [ "$ARCH" = "x86_64" ]; then
+  echo
+  echo "64-bit system detected"
+  echo
+  echo $PWD
+  yum -y --nogpgcheck install install-files/VirtualGL.x86_64.rpm
+ elif [ "$ARCH" = "i686" ]; then
+  echo
+  echo "32-bit system detected"
+  echo
+  yum -y --nogpgcheck install install-files/VirtualGL.i386.rpm
+ fi
+ 
 fi
 
-chmod +x /etc/init.d/xdm-optimus
-chmod +x /usr/bin/xdm-optimus
 chmod +x /usr/local/bin/optimusXserver
 chmod +x /usr/local/bin/bumblebee-bugreport
-
-depmod -a
-
-update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
-rm /etc/alternatives/xorg_extra_modules 
-ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
-
-ldconfig
 
 if [ "`cat /etc/modprobe.d/blacklist.conf |grep "blacklist nouveau" |wc -l`" -eq "0" ]; then
 echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
@@ -133,9 +205,6 @@ fi
 if [ "`cat /etc/modules |grep "nvidia-current" |wc -l`" -eq "0" ]; then
 echo "nvidia-current" >> /etc/modules
 fi
-
-modprobe -r nouveau
-modprobe nvidia-current
 
 INTELBUSID=`echo "PCI:"\`lspci |grep VGA |grep Intel |cut -f1 -d:\`":"\`lspci |grep VGA |grep Intel |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep VGA |grep Intel |cut -f2 -d. |cut -f1 -d" "\``
 
@@ -280,7 +349,12 @@ sed -i 's/REPLACEWITHCONNECTEDMONITOR/'$CONNECTEDMONITOR'/g' /etc/X11/xorg.conf.
 
 echo
 echo "Enabling Optimus Service"
+if [ $DISTRO = UBUNTU  ]; then
 update-rc.d xdm-optimus defaults
+elif [ $DISTRO = FEDORA  ]; then
+chkconfig xdm-optimus on
+fi
+
 
 echo
 echo "Setting up Enviroment variables"
@@ -352,6 +426,8 @@ export VGL_COMPRESS
 VGL_READBACK=fbo
 export VGL_READBACK" >> /etc/bash.bashrc
 
+if [ $DISTRO = UBUNTU  ]; then
+
 if [ "$ARCH" = "x86_64" ]; then
  echo
  echo "64-bit system detected - Configuring"
@@ -365,16 +441,33 @@ elif [ "$ARCH" = "i686" ]; then
  echo "alias optirun='vglrun -ld /usr/lib/nvidia-current'" >> /etc/bash.bashrc
 fi
 
+elif [ $DISTRO = FEDORA  ]; then
+
+if [ "$ARCH" = "x86_64" ]; then
+echo
+echo "64-bit system detected - Configuring"
+echo 
+echo "alias optirun32='vglrun -ld /usr/lib/nvidia-current'
+alias optirun64='vglrun -ld /usr/lib64/nvidia-current'" >> /etc/bash.bashrc
+elif [ "$ARCH" = "i686" ]; then
+echo
+echo "32-bit system detected - Configuring"
+echo
+echo "alias optirun='vglrun -ld /usr/lib/nvidia-current'" >> /etc/bash.bashrc
+fi
+
+fi
+
 echo '#!/bin/sh' > /usr/bin/vglclient-service
 echo 'vglclient -gl' >> /usr/bin/vglclient-service
 chmod +x /usr/bin/vglclient-service
 if [ -d $HOME/.kde/Autostart ]; then
-   if [ -f $HOME/.kde/Autostart/vlgclient-service ]; then
+   if [ -f $HOME/.kde/Autostart/vglclient-service ]; then
    	rm $HOME/.kde/Autostart/vglclient-service
    fi
    ln -s /usr/bin/vglclient-service $HOME/.kde/Autostart/vglclient-service
 elif [ -d $HOME/.config/autostart ]; then
-   if [ -f $HOME/.config/autostart/vlgclient-service ]; then
+   if [ -f $HOME/.config/autostart/vglclient-service ]; then
         rm $HOME/.config/autostart/vglclient-service
    fi
    ln -s /usr/bin/vglclient-service $HOME/.config/autostart/vglclient-service
