@@ -185,6 +185,7 @@ echo "10) Asus U43JC"
 echo "11) Samsung RF511"
 echo "12) CLEVO W150HNQ"
 echo "13) Dell XPS 17 (L701x)"
+echo "14) Asus U53JC"
 echo
 echo "97) Manually Set Output to CRT-0"
 echo "98) Manually Set Output to DFP-0"
@@ -248,6 +249,10 @@ CONNECTEDMONITOR="DFP-0"
 CONNECTEDMONITOR="CRT-0"
 ;;
 
+14) 
+CONNECTEDMONITOR="CRT-0"
+;;
+ 
  
 97)
 CONNECTEDMONITOR="CRT-0"
