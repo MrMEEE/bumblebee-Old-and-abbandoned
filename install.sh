@@ -43,14 +43,22 @@ echo
 if [ $UID != $ROOT_UID ]; then
     echo "You don't have sufficient privileges to run this script."
     echo
-    echo "Please run the script with: sudo install.sh"
+    if [ $DISTRO = UBUNTU ]; then
+     echo "Please run the script with: sudo install.sh"
+    elif [ $DISTRO = FEDORA ]; then
+     echo "Please run the script with: sudo -E install.sh"
+    fi
     exit 1
 fi
 
 if [ $HOME = /root ]; then
     echo "Do not run this script as the root user"
     echo
-    echo "Please run the script with: sudo install.sh"
+    if [ $DISTRO = UBUNTU ]; then
+     echo "Please run the script with: sudo install.sh"
+    elif [ $DISTRO = FEDORA ]; then
+     echo "Please run the script with: sudo -E install.sh"
+    fi
     exit 2
 fi
 
@@ -59,7 +67,7 @@ echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
 echo
-echo "Please note that this script will only work with Ubuntu and Fedora Based machines"
+echo "Please note that this script will probably only work with Ubuntu and Fedora Based machines"
 echo "and has (by me) only been tested on Ubuntu Natty 11.04 and Fedora 14 but should work on others as well"
 echo
 echo "Are you sure you want to proceed?? (Y/N)"
