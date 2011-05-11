@@ -44,7 +44,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.2.1"
+echo "Welcome to the bumblebee installation v.1.2.2"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -140,18 +140,9 @@ modprobe nvidia-current
 INTELBUSID=`echo "PCI:"\`lspci |grep VGA |grep Intel |cut -f1 -d:\`":"\`lspci |grep VGA |grep Intel |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep VGA |grep Intel |cut -f2 -d. |cut -f1 -d" "\``
 
 if [ `lspci |grep VGA |wc -l` -eq 2 ]; then 
-   NVIDIABUSID=`echo "PCI:"\`lspci |grep 3D |grep nVidia |cut -f1 -d:\`":"\`lspci |grep 3D |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep 3D |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``
+   NVIDIABUSID=`echo "PCI:"\`lspci |grep VGA |grep nVidia |cut -f1 -d:\`":"\`lspci |grep VGA |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep VGA |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``
 elif [ `lspci |grep 3D |wc -l` -eq 1 ]; then
-   
-else
-   echo 
-   echo "The BusID of the nVidia card can't be determined"
-   echo "You must correct this manually in /etc/X11/xorg.conf.nvidia"
-   echo "Please report this problem.."
-   echo
-   echo "Press Any Key to continue"
-   echo
-   read 
+   NVIDIABUSID=`echo "PCI:"\`lspci |grep 3D |grep nVidia |cut -f1 -d:\`":"\`lspci |grep 3D |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep 3D |grep nVidia |cut -f2 -d. |cut -f1 -d" "\`   
 fi
 
 
