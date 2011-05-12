@@ -61,7 +61,7 @@ SSD_RELOAD_ARGS="--pidfile $PIDFILE --name $(basename $DAEMON) --signal 1"
 case "$1" in
   start)
       log_daemon_msg "Starting X display manager" "xdm-optimus"
-      LD_LIBRARY_PATH=/usr/lib64/nvidia-current start-stop-daemon --start --quiet $SSD_START_ARGS -- -config /etc/X11/xdm-optimus/xdm-config\
+      LD_LIBRARY_PATH=/usr/lib/nvidia-current start-stop-daemon --start --quiet $SSD_START_ARGS -- -config /etc/X11/xdm-optimus/xdm-config\
         || log_progress_msg "already running"
       log_end_msg 0
   ;;
