@@ -112,6 +112,12 @@ echo
 cp install-files/xdm-optimus-32.bin /usr/bin/xdm-optimus
 dpkg -i install-files/VirtualGL_i386.deb
 fi
+if [ $? -ne 0 ]; then
+  echo
+  echo "Package manager failed to install VirtualGL..."
+  echo
+  exit 20
+fi
 
 chmod +x /etc/init.d/xdm-optimus
 chmod +x /usr/bin/xdm-optimus
