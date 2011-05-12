@@ -62,7 +62,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3"
+echo "Welcome to the bumblebee installation v.1.3.1"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -92,10 +92,23 @@ echo
 echo "Installing needed packages"
 if [ $DISTRO = UBUNTU  ]; then
   apt-get -y install nvidia-current
+  if [ $? -ne 0 ]; then
+   echo
+   echo "Package manager failed to install needed packages..."
+   echo
+   exit 21
+  fi
+          
   modprobe -r nouveau
   modprobe nvidia-current
 elif [ $DISTRO = FEDORA  ]; then
   yum -y install wget binutils gcc kernel-devel mesa-libGL mesa-libGLU
+  if [ $? -ne 0 ]; then
+   echo 
+   echo "Package manager failed to install needed packages..."
+   echo     
+   exit 21       
+  fi
   rm -rf /tmp/NVIDIA*
   if [ "$ARCH" = "x86_64" ]; then  
     wget http://us.download.nvidia.com/XFree86/Linux-x86_64/270.41.06/NVIDIA-Linux-x86_64-270.41.06.run -O /tmp/NVIDIA-Linux-driver.run    
@@ -183,6 +196,12 @@ if [ $DISTRO = UBUNTU  ]; then
   cp install-files/xdm-optimus-32.bin /usr/bin/xdm-optimus
   dpkg -i install-files/VirtualGL_i386.deb
  fi
+ if [ $? -ne 0 ]; then
+  echo
+  echo "Package manager failed to install VirtualGL..."
+  echo
+  exit 20
+ fi
  chmod +x /usr/bin/xdm-optimus
  update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
  rm /etc/alternatives/xorg_extra_modules 
@@ -200,13 +219,12 @@ elif [ $DISTRO = FEDORA  ]; then
   echo
   yum -y --nogpgcheck install install-files/VirtualGL.i386.rpm
  fi
- 
-fi
-if [ $? -ne 0 ]; then
+ if [ $? -ne 0 ]; then
   echo
   echo "Package manager failed to install VirtualGL..."
   echo
   exit 20
+ fi
 fi
 
 chmod +x /usr/local/bin/optimusXserver
