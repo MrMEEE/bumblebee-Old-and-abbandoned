@@ -28,6 +28,13 @@
 
 ROOT_UID=0
 
+if [ `cat /etc/issue |grep -nir fedora |wc -l` -gt 0 ]; then
+ DISTRO=FEDORA
+elif [ `cat /etc/issue |grep -nir ubuntu |wc -l` -gt 0 ]; then
+ DISTRO=UBUNTU  
+fi
+    
+
 if [ $UID != $ROOT_UID ]; then
     echo "You don't have sufficient privileges to run this script."
     echo
@@ -67,7 +74,11 @@ esac
 
 echo 
 echo "Removing nVidia driver package"
-apt-get -y --purge remove nvidia-current
+if [ $DISTRO = UBUNTU  ]; then
+ apt-get -y --purge remove nvidia-current
+elif [ $DISTRO = FEDORA  ]; then
+ yum -y remove binutils gcc kernel-devel
+fi
 
 echo
 echo "Restoring old configuration"
@@ -83,6 +94,8 @@ rm /etc/modprobe.d/virtualgl.conf
 rm /usr/local/bin/optimusXserver
 rm /usr/local/bin/bumblebee-bugreport
 rm /usr/bin/xdm-optimus
+rm -rf /usr/lib64/nvidia-current
+rm -rf /usr/lib/nvidia-current
 if [ -d /opt/prime-ng ]; then
 rm -rf /opt/prime-ng
 fi
@@ -95,11 +108,11 @@ ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules
 
 ldconfig
 
-if [ -f $HOME/.kde/Autostart/vlgclient-service ]; then
+if [ -f $HOME/.kde/Autostart/vglclient-service ]; then
  rm $HOME/.kde/Autostart/vglclient-service
 fi
 
-if [ -f $HOME/.config/autostart/vlgclient-service ]; then
+if [ -f $HOME/.config/autostart/vglclient-service ]; then
  rm $HOME/.config/autostart/vglclient-service
 fi
 
