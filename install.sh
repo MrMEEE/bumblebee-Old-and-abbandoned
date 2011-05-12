@@ -62,7 +62,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.3"
+echo "Welcome to the bumblebee installation v.1.3.4"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -91,6 +91,19 @@ BUMBLEBEEPWD=$PWD
 echo
 echo "Installing needed packages"
 if [ $DISTRO = UBUNTU  ]; then
+ VERSION=`cat /etc/issue | cut -f2 -d" "`
+ if [ $VERSION = 11.04 ]; then 
+   echo
+   echo "Ubuntu 11.04 Detected" 
+   echo
+  else 
+   echo
+   echo "Ubuntu "$VERSION" Detected"
+   echo "Adding X-Swat Driver Repository"
+   echo
+   apt-add-repository ppa:ubuntu-x-swat/x-updates
+  fi
+  apt-get update
   apt-get -y install nvidia-current
   if [ $? -ne 0 ]; then
    echo
