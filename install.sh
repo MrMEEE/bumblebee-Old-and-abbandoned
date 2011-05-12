@@ -282,11 +282,10 @@ echo "6) Dell Vostro 3300"
 echo "7) Dell XPS 15 (L502x)"
 echo "8) Dell Vostro 3400"
 echo "9) Toshiba Satellite M645-SP4132L"
-echo "10) Asus U43JC"
+echo "10) Asus U43JC/U35JC/U43JC/U53JC/K52JC"
 echo "11) Samsung RF511"
 echo "12) CLEVO W150HNQ"
 echo "13) Dell XPS 17 (L701x)"
-echo "14) Asus U53JC/K52JC"
 echo
 echo "97) Manually Set Output to CRT-0"
 echo "98) Manually Set Output to DFP-0"
@@ -350,10 +349,6 @@ CONNECTEDMONITOR="DFP-0"
 CONNECTEDMONITOR="CRT-0"
 ;;
 
-14) 
-CONNECTEDMONITOR="CRT-0"
-;;
- 
  
 97)
 CONNECTEDMONITOR="CRT-0"
