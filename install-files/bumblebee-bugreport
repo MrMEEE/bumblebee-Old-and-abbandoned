@@ -94,7 +94,7 @@ echo "dmidecode" >> /tmp/bug-report/bumblebee-report
 echo >> /tmp/bug-report/bumblebee-report
 dmidecode >> /tmp/bug-report/bumblebee-report
 
-tar zcf $HOME/bumblebee-bugreport-`date +%x`.tar.gz /tmp/bug-report/
+tar zcf $HOME/bumblebee-bugreport-`date +%F`.tar.gz /tmp/bug-report/
 
 echo "Bug report generated"
 echo
