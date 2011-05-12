@@ -34,6 +34,14 @@ if [ `cat /etc/issue |grep -nir fedora |wc -l` -gt 0 ]; then
   DISTRO=FEDORA
 elif [ `cat /etc/issue |grep -nir ubuntu |wc -l` -gt 0 ]; then
   DISTRO=UBUNTU
+elif [ `cat /etc/issue |grep -nir "Arch Linux" |wc -l` -gt 0  ]; then
+  DISTRO=ARCH
+  echo "You are running Arch Linux, please see the buildscript here for support:"
+  echo
+  echo "http://aur.archlinux.org/packages.php?ID=48866"
+  echo 
+  read
+  exit 0
 fi
 
 echo
@@ -62,7 +70,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.5"
+echo "Welcome to the bumblebee installation v.1.3.6"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
