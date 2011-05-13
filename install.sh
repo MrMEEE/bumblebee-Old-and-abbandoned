@@ -70,7 +70,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.8"
+echo "Welcome to the bumblebee installation v.1.3.9"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -202,6 +202,14 @@ cp install-files/virtualgl.conf /etc/modprobe.d/
 cp install-files/optimusXserver /usr/local/bin/
 cp install-files/bumblebee-bugreport /usr/local/bin/
 cp install-files/bumblebee-uninstall /usr/local/bin/
+if [ "$ARCH" = "x86_64" ]; then
+ cp install-files/optirun32 /usr/local/bin/
+ cp install-files/optirun64 /usr/local/bin/
+ chmod +x /usr/local/bin/optirun*
+else
+ cp install-files/optirun32 /usr/local/bin/optirun
+ chmod +x /usr/local/bin/optirun
+fi
 
 if [ $DISTRO = UBUNTU  ]; then
  if [ "$ARCH" = "x86_64" ]; then
@@ -479,43 +487,20 @@ esac
 done
 
 
-echo "VGL_DISPLAY=:1
-export VGL_DISPLAY
-VGL_COMPRESS=$IMAGETRANSPORT
-export VGL_COMPRESS
-VGL_READBACK=fbo
-export VGL_READBACK" >> /etc/bash.bashrc
-
 if [ $DISTRO = UBUNTU  ]; then
-
-if [ "$ARCH" = "x86_64" ]; then
- echo
- echo "64-bit system detected - Configuring"
- echo 
- echo "alias optirun32='vglrun -ld /usr/lib32/nvidia-current'
- alias optirun64='vglrun -ld /usr/lib64/nvidia-current'" >> /etc/bash.bashrc
-elif [ "$ARCH" = "i686" ]; then
- echo
- echo "32-bit system detected - Configuring"
- echo
- echo "alias optirun='vglrun -ld /usr/lib/nvidia-current'" >> /etc/bash.bashrc
-fi
-
+ echo "VGL_DISPLAY=:1
+ export VGL_DISPLAY
+ VGL_COMPRESS=$IMAGETRANSPORT
+ export VGL_COMPRESS
+ VGL_READBACK=fbo
+ export VGL_READBACK" >> /etc/bash.bashrc
 elif [ $DISTRO = FEDORA  ]; then
-
-if [ "$ARCH" = "x86_64" ]; then
-echo
-echo "64-bit system detected - Configuring"
-echo 
-echo "alias optirun32='vglrun -ld /usr/lib/nvidia-current'
-alias optirun64='vglrun -ld /usr/lib64/nvidia-current'" >> /etc/bashrc
-elif [ "$ARCH" = "i686" ]; then
-echo
-echo "32-bit system detected - Configuring"
-echo
-echo "alias optirun='vglrun -ld /usr/lib/nvidia-current'" >> /etc/bashrc
-fi
-
+ echo "VGL_DISPLAY=:1
+ export VGL_DISPLAY
+ VGL_COMPRESS=$IMAGETRANSPORT
+ export VGL_COMPRESS
+ VGL_READBACK=fbo
+ export VGL_READBACK" >> /etc/bashrc
 fi
 
 echo '#!/bin/sh' > /usr/bin/vglclient-service
