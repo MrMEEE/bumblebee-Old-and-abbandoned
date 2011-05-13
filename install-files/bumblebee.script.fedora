@@ -7,19 +7,19 @@
 # chkconfig:	5 98 02
 #
 # description:  bumblebee optimus X server
-# processname:  xdm-optimus
+# processname:  bumblebee
 #
 
 # source function library
 
 . /etc/rc.d/init.d/functions
 
-lockfile=/var/lock/xdm-optimus
+lockfile=/var/lock/bumblebee
 
 RETVAL=0
 
 start() {
-	echo -n $"Starting up optimus X server: "
+	echo -n $"Starting up bumblebee X server: "
 	/usr/local/bin/optimusXserver -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9 &
 	touch "$lockfile" && success || failure
 	RETVAL=$?
@@ -27,7 +27,7 @@ start() {
 }
 
 stop() {
-	echo -n $"Stopping optimus X server: "
+	echo -n $"Stopping bumblebee X server: "
 	kill `ps aux | grep "/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia" |grep -Ev grep |awk '/^root/{print $2}'`
 	/bin/rm "$lockfile" 2> /dev/null && success || failure
 	RETVAL=$?
@@ -51,10 +51,10 @@ case "$1" in
 	;;
   status)
 	if [ -f $lockfile ]; then
-		echo $"Bumblebee Optimus Server is running."
+		echo $"Bumblebee X Server is running."
 		RETVAL=0
 	else
-		echo $"Bumblebee Optimus Server is not running."
+		echo $"Bumblebee X Server is not running."
 		RETVAL=3
 	fi
 	;;

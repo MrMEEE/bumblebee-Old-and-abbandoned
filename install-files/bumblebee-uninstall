@@ -89,7 +89,9 @@ rm /etc/X11/xorg.conf
 mv /etc/X11/xorg.conf.optiorig /etc/X11/xorg.conf
 rm /etc/X11/xorg.conf.nvidia
 rm -rf /etc/X11/xdm-optimus
+rm -rf /etc/X11/bumblebee
 rm /etc/init.d/xdm-optimus
+rm /etc/init.d/bumblebee
 rm /etc/modprobe.d/virtualgl.conf
 rm /usr/local/bin/optimusXserver
 rm /usr/local/bin/bumblebee-bugreport

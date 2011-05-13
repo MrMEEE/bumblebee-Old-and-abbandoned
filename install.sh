@@ -70,7 +70,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.9"
+echo "Welcome to the bumblebee installation v.1.3.10"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -190,12 +190,12 @@ cp install-files/xorg.conf.intel /etc/X11/xorg.conf
 cp install-files/xorg.conf.nvidia /etc/X11/
 
 if [ $DISTRO = UBUNTU  ]; then
-rm -rf /etc/X11/xdm-optimus
-cp -a install-files/xdm-optimus /etc/X11/
-cp install-files/xdm-optimus.script /etc/init.d/xdm-optimus
+rm -rf /etc/X11/bumblebee
+cp -a install-files/bumblebee /etc/X11/
+cp install-files/bumblebee.script /etc/init.d/bumblebee
 cp -n /etc/bash.bashrc /etc/bash.bashrc.optiorig
 elif [ $DISTRO = FEDORA  ]; then
-cp install-files/xdm-optimus.script.fedora /etc/init.d/xdm-optimus
+cp install-files/bumblebee.script.fedora /etc/init.d/bumblebee
 cp -n /etc/bashrc /etc/bashrc.optiorig
 fi 
 cp install-files/virtualgl.conf /etc/modprobe.d/
@@ -216,13 +216,11 @@ if [ $DISTRO = UBUNTU  ]; then
   echo
   echo "64-bit system detected"
   echo
-  cp install-files/xdm-optimus-64.bin /usr/bin/xdm-optimus
   dpkg -i install-files/VirtualGL_amd64.deb
  elif [ "$ARCH" = "i686" ]; then
   echo
   echo "32-bit system detected"
   echo
-  cp install-files/xdm-optimus-32.bin /usr/bin/xdm-optimus
   dpkg -i install-files/VirtualGL_i386.deb
  fi
  if [ $? -ne 0 ]; then
@@ -231,7 +229,6 @@ if [ $DISTRO = UBUNTU  ]; then
   echo
   exit 20
  fi
- chmod +x /usr/bin/xdm-optimus
  update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
  rm /etc/alternatives/xorg_extra_modules 
  ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
@@ -418,9 +415,9 @@ sed -i 's/REPLACEWITHCONNECTEDMONITOR/'$CONNECTEDMONITOR'/g' /etc/X11/xorg.conf.
 echo
 echo "Enabling Optimus Service"
 if [ $DISTRO = UBUNTU  ]; then
-update-rc.d xdm-optimus defaults
+update-rc.d bumblebee defaults
 elif [ $DISTRO = FEDORA  ]; then
-chkconfig xdm-optimus on
+chkconfig bumblebee on
 fi
 
 
@@ -518,7 +515,7 @@ elif [ -d $HOME/.config/autostart ]; then
    ln -s /usr/bin/vglclient-service $HOME/.config/autostart/vglclient-service
 fi
 
-/etc/init.d/xdm-optimus start
+/etc/init.d/bumblebee start
 /usr/bin/vglclient-service &
 
 echo

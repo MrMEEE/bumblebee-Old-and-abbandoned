@@ -52,7 +52,7 @@ mkdir -p /tmp/bug-report
 cp /var/log/Xorg.* /tmp/bug-report/
 cp /etc/X11/xorg.conf /tmp/bug-report/
 cp /etc/X11/xorg.conf.nvidia /tmp/bug-report/
-cp /var/log/xdm-optimus.* /tmp/bug-report/
+cp /var/log/bumblebee.* /tmp/bug-report/
 cp /etc/bash.bashrc /tmp/bug-report/
 
 
