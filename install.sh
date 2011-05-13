@@ -295,18 +295,18 @@ while [ "$CONNECTEDMONITOR" = "UNDEFINED" ]; do
 echo
 echo "Select your Laptop:"
 echo "1) Alienware M11X"
-echo "2) Dell XPS 15"
-echo "3) Asus N61Jv (X64Jv)"
+echo "2) Dell XPS 15/17"
+echo "3) CLEVO W150HNQ"
 echo "4) Asus EeePC 1215N"
 echo "5) Acer Aspire 5745PG"
 echo "6) Dell Vostro 3300"
-echo "7) Dell XPS 15 (L502x)"
-echo "8) Dell Vostro 3400"
+echo "7) Dell Vostro 3400"
+echo "8) Samsung RF511"
 echo "9) Toshiba Satellite M645-SP4132L"
-echo "10) Asus U43JC/U35JC/U43JC/U53JC/K52JC/X52JC"
-echo "11) Samsung RF511"
-echo "12) CLEVO W150HNQ"
-echo "13) Dell XPS 17 (L701x)"
+echo "10) Asus U43JC/U35JC/U43JC/U53JC/K52JC/X52JC/N53SV/N61JV/X64JV"
+#echo "11) "
+#echo "12) "
+#echo "13) "
 echo
 echo "97) Manually Set Output to CRT-0"
 echo "98) Manually Set Output to DFP-0"
@@ -327,7 +327,7 @@ CONNECTEDMONITOR="CRT-0"
 ;;
 
 3)  
-CONNECTEDMONITOR="CRT-0"
+CONNECTEDMONITOR="DFP-0"
 ;;
 
 4)  
@@ -358,17 +358,17 @@ CONNECTEDMONITOR="CRT-0"
 CONNECTEDMONITOR="CRT-0"
 ;;
 
-11) 
-CONNECTEDMONITOR="CRT-0"
-;;
+#11) 
+#CONNECTEDMONITOR=""
+#;;
 
-12)
-CONNECTEDMONITOR="DFP-0"
-;;
+#12)
+#CONNECTEDMONITOR=""
+#;;
    
-13)
-CONNECTEDMONITOR="CRT-0"
-;;
+#13)
+#CONNECTEDMONITOR=""
+#;;
 
  
 97)
