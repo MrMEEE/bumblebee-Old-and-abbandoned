@@ -70,7 +70,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.6"
+echo "Welcome to the bumblebee installation v.1.3.7"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -303,7 +303,7 @@ echo "6) Dell Vostro 3300"
 echo "7) Dell Vostro 3400"
 echo "8) Samsung RF511"
 echo "9) Toshiba Satellite M645-SP4132L"
-echo "10) Asus U43JC/U35JC/U43JC/U53JC/K52JC/X52JC/N53SV/N61JV/X64JV"
+echo "10) Asus U35J/U43JC/U35JC/U43JC/U53JC/K52JC/X52JC/N53SV/N61JV/X64JV"
 #echo "11) "
 #echo "12) "
 #echo "13) "
