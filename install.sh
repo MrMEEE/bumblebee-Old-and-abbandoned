@@ -1,5 +1,18 @@
 #!/bin/bash -l
 
+# ----------------------------------------------------------------------------
+# "Red Bull License"
+# <mj@casalogic.dk> wrote this file and is providing free support
+# in any spare time. If you need extended support, you can fuel him up by
+# donating a Red Bull here to get him through the nights..:
+#
+# https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=mj%40casalogic
+# %2edk&lc=US&item_name=The%20Bumblebee%20Project%20by%20Martin%20Juhl&amount=
+# 3%2e00&currency_code=EUR&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateC
+# C_LG%2egif%3aNonHosted
+# 
+# ----------------------------------------------------------------------------
+
 #
 # ----------------------------------------------------------------------------
 # "THE BEER-WARE LICENSE" (Revision 42):
@@ -71,7 +84,7 @@ if [ $HOME = /root ]; then
 fi
 
 echo "Welcome to the bumblebee installation v.1.3.11"
-echo "Licensed under BEER-WARE License and GPL"
+echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
 echo
