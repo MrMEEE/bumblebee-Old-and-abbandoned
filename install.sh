@@ -70,7 +70,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.7"
+echo "Welcome to the bumblebee installation v.1.3.8"
 echo "Licensed under BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -100,7 +100,7 @@ echo
 echo "Installing needed packages"
 if [ $DISTRO = UBUNTU  ]; then
  VERSION=`cat /etc/issue | cut -f2 -d" "`
- if [ $VERSION = 11.04 ]; then 
+  if [ $VERSION = 11.04 ]; then 
    echo
    echo "Ubuntu 11.04 Detected" 
    echo
@@ -227,6 +227,7 @@ if [ $DISTRO = UBUNTU  ]; then
  update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
  rm /etc/alternatives/xorg_extra_modules 
  ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
+ ldconfig
 elif [ $DISTRO = FEDORA  ]; then
  if [ "$ARCH" = "x86_64" ]; then
   echo
