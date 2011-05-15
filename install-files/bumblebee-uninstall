@@ -77,7 +77,8 @@ echo "Removing nVidia driver package"
 if [ $DISTRO = UBUNTU  ]; then
  apt-get -y --purge remove nvidia-current
 elif [ $DISTRO = FEDORA  ]; then
- yum -y remove binutils gcc kernel-devel
+ yum -y remove VirtualGL
+ 
 fi
 
 echo
