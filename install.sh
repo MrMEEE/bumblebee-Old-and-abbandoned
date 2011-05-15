@@ -83,7 +83,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.11"
+echo "Welcome to the bumblebee installation v.1.3.13"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -167,8 +167,10 @@ elif [ $DISTRO = FEDORA  ]; then
    mkdir -p /usr/lib64/nvidia-current/xorg
    ln -s /usr/lib64/nvidia-current/libglx.so.270.41.06 /usr/lib64/nvidia-current/xorg/libglx.so
    ln -s /usr/lib64/nvidia-current/nvidia_drv.so /usr/lib64/nvidia-current/xorg/nvidia_drv.so
-   ln -s /usr/lib64/nvidia-current/xorg /usr/lib/nvidia-current/xorg
-   ln -s /usr/lib64/xorg/ /usr/lib/xorg
+   rm -rf /usr/lib64/nvidia-current/xorg/xorg
+   ln -s /usr/lib64/nvidia-current/xorg/ /usr/lib32/nvidia-current/xorg
+   rm -rf /usr/lib64/xorg/xorg
+   ln -s /usr/lib64/xorg/ /usr/lib32/xorg
   elif [ "$ARCH" = "i686" ]; then
    rm -rf /usr/lib/nvidia-current/
    mkdir -p /usr/lib/nvidia-current/
