@@ -83,7 +83,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.14"
+echo "Welcome to the bumblebee installation v.1.3.15"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -247,6 +247,7 @@ if [ $DISTRO = UBUNTU  ]; then
  update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
  rm /etc/alternatives/xorg_extra_modules
  rm /etc/alternatives/xorg_extra_modules-bumblebee 
+ rm /usr/lib/nvidia-current/xorg/xorg
  ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
  ldconfig
 elif [ $DISTRO = FEDORA  ]; then
