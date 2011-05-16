@@ -43,10 +43,16 @@ ROOT_UID=0
 #Determine Arch x86_64 or i686
 ARCH=`uname -m`
 
+#Get tools location 
+LSPCI=`whereis lspci | gawk -F' ' '{ print $2 }'`
+MODPROBE=`whereis modprobe | gawk -F' ' '{ print $2 }'`
+
 if [ `cat /etc/issue |grep -nir fedora |wc -l` -gt 0 ]; then
   DISTRO=FEDORA
 elif [ `cat /etc/issue |grep -nir ubuntu |wc -l` -gt 0 ]; then
   DISTRO=UBUNTU
+elif [ `cat /etc/issue |grep -nir openSUSE |wc -l` -gt 0 ]; then
+  DISTRO=OPENSUSE
 elif [ `cat /etc/issue |grep -nir "Arch Linux" |wc -l` -gt 0  ]; then
   DISTRO=ARCH
   echo "You are running Arch Linux, please see the buildscript here for support:"
@@ -83,7 +89,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.16"
+echo "Welcome to the bumblebee installation v.1.3.17"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -92,7 +98,6 @@ echo "Please note that this script will probably only work with Ubuntu and Fedor
 echo "and has (by me) only been tested on Ubuntu Natty 11.04 and Fedora 14 but should work on others as well"
 echo
 echo "Are you sure you want to proceed?? (Y/N)"
-echo
 
 read answer
 
@@ -111,6 +116,7 @@ clear
 BUMBLEBEEPWD=$PWD
 echo
 echo "Installing needed packages"
+
 if [ $DISTRO = UBUNTU  ]; then
  VERSION=`cat /etc/issue | cut -f2 -d" "`
   if [ $VERSION = 11.04 ]; then 
@@ -133,8 +139,8 @@ if [ $DISTRO = UBUNTU  ]; then
    exit 21
   fi
           
-  modprobe -r nouveau
-  modprobe nvidia-current
+  ${MODPROBE} -r nouveau
+  ${MODPROBE} nvidia-current
 elif [ $DISTRO = FEDORA  ]; then
   yum -y install wget binutils gcc kernel-devel mesa-libGL mesa-libGLU
   if [ $? -ne 0 ]; then
@@ -144,10 +150,13 @@ elif [ $DISTRO = FEDORA  ]; then
    exit 21       
   fi
   rm -rf /tmp/NVIDIA*
+  echo "Getting latest NVidia drivers version"
+  NV_DRIVERS_VERSION=`wget -q -O - http://www.nvidia.com/object/unix.html | grep "Linux x86_64/AMD64/EM64T" | cut -f5 -d">" | cut -f1 -d"<"`
+  echo "Latest NVidia drivers version is $NV_DRIVERS_VERSION"
   if [ "$ARCH" = "x86_64" ]; then  
-    wget http://us.download.nvidia.com/XFree86/Linux-x86_64/270.41.06/NVIDIA-Linux-x86_64-270.41.06.run -O /tmp/NVIDIA-Linux-driver.run    
+    wget http://us.download.nvidia.com/XFree86/Linux-x86_64/${NV_DRIVERS_VERSION}/NVIDIA-Linux-x86_64-${NV_DRIVERS_VERSION}.run -O /tmp/NVIDIA-Linux-driver.run    
   elif [ "$ARCH" = "i686" ]; then
-    wget http://us.download.nvidia.com/XFree86/Linux-x86/270.41.06/NVIDIA-Linux-x86-270.41.06.run -O /tmp/NVIDIA-Linux-driver.run
+    wget http://us.download.nvidia.com/XFree86/Linux-x86/${NV_DRIVERS_VERSION}/NVIDIA-Linux-x86-${NV_DRIVERS_VERSION}.run -O /tmp/NVIDIA-Linux-driver.run
   fi
   chmod +x /tmp/NVIDIA-Linux-driver.run
   /tmp/NVIDIA-Linux-driver.run --no-x-check -a -K
@@ -156,16 +165,16 @@ elif [ $DISTRO = FEDORA  ]; then
   cd $BUMBLEBEEPWD
   depmod -a
   ldconfig 
-  modprobe -r nouveau
-  modprobe nvidia
+  ${MODPROBE} -r nouveau
+  ${MODPROBE} nvidia
   if [ "$ARCH" = "x86_64" ]; then
    rm -rf /usr/lib64/nvidia-current/
    rm -rf /usr/lib/nvidia-current/
    mkdir -p /usr/lib64/nvidia-current/
-   mv /tmp/NVIDIA-Linux-x86_64-270.41.06/* /usr/lib64/nvidia-current/
+   mv /tmp/NVIDIA-Linux-x86_64-${NV_DRIVERS_VERSION}/* /usr/lib64/nvidia-current/
    ln -s /usr/lib64/nvidia-current/32 /usr/lib/nvidia-current
    mkdir -p /usr/lib64/nvidia-current/xorg
-   ln -s /usr/lib64/nvidia-current/libglx.so.270.41.06 /usr/lib64/nvidia-current/xorg/libglx.so
+   ln -s /usr/lib64/nvidia-current/libglx.so.${NV_DRIVERS_VERSION} /usr/lib64/nvidia-current/xorg/libglx.so
    ln -s /usr/lib64/nvidia-current/nvidia_drv.so /usr/lib64/nvidia-current/xorg/nvidia_drv.so
    rm -rf /usr/lib64/nvidia-current/xorg/xorg
    ln -s /usr/lib64/nvidia-current/xorg/ /usr/lib32/nvidia-current/xorg
@@ -174,12 +183,68 @@ elif [ $DISTRO = FEDORA  ]; then
   elif [ "$ARCH" = "i686" ]; then
    rm -rf /usr/lib/nvidia-current/
    mkdir -p /usr/lib/nvidia-current/
-   mv /tmp/NVIDIA-Linux-x86-270.41.06/* /usr/lib/nvidia-current/
+   mv /tmp/NVIDIA-Linux-x86-${NV_DRIVERS_VERSION}/* /usr/lib/nvidia-current/
    mkdir -p /usr/lib/nvidia-current/xorg
-   ln -s /usr/lib/nvidia-current/libglx.so.270.41.06 /usr/lib/nvidia-current/xorg/libglx.so
+   ln -s /usr/lib/nvidia-current/libglx.so.${NV_DRIVERS_VERSION} /usr/lib/nvidia-current/xorg/libglx.so
    ln -s /usr/lib/nvidia-current/nvidia_drv.so /usr/lib/nvidia-current/xorg/nvidia_drv.so
   fi
+elif [ $DISTRO = OPENSUSE ]; then
+	VERSION=`cat /etc/issue |grep openSUSE | cut -f4 -d" "`
+	echo "Do you want me to install NVidia repository for openSUSE $VERSION (y/n) ?"
+	read answer
+case "$answer" in
+y|Y)
+	zypper ar -f ftp://download.nvidia.com/opensuse/${VERSION}/nvidia
+	if [ $? -ne 0 ]; then
+		echo
+		echo "Package manager failed to install needed packages..."
+		echo
+		exit 21
+	fi
+	zypper update
+;;
 
+n|N)
+echo "NVidia drivers repository will NOT be installed."
+;;
+
+*)
+
+;;
+
+esac
+	echo "What is your NVidia card family ?"
+	echo "1) GF6 or newer"
+	echo "2) FX5XXX"
+	echo "3) GF4 or older"
+	echo "4) Skip NVidia drivers install (you need to do this by yourself in this case)"
+	read card
+case $card in
+1)
+	zypper install x11-video-nvidiaG02
+;;
+
+2)
+	zypper install x11-video-nvidiaG01
+;;
+
+3)
+	zypper install x11-video-nvidiaG01
+;;
+
+4)
+	echo "Skip drivers installation. Please remember that NVidia drivers *HAVE TO BE INSTALLED*"
+;;
+
+*)
+echo
+echo "Please choose a valid option, Press any key to try again"
+read
+;;
+esac
+	
+	${MODPROBE} -r nouveau
+	${MODPROBE} nvidia
 fi
 
 
@@ -192,6 +257,10 @@ fi
 elif [ $DISTRO = FEDORA ]; then
 if [ `cat /etc/bashrc |grep VGL |wc -l` -ne 0 ]; then
    cp /etc/bashrc.optiorig /etc/bashrc
+fi 
+elif [ $DISTRO = OPENSUSE ]; then
+if [ `cat /etc/bash.bashrc |grep VGL |wc -l` -ne 0 ]; then
+   cp /etc/bash.bashrc.optiorig /etc/bash.bashrc
 fi 
 fi
 
@@ -212,6 +281,10 @@ cp -n /etc/bash.bashrc /etc/bash.bashrc.optiorig
 elif [ $DISTRO = FEDORA  ]; then
 cp install-files/bumblebee.script.fedora /etc/init.d/bumblebee
 cp -n /etc/bashrc /etc/bashrc.optiorig
+elif [ $DISTRO = OPENSUSE  ]; then
+cp install-files/bumblebee.script.openSUSE /etc/init.d/bumblebee
+chmod +x /etc/init.d/bumblebee
+cp -n /etc/bash.bashrc /etc/bash.bashrc.optiorig
 fi 
 cp install-files/virtualgl.conf /etc/modprobe.d/
 cp install-files/optimusXserver /usr/local/bin/
@@ -269,6 +342,25 @@ elif [ $DISTRO = FEDORA  ]; then
   echo
   exit 20
  fi
+ elif [ $DISTRO = OPENSUSE  ]; then
+ if [ "$ARCH" = "x86_64" ]; then
+  echo
+  echo "64-bit system detected"
+  echo
+  echo $PWD
+  zypper --no-gpg-check install -l install-files/VirtualGL.x86_64.rpm
+ elif [ "$ARCH" = "i686" ]; then
+  echo
+  echo "32-bit system detected"
+  echo
+  zypper --no-gpg-check install -l install-files/VirtualGL.i386.rpm
+ fi
+ if [ $? -ne 0 ]; then
+  echo
+  echo "Package manager failed to install VirtualGL..."
+  echo
+  exit 20
+ fi
 fi
 
 chmod +x /usr/local/bin/optimusXserver
@@ -282,12 +374,12 @@ if [ "`cat /etc/modules |grep "nvidia-current" |wc -l`" -eq "0" ]; then
 echo "nvidia-current" >> /etc/modules
 fi
 
-INTELBUSID=`echo "PCI:"\`lspci |grep VGA |grep Intel |cut -f1 -d:\`":"\`lspci |grep VGA |grep Intel |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep VGA |grep Intel |cut -f2 -d. |cut -f1 -d" "\``
+INTELBUSID=`echo "PCI:"\`${LSPCI} |grep VGA |grep Intel |cut -f1 -d:\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d. |cut -f1 -d" "\``
 
-if [ `lspci |grep VGA |wc -l` -eq 2 ]; then 
-   NVIDIABUSID=`echo "PCI:"\`lspci |grep VGA |grep nVidia |cut -f1 -d:\`":"\`lspci |grep VGA |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep VGA |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``
-elif [ `lspci |grep 3D |wc -l` -eq 1 ]; then
-   NVIDIABUSID=`echo "PCI:"\`lspci |grep 3D |grep nVidia |cut -f1 -d:\`":"\`lspci |grep 3D |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep 3D |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``   
+if [ `${LSPCI} |grep VGA |wc -l` -eq 2 ]; then 
+   NVIDIABUSID=`echo "PCI:"\`${LSPCI} |grep VGA |grep nVidia |cut -f1 -d:\`":"\`${LSPCI} |grep VGA |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep VGA |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``
+elif [ `${LSPCI} |grep 3D |wc -l` -eq 1 ]; then
+   NVIDIABUSID=`echo "PCI:"\`${LSPCI} |grep 3D |grep nVidia |cut -f1 -d:\`":"\`${LSPCI} |grep 3D |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep 3D |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``   
 else
 echo 
 echo "The BusID of the nVidia card can't be determined"
@@ -435,6 +527,8 @@ if [ $DISTRO = UBUNTU  ]; then
 update-rc.d bumblebee defaults
 elif [ $DISTRO = FEDORA  ]; then
 chkconfig bumblebee on
+elif [ $DISTRO = OPENSUSE  ]; then
+chkconfig bumblebee on
 fi
 
 
@@ -515,12 +609,24 @@ elif [ $DISTRO = FEDORA  ]; then
  export VGL_COMPRESS
  VGL_READBACK=fbo
  export VGL_READBACK" >> /etc/bashrc
+elif [ $DISTRO = OPENSUSE  ]; then
+ echo "VGL_DISPLAY=:1
+ export VGL_DISPLAY
+ VGL_COMPRESS=$IMAGETRANSPORT
+ export VGL_COMPRESS
+ VGL_READBACK=fbo
+ export VGL_READBACK" >> /etc/bash.bashrc
 fi
 
 echo '#!/bin/sh' > /usr/bin/vglclient-service
 echo 'vglclient -gl' >> /usr/bin/vglclient-service
 chmod +x /usr/bin/vglclient-service
-if [ -d $HOME/.kde/Autostart ]; then
+if [ -d $HOME/.kde4/Autostart ]; then
+   if [ -f $HOME/.kde4/Autostart/vglclient-service ]; then
+   	rm $HOME/.kde4/Autostart/vglclient-service
+   fi
+   ln -s /usr/bin/vglclient-service $HOME/.kde4/Autostart/vglclient-service
+elif [ -d $HOME/.kde/Autostart ]; then
    if [ -f $HOME/.kde/Autostart/vglclient-service ]; then
    	rm $HOME/.kde/Autostart/vglclient-service
    fi
