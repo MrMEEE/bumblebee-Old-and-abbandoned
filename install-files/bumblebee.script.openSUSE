@@ -1,0 +1,81 @@
+#! /bin/sh
+#
+# Author: Arnaud Dupuis <a.dupuis@infinityperl.org>
+#
+# /etc/init.d/bumblebee
+#
+#
+### BEGIN INIT INFO
+# Provides: bumblebee
+# Required-Start: 
+# Required-Stop: 
+# Default-Start: 3 5
+# Default-Stop: 0 1 2 6
+# Description: Start the bumblebee optimus X server
+### END INIT INFO
+
+. /etc/rc.status
+
+lockfile=/var/lock/bumblebee
+
+RETVAL=0
+
+start() {
+	echo -n $"Starting up bumblebee X server: "
+	/usr/local/bin/optimusXserver -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9 &
+	touch "$lockfile" && success || failure
+	RETVAL=$?
+	echo
+}
+
+stop() {
+	echo -n $"Stopping bumblebee X server: "
+	kill `ps aux | grep "/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia" |grep -Ev grep |awk '/^root/{print $2}'`
+	/bin/rm "$lockfile" 2> /dev/null && success || failure
+	RETVAL=$?
+	echo
+}
+
+restart() {
+	stop
+	start
+}
+
+case "$1" in
+  start)
+	start
+	# Remember status and be verbose
+        rc_status -v
+	;;
+  stop) 
+	stop
+	# Remember status and be verbose
+        rc_status -v
+	;;
+  try-restart)
+        ## Stop the service and if this succeeds (i.e. the 
+        ## service was running before), start it again.
+        $0 status >/dev/null &&  $0 restart
+
+        # Remember status and be quiet
+        rc_status
+        ;;
+  restart)
+	restart
+	;;
+  status)
+	if [ -f $lockfile ]; then
+		echo $"Bumblebee X Server is running."
+		RETVAL=0
+	else
+		echo $"Bumblebee X Server is not running."
+		RETVAL=3
+	fi
+	;;
+  *)
+	echo $"Usage: $0 {start|stop|status|restart}"
+	exit 1
+esac
+
+exit $RETVAL
+
