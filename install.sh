@@ -83,7 +83,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.15"
+echo "Welcome to the bumblebee installation v.1.3.16"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -222,7 +222,7 @@ if [ "$ARCH" = "x86_64" ]; then
  cp install-files/optirun64 /usr/local/bin/
  chmod +x /usr/local/bin/optirun*
 else
- cp install-files/optirun32 /usr/local/bin/optirun
+ cp install-files/optirun64 /usr/local/bin/optirun
  chmod +x /usr/local/bin/optirun
 fi
 
