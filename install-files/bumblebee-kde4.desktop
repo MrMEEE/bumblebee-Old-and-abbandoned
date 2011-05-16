@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=XSession
+Exec=/usr/local/bin/bumblebee-startkde4
+TryExec=/usr/local/bin/bumblebee-startkde4
+Name=KDE NVidia Optimus 
+Comment=The desktop made by KDE with NVidia Optimus support from the Bumblebee project
+
