@@ -18,9 +18,12 @@ lockfile=/var/lock/bumblebee
 
 RETVAL=0
 
+LD_LIBRARY_PATH=/usr/lib/nvidia-current
+export LD_LIBRARY_PATH
+
 start() {
 	echo -n $"Starting up bumblebee X server: "
-	/usr/local/bin/optimusXserver -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9 &
+	/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9 &
 	touch "$lockfile" && success || failure
 	RETVAL=$?
 	echo

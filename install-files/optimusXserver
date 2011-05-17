@@ -1,2 +1,0 @@
-#!/bin/bash
-LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/bin/X $@

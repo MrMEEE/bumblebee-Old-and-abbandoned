@@ -56,6 +56,9 @@ elif [ `cat /etc/issue |grep -nir ubuntu |wc -l` -gt 0 ]; then
 elif [ `cat /etc/issue |grep -nir openSUSE |wc -l` -gt 0 ]; then
   DISTRO=OPENSUSE
   BASHRC=/etc/bash.bashrc
+elif [ `cat /etc/issue |grep -nir debian |wc -l` -gt 0 ]; then
+  DISTRO=DEBIAN
+  BASHRC=/etc/bash.bashrc
 elif [ `cat /etc/issue |grep -nir "Arch Linux" |wc -l` -gt 0  ]; then
   DISTRO=ARCH
   echo "You are running Arch Linux, please see the buildscript here for support:"
@@ -67,17 +70,17 @@ elif [ `cat /etc/issue |grep -nir "Arch Linux" |wc -l` -gt 0  ]; then
 fi
 
 echo
-echo $DISTRO" distribution found"
+echo $DISTRO" distribution found."
 echo
 
 
 if [ $UID != $ROOT_UID ] || [ $HOME = /root ]; then
   echo "You don't have sufficient privileges to run this script."
   echo
-  echo "Do not run this script as the root user"
+  echo "Do not run this script as the root user."
   echo
   case "$DISTRO" in
-   FEDORA)
+   FEDORA | DEBIAN)
     echo "Please run the script with: sudo -E install.sh"
    ;;
    *)
@@ -87,12 +90,12 @@ if [ $UID != $ROOT_UID ] || [ $HOME = /root ]; then
   exit 1
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.22"
+echo "Welcome to the bumblebee installation v.1.4.0"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
 echo
-echo "Please note that this script will probably only work with Ubuntu and Fedora Based machines"
+echo "Please note that this script will probably only work with Ubuntu, Debian, OpenSuSE and Fedora Based machines"
 echo "and has (by me) only been tested on Ubuntu Natty 11.04 and Fedora 14 but should work on others as well"
 echo
 echo "Are you sure you want to proceed?? (Y/N)"
@@ -114,7 +117,7 @@ clear
 BUMBLEBEEPWD=$PWD
 
 echo
-echo "Installing needed packages"
+echo "Installing needed packages."
 echo 
 
 case "$DISTRO" in
@@ -123,12 +126,12 @@ case "$DISTRO" in
   VERSION=`cat /etc/issue | cut -f2 -d" "`
   if [ $VERSION = 11.04 ]; then 
    echo
-   echo "Ubuntu 11.04 Detected" 
+   echo "Ubuntu 11.04 Detected." 
    echo
   else 
    echo
-   echo "Ubuntu "$VERSION" Detected"
-   echo "Adding X-Swat Driver Repository"
+   echo "Ubuntu "$VERSION" Detected."
+   echo "Adding X-Swat Driver Repository."
    echo
    apt-add-repository ppa:ubuntu-x-swat/x-updates
   fi
@@ -244,6 +247,17 @@ case "$DISTRO" in
     echo "Please choose a valid option, Press any key to try again"
     read
    ;;
+   DEBIAN)
+    apt-get update
+    apt-get -y install nvidia-kernel-dkms
+    if [ $? -ne 0 ]; then
+     echo
+     echo "Package manager failed to install needed packages..."
+     echo "Please check that you have non-free repository enabled."
+     echo
+     exit 21
+    fi
+   ;;
   esac
  ${MODPROBE} -r nouveau
  ${MODPROBE} nvidia
@@ -273,7 +287,6 @@ cp -n $BASHRC $BASHRC.optiorig
 case "$DISTRO" in
 
  UBUNTU)
-  cp install-files/bumblebee.script /etc/init.d/bumblebee
   if [ "$ARCH" = "x86_64" ]; then
    echo
    echo "64-bit system detected"
@@ -291,12 +304,38 @@ case "$DISTRO" in
    echo
    exit 20
   fi
+  cp install-files/bumblebee.script.ubuntu /etc/init.d/bumblebee
   update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
   rm /etc/alternatives/xorg_extra_modules
   rm /etc/alternatives/xorg_extra_modules-bumblebee
   rm /usr/lib/nvidia-current/xorg/xorg
   ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
   ldconfig 
+ ;;
+ DEBIAN)
+ if [ "$ARCH" = "x86_64" ]; then
+  echo
+  echo "64-bit system detected"
+  echo
+  dpkg -i install-files/VirtualGL_amd64.deb
+ elif [ "$ARCH" = "i686" ]; then
+  echo
+  echo "32-bit system detected"
+  echo
+  dpkg -i install-files/VirtualGL_i386.deb
+ fi
+ if [ $? -ne 0 ]; then
+  echo
+  echo "Package manager failed to install VirtualGL..."
+  echo
+  exit 20
+ fi
+ cp install-files/bumblebee.script.debian /etc/init.d/bumblebee
+ update-alternatives --remove libglx.so /usr/lib/nvidia/libglx.so
+ update-alternatives --remove libGL.so.1 /usr/lib/nvidia/libGL.so.1
+ mkdir /usr/local/lib/bumblebee
+ ln -s /usr/lib/nvidia/libglx.so /usr/local/lib/bumblebee/libglx.so
+ ldconfig
  ;;
  FEDORA)
   cp install-files/bumblebee.script.fedora /etc/init.d/bumblebee
@@ -343,11 +382,9 @@ case "$DISTRO" in
 esac
 
 cp install-files/virtualgl.conf /etc/modprobe.d/
-cp install-files/optimusXserver /usr/local/bin/
 cp install-files/bumblebee-bugreport /usr/local/bin/
 cp install-files/bumblebee-uninstall /usr/local/bin/
 chmod +x /etc/init.d/bumblebee
-chmod +x /usr/local/bin/optimusXserver
 chmod +x /usr/local/bin/bumblebee-bugreport
 
 if [ "$ARCH" = "x86_64" ]; then
@@ -359,14 +396,23 @@ else
  chmod +x /usr/local/bin/optirun
 fi
 
-if [ "`cat /etc/modprobe.d/blacklist.conf |grep "blacklist nouveau" |wc -l`" -eq "0" ]; then
-  echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
-fi
+case "$DISTRO" in
 
+UBUNTU)
 if [ "`cat /etc/modules |grep "nvidia-current" |wc -l`" -eq "0" ]; then
   echo "nvidia-current" >> /etc/modules
 fi
+;;
+OPENSUSE | DEBIAN | FEDORA)
+if [ "`cat /etc/modules |grep "nvidia-current" |wc -l`" -eq "0" ]; then
+  echo "nvidia" >> /etc/modules
+fi
+;;
+esac
 
+if [ "`cat /etc/modprobe.d/blacklist.conf |grep "blacklist nouveau" |wc -l`" -eq "0" ]; then
+  echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
+fi
 
 INTELBUSID=`echo "PCI:"\`${LSPCI} |grep VGA |grep Intel |cut -f1 -d:\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d. |cut -f1 -d" "\``
 if [ `${LSPCI} |grep VGA |wc -l` -eq 2 ]; then 
@@ -375,11 +421,11 @@ elif [ `${LSPCI} |grep 3D |wc -l` -eq 1 ]; then
    NVIDIABUSID=`echo "PCI:"\`${LSPCI} |grep 3D |grep nVidia |cut -f1 -d:\`":"\`${LSPCI} |grep 3D |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep 3D |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``   
 else
  echo 
- echo "The BusID of the nVidia card can't be determined"
+ echo "The BusID of the nVidia card can't be determined."
  echo "You must correct this manually in /etc/X11/xorg.conf.nvidia"
  echo "Please report this problem.."
  echo
- echo "Press Any Key to continue"
+ echo "Press Any Key to continue."
  echo
  read 
 fi
@@ -388,7 +434,7 @@ fi
 clear
 
 echo
-echo "Changing Configuration to match your Machine"
+echo "Changing Configuration to match your Machine."
 echo 
 
 sed -i 's/REPLACEWITHBUSID/'$INTELBUSID'/g' /etc/X11/xorg.conf
@@ -518,13 +564,10 @@ echo "Enabling Optimus Service"
 echo
  
 case "$DISTRO" in
- UBUNTU)
+ UBUNTU | DEBIAN)
   update-rc.d bumblebee defaults
  ;;
- FEDORA)
-  chkconfig bumblebee on
- ;;
- OPENSUSE)
+ FEDORA | OPENSUSE)
   chkconfig bumblebee on
  ;;
 esac
@@ -583,7 +626,7 @@ IMAGETRANSPORT="rgb"
 ;;
 *)
 echo
-echo "Please choose a valid option, Press any key to try again"
+echo "Please choose a valid option, Press any key to try again."
 read
 clear
   
@@ -629,14 +672,14 @@ echo "Ok... Installation complete..."
 echo
 echo "Now you need to make sure that the command \"vglclient -gl\" is run after your Desktop Enviroment is started"
 echo
-echo "In KDE this is done by this script.. Thanks to Peter Liedler.."
+echo "In KDE this is done by this script.. Thanks to Peter Liedler."
 echo
-echo "In GNOME this is done by this script.. Thanks to Peter Liedler.."
+echo "In GNOME this is done by this script.. Thanks to Peter Liedler."
 echo
 if [ "$ARCH" = "x86_64" ]; then
 echo "After that you should be able to start applications with \"optirun32 <application>\" or \"optirun64 <application>\""
 echo "optirun32 can be used for legacy 32-bit applications and Wine Games.. Everything else should work on optirun64"
-echo "But... if one doesn't work... try the other"
+echo "But... if one doesn't work... try the other."
 elif [ "$ARCH" = "i686" ]; then
 echo "After that you should be able to start applications with \"optirun <application>\"."
 fi
@@ -644,7 +687,7 @@ echo
 echo "If you have any problems in or after the installation, please try to run the bumblebee-uninstall script and then"
 echo "rerun this script... if that doesn't work: please run the bumblebee-bugreport tool and send me a bugreport."
 echo 
-echo "Or even better.. create an issue on github... this really makes bugfixing much easier for me and faster for you"
+echo "Or even better.. create an issue on github... this really makes bugfixing much easier for me and faster for you."
 echo
 echo "Good luck... MrMEEE / Martin Juhl"
 echo
