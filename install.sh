@@ -49,10 +49,13 @@ MODPROBE=`which modprobe`
 
 if [ `cat /etc/issue |grep -nir fedora |wc -l` -gt 0 ]; then
   DISTRO=FEDORA
+  BASHRC=/etc/bashrc
 elif [ `cat /etc/issue |grep -nir ubuntu |wc -l` -gt 0 ]; then
   DISTRO=UBUNTU
+  BASHRC=/etc/bash.bashrc
 elif [ `cat /etc/issue |grep -nir openSUSE |wc -l` -gt 0 ]; then
   DISTRO=OPENSUSE
+  BASHRC=/etc/bash.bashrc
 elif [ `cat /etc/issue |grep -nir "Arch Linux" |wc -l` -gt 0  ]; then
   DISTRO=ARCH
   echo "You are running Arch Linux, please see the buildscript here for support:"
@@ -67,29 +70,24 @@ echo
 echo $DISTRO" distribution found"
 echo
 
-if [ $UID != $ROOT_UID ]; then
-    echo "You don't have sufficient privileges to run this script."
-    echo
-    if [ $DISTRO = UBUNTU ]; then
-     echo "Please run the script with: sudo install.sh"
-    elif [ $DISTRO = FEDORA ]; then
-     echo "Please run the script with: sudo -E install.sh"
-    fi
-    exit 1
+
+if [ $UID != $ROOT_UID ] || [ $HOME = /root ]; then
+  echo "You don't have sufficient privileges to run this script."
+  echo
+  echo "Do not run this script as the root user"
+  echo
+  case "$DISTRO" in
+   FEDORA)
+    echo "Please run the script with: sudo -E install.sh"
+   ;;
+   *)
+    echo "Please run the script with: sudo install.sh"
+   ;;
+  esac
+  exit 1
 fi
 
-if [ $HOME = /root ]; then
-    echo "Do not run this script as the root user"
-    echo
-    if [ $DISTRO = UBUNTU ]; then
-     echo "Please run the script with: sudo install.sh"
-    elif [ $DISTRO = FEDORA ]; then
-     echo "Please run the script with: sudo -E install.sh"
-    fi
-    exit 2
-fi
-
-echo "Welcome to the bumblebee installation v.1.3.20"
+echo "Welcome to the bumblebee installation v.1.3.21"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -114,11 +112,15 @@ esac
 clear
 
 BUMBLEBEEPWD=$PWD
+
 echo
 echo "Installing needed packages"
+echo 
 
-if [ $DISTRO = UBUNTU  ]; then
- VERSION=`cat /etc/issue | cut -f2 -d" "`
+case "$DISTRO" in
+
+ UBUNTU)
+  VERSION=`cat /etc/issue | cut -f2 -d" "`
   if [ $VERSION = 11.04 ]; then 
    echo
    echo "Ubuntu 11.04 Detected" 
@@ -138,10 +140,11 @@ if [ $DISTRO = UBUNTU  ]; then
    echo
    exit 21
   fi
-          
   ${MODPROBE} -r nouveau
   ${MODPROBE} nvidia-current
-elif [ $DISTRO = FEDORA  ]; then
+ ;;
+ 
+ FEDORA)
   yum -y install wget binutils gcc kernel-devel mesa-libGL mesa-libGLU
   if [ $? -ne 0 ]; then
    echo 
@@ -172,6 +175,7 @@ elif [ $DISTRO = FEDORA  ]; then
   ldconfig 
   ${MODPROBE} -r nouveau
   ${MODPROBE} nvidia
+  
   if [ "$ARCH" = "x86_64" ]; then
    rm -rf /usr/lib64/nvidia-current/
    rm -rf /usr/lib/nvidia-current/
@@ -193,80 +197,65 @@ elif [ $DISTRO = FEDORA  ]; then
    ln -s /usr/lib/nvidia-current/libglx.so.${NV_DRIVERS_VERSION} /usr/lib/nvidia-current/xorg/libglx.so
    ln -s /usr/lib/nvidia-current/nvidia_drv.so /usr/lib/nvidia-current/xorg/nvidia_drv.so
   fi
-elif [ $DISTRO = OPENSUSE ]; then
-	VERSION=`cat /etc/issue |grep openSUSE | cut -f4 -d" "`
-	echo "Do you want me to install NVidia repository for openSUSE $VERSION (y/n) ?"
-	read answer
-case "$answer" in
-y|Y)
-	zypper ar -f ftp://download.nvidia.com/opensuse/${VERSION}/nvidia
-	if [ $? -ne 0 ]; then
-		echo
-		echo "Package manager failed to install needed packages..."
-		echo
-		exit 21
-	fi
-	zypper update
-;;
+ ;;
+ OPENSUSE)
+  VERSION=`cat /etc/issue |grep openSUSE | cut -f4 -d" "`
+  echo "Do you want me to install NVidia repository for openSUSE $VERSION (y/n) ?"
+  read answer
+  case "$answer" in
+   y|Y)
+    zypper ar -f ftp://download.nvidia.com/opensuse/${VERSION}/nvidia
+    if [ $? -ne 0 ]; then
+     echo
+     echo "Package manager failed to install needed packages..."
+     echo
+     exit 21
+    fi
+    zypper update
+   ;;
+   n|N)
+    echo "NVidia drivers repository will NOT be installed."
+   ;;
+   *)
+   ;;
+  esac
+  echo "What is your NVidia card family ?"
+  echo "1) GF6 or newer"
+  echo "2) FX5XXX"
+  echo "3) GF4 or older"
+  echo "4) Skip NVidia drivers install (you need to do this by yourself in this case)"
+  read card
 
-n|N)
-echo "NVidia drivers repository will NOT be installed."
-;;
-
-*)
-
-;;
-
+  case $card in
+   1)
+    zypper install x11-video-nvidiaG02
+   ;;
+   2)
+    zypper install x11-video-nvidiaG01
+   ;;
+   3)
+    zypper install x11-video-nvidiaG01
+   ;;
+   4)
+    echo "Skip drivers installation. Please remember that NVidia drivers *HAVE TO BE INSTALLED*"
+   ;;
+   *)
+    echo
+    echo "Please choose a valid option, Press any key to try again"
+    read
+   ;;
+  esac
+ ${MODPROBE} -r nouveau
+ ${MODPROBE} nvidia
 esac
-	echo "What is your NVidia card family ?"
-	echo "1) GF6 or newer"
-	echo "2) FX5XXX"
-	echo "3) GF4 or older"
-	echo "4) Skip NVidia drivers install (you need to do this by yourself in this case)"
-	read card
-case $card in
-1)
-	zypper install x11-video-nvidiaG02
-;;
-
-2)
-	zypper install x11-video-nvidiaG01
-;;
-
-3)
-	zypper install x11-video-nvidiaG01
-;;
-
-4)
-	echo "Skip drivers installation. Please remember that NVidia drivers *HAVE TO BE INSTALLED*"
-;;
-
-*)
-echo
-echo "Please choose a valid option, Press any key to try again"
-read
-;;
-esac
-	
-	${MODPROBE} -r nouveau
-	${MODPROBE} nvidia
-fi
 
 
 echo
 echo "Backing up Configuration"
-if [ $DISTRO = UBUNTU ]; then
-if [ `cat /etc/bash.bashrc |grep VGL |wc -l` -ne 0 ]; then
-   cp /etc/bash.bashrc.optiorig /etc/bash.bashrc
-fi 
-elif [ $DISTRO = FEDORA ]; then
-if [ `cat /etc/bashrc |grep VGL |wc -l` -ne 0 ]; then
-   cp /etc/bashrc.optiorig /etc/bashrc
-fi 
-elif [ $DISTRO = OPENSUSE ]; then
-if [ `cat /etc/bash.bashrc |grep VGL |wc -l` -ne 0 ]; then
-   cp /etc/bash.bashrc.optiorig /etc/bash.bashrc
-fi 
+echo
+
+if [ `cat $BASHRC |grep VGL |wc -l` -ne 0 ]; then
+   cp $BASHRC.optiorig $BASHRC
 fi
 
 cp -n /etc/modprobe.d/blacklist.conf /etc/modprobe.d/blacklist.conf.optiorig
@@ -275,24 +264,92 @@ cp -n /etc/X11/xorg.conf /etc/X11/xorg.conf.optiorig
 
 echo
 echo "Installing Optimus Configuration and files"
+echo
+
 cp install-files/xorg.conf.intel /etc/X11/xorg.conf
 cp install-files/xorg.conf.nvidia /etc/X11/
+cp -n $BASHRC $BASHRC.optiorig
 
-if [ $DISTRO = UBUNTU  ]; then
-cp install-files/bumblebee.script /etc/init.d/bumblebee
-cp -n /etc/bash.bashrc /etc/bash.bashrc.optiorig
-elif [ $DISTRO = FEDORA  ]; then
-cp install-files/bumblebee.script.fedora /etc/init.d/bumblebee
-cp -n /etc/bashrc /etc/bashrc.optiorig
-elif [ $DISTRO = OPENSUSE  ]; then
-cp install-files/bumblebee.script.openSUSE /etc/init.d/bumblebee
-chmod +x /etc/init.d/bumblebee
-cp -n /etc/bash.bashrc /etc/bash.bashrc.optiorig
-fi 
+case "$DISTRO" in
+
+ UBUNTU)
+  cp install-files/bumblebee.script /etc/init.d/bumblebee
+  if [ "$ARCH" = "x86_64" ]; then
+   echo
+   echo "64-bit system detected"
+   echo
+   dpkg -i install-files/VirtualGL_amd64.deb
+  elif [ "$ARCH" = "i686" ]; then
+   echo
+   echo "32-bit system detected"
+   echo
+   dpkg -i install-files/VirtualGL_i386.deb
+  fi
+  if [ $? -ne 0 ]; then
+   echo
+   echo "Package manager failed to install VirtualGL..."
+   echo
+   exit 20
+  fi
+  update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
+  rm /etc/alternatives/xorg_extra_modules
+  rm /etc/alternatives/xorg_extra_modules-bumblebee
+  rm /usr/lib/nvidia-current/xorg/xorg
+  ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
+  ldconfig 
+ ;;
+ FEDORA)
+  cp install-files/bumblebee.script.fedora /etc/init.d/bumblebee
+  if [ "$ARCH" = "x86_64" ]; then
+   echo
+   echo "64-bit system detected"
+   echo
+   echo $PWD
+   yum -y --nogpgcheck install install-files/VirtualGL.x86_64.rpm
+  elif [ "$ARCH" = "i686" ]; then
+   echo
+   echo "32-bit system detected"
+   echo
+   yum -y --nogpgcheck install install-files/VirtualGL.i386.rpm
+  fi
+  if [ $? -ne 0 ]; then
+   echo
+   echo "Package manager failed to install VirtualGL..."
+   echo
+   exit 20
+  fi
+ ;;
+ OPENSUSE)
+  cp install-files/bumblebee.script.openSUSE /etc/init.d/bumblebee
+  if [ "$ARCH" = "x86_64" ]; then   
+   echo
+   echo "64-bit system detected"
+   echo
+   echo $PWD
+   zypper --no-gpg-check install -l install-files/VirtualGL.x86_64.rpm
+  elif [ "$ARCH" = "i686" ]; then
+   echo
+   echo "32-bit system detected"
+   echo
+   zypper --no-gpg-check install -l install-files/VirtualGL.i386.rpm
+  fi
+  if [ $? -ne 0 ]; then
+   echo
+   echo "Package manager failed to install VirtualGL..."
+   echo
+   exit 20
+  fi
+ ;; 
+esac
+
 cp install-files/virtualgl.conf /etc/modprobe.d/
 cp install-files/optimusXserver /usr/local/bin/
 cp install-files/bumblebee-bugreport /usr/local/bin/
 cp install-files/bumblebee-uninstall /usr/local/bin/
+chmod +x /etc/init.d/bumblebee
+chmod +x /usr/local/bin/optimusXserver
+chmod +x /usr/local/bin/bumblebee-bugreport
+
 if [ "$ARCH" = "x86_64" ]; then
  cp install-files/optirun32 /usr/local/bin/
  cp install-files/optirun64 /usr/local/bin/
@@ -302,97 +359,29 @@ else
  chmod +x /usr/local/bin/optirun
 fi
 
-if [ $DISTRO = UBUNTU  ]; then
- if [ "$ARCH" = "x86_64" ]; then
-  echo
-  echo "64-bit system detected"
-  echo
-  dpkg -i install-files/VirtualGL_amd64.deb
- elif [ "$ARCH" = "i686" ]; then
-  echo
-  echo "32-bit system detected"
-  echo
-  dpkg -i install-files/VirtualGL_i386.deb
- fi
- if [ $? -ne 0 ]; then
-  echo
-  echo "Package manager failed to install VirtualGL..."
-  echo
-  exit 20
- fi
- update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
- rm /etc/alternatives/xorg_extra_modules
- rm /etc/alternatives/xorg_extra_modules-bumblebee 
- rm /usr/lib/nvidia-current/xorg/xorg
- ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
- ldconfig
-elif [ $DISTRO = FEDORA  ]; then
- if [ "$ARCH" = "x86_64" ]; then
-  echo
-  echo "64-bit system detected"
-  echo
-  echo $PWD
-  yum -y --nogpgcheck install install-files/VirtualGL.x86_64.rpm
- elif [ "$ARCH" = "i686" ]; then
-  echo
-  echo "32-bit system detected"
-  echo
-  yum -y --nogpgcheck install install-files/VirtualGL.i386.rpm
- fi
- if [ $? -ne 0 ]; then
-  echo
-  echo "Package manager failed to install VirtualGL..."
-  echo
-  exit 20
- fi
- elif [ $DISTRO = OPENSUSE  ]; then
- if [ "$ARCH" = "x86_64" ]; then
-  echo
-  echo "64-bit system detected"
-  echo
-  echo $PWD
-  zypper --no-gpg-check install -l install-files/VirtualGL.x86_64.rpm
- elif [ "$ARCH" = "i686" ]; then
-  echo
-  echo "32-bit system detected"
-  echo
-  zypper --no-gpg-check install -l install-files/VirtualGL.i386.rpm
- fi
- if [ $? -ne 0 ]; then
-  echo
-  echo "Package manager failed to install VirtualGL..."
-  echo
-  exit 20
- fi
-fi
-
-chmod +x /usr/local/bin/optimusXserver
-chmod +x /usr/local/bin/bumblebee-bugreport
-
 if [ "`cat /etc/modprobe.d/blacklist.conf |grep "blacklist nouveau" |wc -l`" -eq "0" ]; then
-echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
+  echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
 fi
 
 if [ "`cat /etc/modules |grep "nvidia-current" |wc -l`" -eq "0" ]; then
-echo "nvidia-current" >> /etc/modules
+  echo "nvidia-current" >> /etc/modules
 fi
 
-INTELBUSID=`echo "PCI:"\`${LSPCI} |grep VGA |grep Intel |cut -f1 -d:\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d. |cut -f1 -d" "\``
 
+INTELBUSID=`echo "PCI:"\`${LSPCI} |grep VGA |grep Intel |cut -f1 -d:\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d. |cut -f1 -d" "\``
 if [ `${LSPCI} |grep VGA |wc -l` -eq 2 ]; then 
    NVIDIABUSID=`echo "PCI:"\`${LSPCI} |grep VGA |grep nVidia |cut -f1 -d:\`":"\`${LSPCI} |grep VGA |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep VGA |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``
 elif [ `${LSPCI} |grep 3D |wc -l` -eq 1 ]; then
    NVIDIABUSID=`echo "PCI:"\`${LSPCI} |grep 3D |grep nVidia |cut -f1 -d:\`":"\`${LSPCI} |grep 3D |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep 3D |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``   
 else
-echo 
-echo "The BusID of the nVidia card can't be determined"
-echo "You must correct this manually in /etc/X11/xorg.conf.nvidia"
-echo "Please report this problem.."
-echo
-echo "Press Any Key to continue"
-echo
-read 
-
+ echo 
+ echo "The BusID of the nVidia card can't be determined"
+ echo "You must correct this manually in /etc/X11/xorg.conf.nvidia"
+ echo "Please report this problem.."
+ echo
+ echo "Press Any Key to continue"
+ echo
+ read 
 fi
 
 
@@ -526,13 +515,19 @@ sed -i 's/REPLACEWITHCONNECTEDMONITOR/'$CONNECTEDMONITOR'/g' /etc/X11/xorg.conf.
 
 echo
 echo "Enabling Optimus Service"
-if [ $DISTRO = UBUNTU  ]; then
-update-rc.d bumblebee defaults
-elif [ $DISTRO = FEDORA  ]; then
-chkconfig bumblebee on
-elif [ $DISTRO = OPENSUSE  ]; then
-chkconfig bumblebee on
-fi
+echo
+ 
+case "$DISTRO" in
+ UBUNTU)
+  update-rc.d bumblebee defaults
+ ;;
+ FEDORA)
+  chkconfig bumblebee on
+ ;;
+ OPENSUSE)
+  chkconfig bumblebee on
+ ;;
+esac
 
 
 echo
@@ -597,29 +592,12 @@ clear
 esac
 done
 
-
-if [ $DISTRO = UBUNTU  ]; then
- echo "VGL_DISPLAY=:1
- export VGL_DISPLAY
- VGL_COMPRESS=$IMAGETRANSPORT
- export VGL_COMPRESS
- VGL_READBACK=fbo
- export VGL_READBACK" >> /etc/bash.bashrc
-elif [ $DISTRO = FEDORA  ]; then
- echo "VGL_DISPLAY=:1
- export VGL_DISPLAY
- VGL_COMPRESS=$IMAGETRANSPORT
- export VGL_COMPRESS
- VGL_READBACK=fbo
- export VGL_READBACK" >> /etc/bashrc
-elif [ $DISTRO = OPENSUSE  ]; then
- echo "VGL_DISPLAY=:1
- export VGL_DISPLAY
- VGL_COMPRESS=$IMAGETRANSPORT
- export VGL_COMPRESS
- VGL_READBACK=fbo
- export VGL_READBACK" >> /etc/bash.bashrc
-fi
+echo "VGL_DISPLAY=:1
+export VGL_DISPLAY
+VGL_COMPRESS=$IMAGETRANSPORT
+export VGL_COMPRESS
+VGL_READBACK=fbo
+export VGL_READBACK" >> $BASHRC
 
 echo '#!/bin/sh' > /usr/bin/vglclient-service
 echo 'vglclient -gl' >> /usr/bin/vglclient-service
