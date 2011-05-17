@@ -89,7 +89,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.18"
+echo "Welcome to the bumblebee installation v.1.3.19"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -159,9 +159,14 @@ elif [ $DISTRO = FEDORA  ]; then
     wget http://us.download.nvidia.com/XFree86/Linux-x86/${NV_DRIVERS_VERSION}/NVIDIA-Linux-x86-${NV_DRIVERS_VERSION}.run -O /tmp/NVIDIA-Linux-driver.run
   fi
   chmod +x /tmp/NVIDIA-Linux-driver.run
-  /tmp/NVIDIA-Linux-driver.run --no-x-check -a -K
   cd /tmp/
   /tmp/NVIDIA-Linux-driver.run -x
+  if [ "$ARCH" = "x86_64" ]; then
+    cd /tmp/NVIDIA-Linux-x86_64-${NV_DRIVERS_VERSION}/kernel
+  elif [ "$ARCH" = "i686" ]; then
+    cd /tmp/NVIDIA-Linux-x86-${NV_DRIVERS_VERSION}/kernel
+  fi
+  make install
   cd $BUMBLEBEEPWD
   depmod -a
   ldconfig 
