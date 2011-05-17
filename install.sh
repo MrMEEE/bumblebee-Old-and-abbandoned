@@ -44,8 +44,8 @@ ROOT_UID=0
 ARCH=`uname -m`
 
 #Get tools location 
-LSPCI=`whereis lspci | gawk -F' ' '{ print $2 }'`
-MODPROBE=`whereis modprobe | gawk -F' ' '{ print $2 }'`
+LSPCI=`which lspci`
+MODPROBE=`which modprobe`
 
 if [ `cat /etc/issue |grep -nir fedora |wc -l` -gt 0 ]; then
   DISTRO=FEDORA
@@ -89,7 +89,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.19"
+echo "Welcome to the bumblebee installation v.1.3.20"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"

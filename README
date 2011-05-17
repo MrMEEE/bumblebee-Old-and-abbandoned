@@ -43,7 +43,7 @@ bumblebee is Optimus support for Linux, with real offloading, and not
 switchable graphics.. More important.. it works on Optimus Laptops without a
 graphical multiplexer..
 
-Version 1.3.19 of the bumblebee project has been release!!! (version number has
+Version 1.3.20 of the bumblebee project has been release!!! (version number has
 been reset from the prime-ng project)
 
 The Installation should now be completely automatic...
@@ -51,7 +51,7 @@ The Installation should now be completely automatic...
 First of all: If you have any problem... please create a bug report package
 with the bumblebee-bugreport tool..
 
-Then create and issue on github...
+Then create an issue on github...
 
 This project have had great succes and I need to have a way to easily manage
 support problems..
