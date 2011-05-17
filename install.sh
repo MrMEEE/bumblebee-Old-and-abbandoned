@@ -90,7 +90,7 @@ if [ $UID != $ROOT_UID ] || [ $HOME = /root ]; then
   exit 1
 fi
 
-echo "Welcome to the bumblebee installation v.1.4.0"
+echo "Welcome to the bumblebee installation v.1.4.1"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -387,6 +387,9 @@ cp install-files/bumblebee-uninstall /usr/local/bin/
 chmod +x /etc/init.d/bumblebee
 chmod +x /usr/local/bin/bumblebee-bugreport
 
+case "$DISTRO" in
+
+UBUNTU | FEDORA | OPENSUSE)
 if [ "$ARCH" = "x86_64" ]; then
  cp install-files/optirun32 /usr/local/bin/
  cp install-files/optirun64 /usr/local/bin/
@@ -395,6 +398,20 @@ else
  cp install-files/optirun64 /usr/local/bin/optirun
  chmod +x /usr/local/bin/optirun
 fi
+;;
+
+DEBIAN)
+if [ "$ARCH" = "x86_64" ]; then
+ cp install-files/optirun32.debian /usr/local/bin/
+ cp install-files/optirun64.debian /usr/local/bin/
+ chmod +x /usr/local/bin/optirun*
+else
+ cp install-files/optirun64.debian /usr/local/bin/optirun
+ chmod +x /usr/local/bin/optirun
+fi
+;;
+
+esac
 
 case "$DISTRO" in
 
