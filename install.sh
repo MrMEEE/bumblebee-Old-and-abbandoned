@@ -89,7 +89,7 @@ if [ $HOME = /root ]; then
     exit 2
 fi
 
-echo "Welcome to the bumblebee installation v.1.3.17"
+echo "Welcome to the bumblebee installation v.1.3.18"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -274,8 +274,6 @@ cp install-files/xorg.conf.intel /etc/X11/xorg.conf
 cp install-files/xorg.conf.nvidia /etc/X11/
 
 if [ $DISTRO = UBUNTU  ]; then
-rm -rf /etc/X11/bumblebee
-cp -a install-files/bumblebee /etc/X11/
 cp install-files/bumblebee.script /etc/init.d/bumblebee
 cp -n /etc/bash.bashrc /etc/bash.bashrc.optiorig
 elif [ $DISTRO = FEDORA  ]; then

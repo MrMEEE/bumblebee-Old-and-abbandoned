@@ -1,6 +1,0 @@
-#!/bin/sh
-#
-# This script is run as root before showing login widget.
-xhost +LOCAL:
-
-#xsetroot -solid rgb:8/8/8
