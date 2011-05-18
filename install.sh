@@ -90,7 +90,7 @@ if [ $UID != $ROOT_UID ] || [ $HOME = /root ]; then
   exit 1
 fi
 
-echo "Welcome to the bumblebee installation v.1.4.3"
+echo "Welcome to the bumblebee installation v.1.4.4"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -189,9 +189,9 @@ case "$DISTRO" in
    ln -s /usr/lib64/nvidia-current/libglx.so.${NV_DRIVERS_VERSION} /usr/lib64/nvidia-current/xorg/libglx.so
    ln -s /usr/lib64/nvidia-current/nvidia_drv.so /usr/lib64/nvidia-current/xorg/nvidia_drv.so
    rm -rf /usr/lib64/nvidia-current/xorg/xorg
-   ln -s /usr/lib64/nvidia-current/xorg/ /usr/lib32/nvidia-current/xorg
+   ln -s /usr/lib64/nvidia-current/xorg/ /usr/lib/nvidia-current/xorg
    rm -rf /usr/lib64/xorg/xorg
-   ln -s /usr/lib64/xorg/ /usr/lib32/xorg
+   ln -s /usr/lib64/xorg/ /usr/lib/xorg
   elif [ "$ARCH" = "i686" ]; then
    rm -rf /usr/lib/nvidia-current/
    mkdir -p /usr/lib/nvidia-current/
@@ -389,14 +389,21 @@ chmod +x /usr/local/bin/bumblebee-bugreport
 
 case "$DISTRO" in
 
-UBUNTU | FEDORA | OPENSUSE)
+UBUNTU | OPENSUSE)
 if [ "$ARCH" = "x86_64" ]; then
- cp install-files/optirun32 /usr/local/bin/
- cp install-files/optirun64 /usr/local/bin/
- chmod +x /usr/local/bin/optirun*
+ cp install-files/optirun32.ubuntu /usr/local/bin/
+ cp install-files/optirun64.ubuntu /usr/local/bin/
 else
- cp install-files/optirun64 /usr/local/bin/optirun
- chmod +x /usr/local/bin/optirun
+ cp install-files/optirun64.ubuntu /usr/local/bin/optirun
+fi
+;;
+
+FEDORA)
+if [ "$ARCH" = "x86_64" ]; then
+ cp install-files/optirun32.fedora /usr/local/bin/
+ cp install-files/optirun64.fedora /usr/local/bin/
+else
+ cp install-files/optirun64.fedora /usr/local/bin/optirun
 fi
 ;;
 
@@ -404,14 +411,14 @@ DEBIAN)
 if [ "$ARCH" = "x86_64" ]; then
  cp install-files/optirun32.debian /usr/local/bin/
  cp install-files/optirun64.debian /usr/local/bin/
- chmod +x /usr/local/bin/optirun*
 else
  cp install-files/optirun64.debian /usr/local/bin/optirun
- chmod +x /usr/local/bin/optirun
 fi
 ;;
 
 esac
+
+chmod +x /usr/local/bin/optirun*
 
 case "$DISTRO" in
 
