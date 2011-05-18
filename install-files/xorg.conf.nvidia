@@ -57,7 +57,7 @@ Section "Screen"
 EndSection
 
 Section "Extensions"
-Option "Composite" "Disable"
+Option "Composite" "Enable"
 EndSection
 
 Section "Monitor"
