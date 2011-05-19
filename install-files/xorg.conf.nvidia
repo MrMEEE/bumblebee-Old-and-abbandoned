@@ -23,9 +23,9 @@ Section "Device"
     Identifier     "Device1"
     Driver         "nvidia"
     VendorName     "NVIDIA Corporation"
-    BusID          "PCI:01:00:0"
+    BusID          "$NVIDIABUSID"
     Option         "IgnoreEDID"
-    Option 	   "ConnectedMonitor" "CRT-0"
+    Option 	   "ConnectedMonitor" "REPLACEWITHCONNECTEDMONITOR"
 EndSection
 
 Section "Screen"

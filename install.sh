@@ -90,7 +90,7 @@ if [ $UID != $ROOT_UID ] || [ $HOME = /root ]; then
   exit 1
 fi
 
-echo "Welcome to the bumblebee installation v.1.4.11"
+echo "Welcome to the bumblebee installation v.1.4.12"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -460,6 +460,10 @@ else
  read 
 fi
 
+# Start of Automatic Detection:
+
+# LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig  --query-gpu-info |grep "Display Device 0" | cut -f2 -d\( | cut -f1 -d\)
+
 
 clear
 
@@ -471,6 +475,18 @@ sed -i 's/REPLACEWITHBUSID/'$INTELBUSID'/g' /etc/X11/xorg.conf
 sed -i 's/REPLACEWITHBUSID/'$NVIDIABUSID'/g' /etc/X11/xorg.conf.nvidia
 
 CONNECTEDMONITOR="UNDEFINED"
+
+#echo
+#echo "Auto-detecting hardware"
+#echo
+
+#case "$DISTRO" in
+
+# UBUNTU)
+#  if [ `LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig  --query-gpu-info | ` ]
+# ;;
+
+#esac
 
 while [ "$CONNECTEDMONITOR" = "UNDEFINED" ]; do
 

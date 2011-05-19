@@ -43,7 +43,7 @@ bumblebee is Optimus support for Linux, with real offloading, and not
 switchable graphics.. More important.. it works on Optimus Laptops without a
 graphical multiplexer..
 
-Version 1.4.11 of the bumblebee project has been released!!! (version number has
+Version 1.4.12 of the bumblebee project has been released!!! (version number has
 been reset from the prime-ng project)
 
 Bumblebee Supports: Ubuntu, Debian, OpenSuSE, Fedora and Arch Linux. More
