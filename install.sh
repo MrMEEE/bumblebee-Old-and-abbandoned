@@ -90,7 +90,7 @@ if [ $UID != $ROOT_UID ] || [ $HOME = /root ]; then
   exit 1
 fi
 
-echo "Welcome to the bumblebee installation v.1.4.5"
+echo "Welcome to the bumblebee installation v.1.4.6"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -200,6 +200,10 @@ case "$DISTRO" in
    ln -s /usr/lib/nvidia-current/libglx.so.${NV_DRIVERS_VERSION} /usr/lib/nvidia-current/xorg/libglx.so
    ln -s /usr/lib/nvidia-current/nvidia_drv.so /usr/lib/nvidia-current/xorg/nvidia_drv.so
   fi
+  echo
+  echo "Regenerating initramfs."
+  echo
+  mkinitrd -f /boot/initramfs-$(uname -r).img $(uname -r)
  ;;
  OPENSUSE)
   VERSION=`cat /etc/issue |grep openSUSE | cut -f4 -d" "`
@@ -345,11 +349,13 @@ case "$DISTRO" in
    echo
    echo $PWD
    yum -y --nogpgcheck install install-files/VirtualGL.x86_64.rpm
+   sed -i 's$/usr/lib/$/usr/lib64/$g' /etc/X11/bumblebee.script.fedora
   elif [ "$ARCH" = "i686" ]; then
    echo
    echo "32-bit system detected"
    echo
    yum -y --nogpgcheck install install-files/VirtualGL.i386.rpm
+   sed -i 's$/usr/lib/$/usr/lib32/$g' /etc/X11/bumblebee.script.fedora
   fi
   if [ $? -ne 0 ]; then
    echo
