@@ -392,8 +392,11 @@ esac
 cp install-files/virtualgl.conf /etc/modprobe.d/
 cp install-files/bumblebee-bugreport /usr/local/bin/
 cp install-files/bumblebee-uninstall /usr/local/bin/
+cp install-files/bumblebee-config /usr/local/bin/
 chmod +x /etc/init.d/bumblebee
 chmod +x /usr/local/bin/bumblebee-bugreport
+chmod +x /usr/local/bin/bumblebee-uninstall
+chmod +x /usr/local/bin/bumblebee-config
 
 case "$DISTRO" in
 
@@ -462,11 +465,6 @@ else
  read 
 fi
 
-# Start of Automatic Detection:
-
-# LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig  --query-gpu-info |grep "Display Device 0" | cut -f2 -d\( | cut -f1 -d\)
-
-
 clear
 
 echo
@@ -478,17 +476,19 @@ sed -i 's/REPLACEWITHBUSID/'$NVIDIABUSID'/g' /etc/X11/xorg.conf.nvidia
 
 CONNECTEDMONITOR="UNDEFINED"
 
-#echo
-#echo "Auto-detecting hardware"
-#echo
+echo
+echo "Auto-detecting hardware"
+echo
 
-#case "$DISTRO" in
+case "$DISTRO" in
 
-# UBUNTU)
-#  if [ `LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig  --query-gpu-info | ` ]
-# ;;
+ UBUNTU)
+  if [ `LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig  --query-gpu-info |grep "Display Devices" |cut -f2 -d":"` -gt 0 ]; then
+   CONNECTEDMONITOR=`LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig  --query-gpu-info |grep "Display Device 0" | cut -f2 -d\( | cut -f1 -d\)`
+  fi
+ ;;
 
-#esac
+esac
 
 while [ "$CONNECTEDMONITOR" = "UNDEFINED" ]; do
 
@@ -505,9 +505,6 @@ echo "7) Dell Vostro 3400/3500"
 echo "8) Samsung RF511/RF711/QX410-J01"
 echo "9) Toshiba Satellite M645-SP4132L"
 echo "10) Asus U35J/U43JC/U35JC/U43JC/U53JC/P52JC/K52JC/X52JC/N53SV/N61JV/X64JV"
-#echo "11) "
-#echo "12) "
-#echo "13) "
 echo
 echo "97) Manually Set Output to CRT-0"
 echo "98) Manually Set Output to DFP-0"
@@ -559,19 +556,6 @@ CONNECTEDMONITOR="CRT-0"
 CONNECTEDMONITOR="CRT-0"
 ;;
 
-#11) 
-#CONNECTEDMONITOR=""
-#;;
-
-#12)
-#CONNECTEDMONITOR=""
-#;;
-   
-#13)
-#CONNECTEDMONITOR=""
-#;;
-
- 
 97)
 CONNECTEDMONITOR="CRT-0"
 ;;
@@ -736,6 +720,8 @@ echo "If you have any problems in or after the installation, please try to run t
 echo "rerun this script... if that doesn't work: please run the bumblebee-bugreport tool and send me a bugreport."
 echo 
 echo "Or even better.. create an issue on github... this really makes bugfixing much easier for me and faster for you."
+echo
+echo "If you need to reconfigure bumblebee the script bumblebee-config as available."
 echo
 echo "Good luck... MrMEEE / Martin Juhl"
 echo
