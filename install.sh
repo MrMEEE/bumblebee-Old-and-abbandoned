@@ -409,7 +409,7 @@ if [ "$ARCH" = "x86_64" ]; then
  cp install-files/optirun32.fedora /usr/local/bin/optirun32
  cp install-files/optirun64.fedora /usr/local/bin/optirun64
 else
- cp install-files/optirun64.fedora /usr/local/bin/optirun
+ cp install-files/optirun32.fedora /usr/local/bin/optirun
 fi
 ;;
 
