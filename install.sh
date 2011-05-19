@@ -90,7 +90,7 @@ if [ $UID != $ROOT_UID ] || [ $HOME = /root ]; then
   exit 1
 fi
 
-echo "Welcome to the bumblebee installation v.1.4.6"
+echo "Welcome to the bumblebee installation v.1.4.7"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -349,13 +349,12 @@ case "$DISTRO" in
    echo
    echo $PWD
    yum -y --nogpgcheck install install-files/VirtualGL.x86_64.rpm
-   sed -i 's$/usr/lib/$/usr/lib64/$g' /etc/X11/bumblebee.script.fedora
+   sed -i 's$/usr/lib/$/usr/lib64/$g' /etc/init.d/bumblebee
   elif [ "$ARCH" = "i686" ]; then
    echo
    echo "32-bit system detected"
    echo
    yum -y --nogpgcheck install install-files/VirtualGL.i386.rpm
-   sed -i 's$/usr/lib/$/usr/lib32/$g' /etc/X11/bumblebee.script.fedora
   fi
   if [ $? -ne 0 ]; then
    echo
