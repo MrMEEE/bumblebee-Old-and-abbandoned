@@ -90,7 +90,7 @@ if [ $UID != $ROOT_UID ] || [ $HOME = /root ]; then
   exit 1
 fi
 
-echo "Welcome to the bumblebee installation v.1.4.9"
+echo "Welcome to the bumblebee installation v.1.4.10"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -182,16 +182,17 @@ case "$DISTRO" in
   if [ "$ARCH" = "x86_64" ]; then
    rm -rf /usr/lib64/nvidia-current/
    rm -rf /usr/lib/nvidia-current/
+   rm -rf /usr/lib32/nvidia-current/
    mkdir -p /usr/lib64/nvidia-current/
    mv /tmp/NVIDIA-Linux-x86_64-${NV_DRIVERS_VERSION}/* /usr/lib64/nvidia-current/
-   ln -s /usr/lib64/nvidia-current/32 /usr/lib/nvidia-current
+   ln -s /usr/lib64/nvidia-current/32 /usr/lib32/nvidia-current
    mkdir -p /usr/lib64/nvidia-current/xorg
    ln -s /usr/lib64/nvidia-current/libglx.so.${NV_DRIVERS_VERSION} /usr/lib64/nvidia-current/xorg/libglx.so
    ln -s /usr/lib64/nvidia-current/nvidia_drv.so /usr/lib64/nvidia-current/xorg/nvidia_drv.so
    rm -rf /usr/lib64/nvidia-current/xorg/xorg
-   ln -s /usr/lib64/nvidia-current/xorg/ /usr/lib/nvidia-current/xorg
+   ln -s /usr/lib64/nvidia-current/xorg/ /usr/lib32/nvidia-current/xorg
    rm -rf /usr/lib64/xorg/xorg
-   ln -s /usr/lib64/xorg/ /usr/lib/xorg
+   ln -s /usr/lib64/xorg/ /usr/lib32/xorg
   elif [ "$ARCH" = "i686" ]; then
    rm -rf /usr/lib/nvidia-current/
    mkdir -p /usr/lib/nvidia-current/
