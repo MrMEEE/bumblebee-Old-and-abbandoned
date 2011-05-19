@@ -122,6 +122,8 @@ rm /usr/local/bin/bumblebee-bugreport
 rm /usr/bin/xdm-optimus
 rm -rf /usr/lib64/nvidia-current
 rm -rf /usr/lib/nvidia-current
+rm /usr/local/bin/optirun*
+rm /usr/bin/vglclient-service
 if [ -d /opt/prime-ng ]; then
 rm -rf /opt/prime-ng
 fi
