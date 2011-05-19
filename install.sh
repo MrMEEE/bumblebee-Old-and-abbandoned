@@ -90,7 +90,7 @@ if [ $UID != $ROOT_UID ] || [ $HOME = /root ]; then
   exit 1
 fi
 
-echo "Welcome to the bumblebee installation v.1.4.4"
+echo "Welcome to the bumblebee installation v.1.4.5"
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -391,8 +391,8 @@ case "$DISTRO" in
 
 UBUNTU | OPENSUSE)
 if [ "$ARCH" = "x86_64" ]; then
- cp install-files/optirun32.ubuntu /usr/local/bin/
- cp install-files/optirun64.ubuntu /usr/local/bin/
+ cp install-files/optirun32.ubuntu /usr/local/bin/optirun32
+ cp install-files/optirun64.ubuntu /usr/local/bin/optirun64
 else
  cp install-files/optirun64.ubuntu /usr/local/bin/optirun
 fi
@@ -400,8 +400,8 @@ fi
 
 FEDORA)
 if [ "$ARCH" = "x86_64" ]; then
- cp install-files/optirun32.fedora /usr/local/bin/
- cp install-files/optirun64.fedora /usr/local/bin/
+ cp install-files/optirun32.fedora /usr/local/bin/optirun32
+ cp install-files/optirun64.fedora /usr/local/bin/optirun64
 else
  cp install-files/optirun64.fedora /usr/local/bin/optirun
 fi
@@ -409,8 +409,8 @@ fi
 
 DEBIAN)
 if [ "$ARCH" = "x86_64" ]; then
- cp install-files/optirun32.debian /usr/local/bin/
- cp install-files/optirun64.debian /usr/local/bin/
+ cp install-files/optirun32.debian /usr/local/bin/optirun32
+ cp install-files/optirun64.debian /usr/local/bin/optirun64
 else
  cp install-files/optirun64.debian /usr/local/bin/optirun
 fi
