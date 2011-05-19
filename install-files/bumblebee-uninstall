@@ -132,4 +132,6 @@ echo
 echo "bumblebee has been uninstalled :("
 echo
 
+rm /etc/bumblebee
+
 rm /usr/local/bin/bumblebee-uninstall

@@ -37,6 +37,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
+BUMBLEBEEVERSION=1.4.14
+
 
 ROOT_UID=0
 
@@ -90,7 +92,7 @@ if [ $UID != $ROOT_UID ] || [ $HOME = /root ]; then
   exit 1
 fi
 
-echo "Welcome to the bumblebee installation v.1.4.13"
+echo "Welcome to the bumblebee installation v."$BUMBLEBEEVERSION
 echo "Licensed under Red Bull, BEER-WARE License and GPL"
 echo
 echo "This will enable you to utilize both your Intel and nVidia card"
@@ -739,5 +741,6 @@ echo "Good luck... MrMEEE / Martin Juhl"
 echo
 echo "http://www.martin-juhl.dk, http://twitter.com/martinjuhl, https://github.com/MrMEEE/bumblebee"
 
+echo "Bumblebee Version: "$BUMBLEBEEVERSION > /etc/bumblebee
 
 exit 0

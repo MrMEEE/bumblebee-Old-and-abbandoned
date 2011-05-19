@@ -58,6 +58,10 @@ cp /etc/bash.bashrc /tmp/bug-report/
 
 echo "Bumblebee Bug Report" >> /tmp/bug-report/bumblebee-report
 echo >> /tmp/bug-report/bumblebee-report
+
+echo "Bumblebee Version: "`cat /etc/bumblebee` >> /tmp/bug-report/bumblebee-report
+echo >> /tmp/bug-report/bumblebee-report
+
 echo "uname -a info" >> /tmp/bug-report/bumblebee-report
 echo >> /tmp/bug-report/bumblebee-report
 uname -a >> /tmp/bug-report/bumblebee-report
