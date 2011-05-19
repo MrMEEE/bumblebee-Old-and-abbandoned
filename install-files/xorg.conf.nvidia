@@ -5,8 +5,6 @@ EndSection
 Section "ServerLayout"
     Identifier     "Layout0"
     Screen         "Screen1"
-    InputDevice    "Keyboard0" "SendCoreEvents"
-    InputDevice    "Mouse0" "SendCoreEvents"
 EndSection
 
 Section "Module"
@@ -21,28 +19,13 @@ EndSection
 Section "Files"
 EndSection
 
-Section "InputDevice"
-    Identifier     "Mouse0"
-    Driver         "mouse"
-    Option         "Protocol" "auto"
-    Option         "Device" "/dev/psaux"
-    Option         "Emulate3Buttons" "no"
-    Option         "ZAxisMapping" "4 5"
-EndSection
-
-Section "InputDevice"
-    # generated from default
-    Identifier     "Keyboard0"
-    Driver         "kbd"
-EndSection
-
 Section "Device"
     Identifier     "Device1"
     Driver         "nvidia"
     VendorName     "NVIDIA Corporation"
-    BusID          "REPLACEWITHBUSID"
+    BusID          "PCI:01:00:0"
     Option         "IgnoreEDID"
-    Option 	   "ConnectedMonitor" "REPLACEWITHCONNECTEDMONITOR"
+    Option 	   "ConnectedMonitor" "CRT-0"
 EndSection
 
 Section "Screen"
