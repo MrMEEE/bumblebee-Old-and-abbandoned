@@ -37,7 +37,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.4.17
+BUMBLEBEEVERSION=1.4.19
 
 
 ROOT_UID=0
@@ -146,7 +146,7 @@ case "$DISTRO" in
    apt-add-repository ppa:ubuntu-x-swat/x-updates
   fi
   apt-get update
-  apt-get -y install nvidia-current
+  apt-get -y install nvidia-current screen
   if [ $? -ne 0 ]; then
    echo
    echo "Package manager failed to install needed packages..."
@@ -612,9 +612,13 @@ sed -i 's/REPLACEWITHCONNECTEDMONITOR/'$CONNECTEDMONITOR'/g' /etc/X11/xorg.conf.
 echo
 echo "Enabling Optimus Service"
 echo
- 
+
+# Should be removed when changes from v.1.4.19 has been implemented on Fedora, OpenSuSE and Debian. 
 case "$DISTRO" in
- UBUNTU | DEBIAN)
+ UBUNTU)
+  update-rc.d -f bumblebee remove
+ ;; 
+ DEBIAN)
   update-rc.d bumblebee defaults
  ;;
  FEDORA | OPENSUSE)
@@ -713,20 +717,47 @@ if [ -d $HOME/.config/autostart ]; then
    ln -s /usr/bin/vglclient-service $HOME/.config/autostart/vglclient-service
 fi
 
+echo
+echo "Starting Services:"
+echo
+# Should be removed when changes from v.1.4.19 has been implemented on Fedora, OpenSuSE and Debian.
+
+if [ "$DISTRO" != UBUNTU ]; then 
 /etc/init.d/bumblebee start
 /usr/bin/vglclient-service &
+fi
+
+echo
+echo "Setting up bumblebee user rights."
+echo
+#Support for starting/stopping the Bumblebee services ondemand.
+case "$DISTRO" in 
+UBUNTU)
+groupadd bumblebee
+gpasswd -a `env |grep SUDO_USER |cut -f2 -d=` bumblebee
+grep -Ev 'bumblebee' /etc/sudoers /etc/sudoers.optiorig
+mv /etc/sudoers.optiorig /etc/sudoers
+echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /etc/init.d/bumblebee" >> /etc/sudoers
+;;
 
 echo
 echo
 echo
 echo "Ok... Installation complete..."
 echo
-echo "Now you need to make sure that the command \"vglclient -gl\" is run after your Desktop Enviroment is started"
-echo
-echo "In KDE this is done by this script.. Thanks to Peter Liedler."
-echo
-echo "In GNOME this is done by this script.. Thanks to Peter Liedler."
-echo
+# Should be removed when changes from v.1.4.19 has been implemented on Fedora, OpenSuSE and Debian.
+
+if [ "$DISTRO" != UBUNTU ]; then
+ echo "Now you need to make sure that the command \"vglclient -gl\" is run after your Desktop Enviroment is started"
+ echo
+ echo "In KDE this is done by this script.. Thanks to Peter Liedler."
+ echo
+ echo "In GNOME this is done by this script.. Thanks to Peter Liedler."
+ echo
+else
+ echo "Please logout and back in to activate new groups."
+ echo
+fi
 if [ "$ARCH" = "x86_64" ]; then
 echo "After that you should be able to start applications with \"optirun32 <application>\" or \"optirun64 <application>\""
 echo "optirun32 can be used for legacy 32-bit applications and Wine Games.. Everything else should work on optirun64"

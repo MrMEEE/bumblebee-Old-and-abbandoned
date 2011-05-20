@@ -88,7 +88,7 @@ echo
 if [ $DISTRO = UBUNTU  ] || [ $DISTRO = DEBIAN  ]; then
  echo "Removing nVidia driver package"
  echo
- apt-get -y --purge remove nvidia-current
+ apt-get -y --purge remove nvidia-current screen
  echo "Removing VirtualGL package"
  echo
  dpkg -r VirtualGL
@@ -145,6 +145,9 @@ if [ -f $HOME/.config/autostart/vglclient-service ]; then
 fi
 
 grep -Ev 'VGL|optirun' $HOME/.bashrc > $HOME/.oldbashrc
+mv $HOME/.oldbashrc $HOME/.bashrc
+grep -Ev 'bumblebee' /etc/sudoers /etc/sudoers.optiorig
+mv /etc/sudoers.optiorig /etc/sudoers
 
 killall -9 vglclient
 

@@ -16,10 +16,14 @@
 PATH=/sbin:/usr/local/sbin:/usr/sbin:/bin:/usr/local/bin:/usr/bin
 LD_LIBRARY_PATH=/usr/lib/nvidia-current
 export LD_LIBRARY_PATH
+DISPLAY=:0
+export DISPLAY
 DESC="Bumblebee X server"
 NAME=bumblebee
 DAEMON=/usr/bin/X
+VGLDAEMON=/usr/bin/vglclient
 DAEMON_ARGS="-ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9"
+VGLDAEMON_ARGS="-gl"
 PIDFILE=/tmp/.X1-lock
 SCRIPTNAME=/etc/init.d/$NAME
 
@@ -34,15 +38,17 @@ while  [ `ps a |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
  sleep 1
  log_daemon_msg "."
 done
+start-stop-daemon --start --quiet --background --exec $VGLDAEMON -- $VGLDAEMON_ARGS
 return 0
 }
 
 do_stop()
 {
 kill `cat $PIDFILE 2>&1` > /dev/null 2>&1
+killall vglclient > /dev/null 2>&1
 RETVAL=$?
 rm -f $PIDFILE
-while  [ `ps a |grep xorg.conf.nvidia |wc -l` -eq 2 ]; do
+while  [ `ps a |grep xorg.conf.nvidia |wc -l` -ne 1 ]; do
  sleep 1
  log_daemon_msg "."
 done
