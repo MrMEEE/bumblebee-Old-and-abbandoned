@@ -37,7 +37,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.4.16
+BUMBLEBEEVERSION=1.4.17
 
 
 ROOT_UID=0
@@ -338,8 +338,9 @@ case "$DISTRO" in
   exit 20
  fi
  cp install-files/bumblebee.script.debian /etc/init.d/bumblebee
- update-alternatives --remove libglx.so /usr/lib/nvidia/libglx.so
- update-alternatives --remove libGL.so.1 /usr/lib/nvidia/libGL.so.1
+ rm /etc/alternatives/libglx.so
+ rm /etc/alternatives/libGL.so
+ rm /etc/alternatives/libGL.so.1
  mkdir /usr/local/lib/bumblebee
  ln -s /usr/lib/nvidia/libglx.so /usr/local/lib/bumblebee/libglx.so
  ldconfig
