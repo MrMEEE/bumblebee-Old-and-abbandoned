@@ -67,8 +67,11 @@ the thougher applications with the command "optirun32 <application>" or
 "optirun64 <application>"...
 
 So now we just need somebody to write an application for automatically
-balance which applications should be run on which card.. and shut the nVidia
-card down, when not used..
+balance which applications should be run on which card.. 
+
+Support for automatically shutting down and starting up the nVidia card has
+been added in version 1.4.20 for Ubuntu. Other distributions are in
+progress.
 
 But still I think it is a good step forward...
 
