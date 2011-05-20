@@ -37,7 +37,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.4.19
+BUMBLEBEEVERSION=1.4.20
 
 
 ROOT_UID=0
@@ -298,6 +298,9 @@ echo
 
 cp install-files/xorg.conf.intel /etc/X11/xorg.conf
 cp install-files/xorg.conf.nvidia /etc/X11/
+cp install-files/bumblebee-enablecard /usr/local/bin/
+cp install-files/bumblebee-disablecard /usr/local/bin/
+
 cp -n $BASHRC $BASHRC.optiorig
 
 case "$DISTRO" in
@@ -415,6 +418,8 @@ chmod +x /etc/init.d/bumblebee
 chmod +x /usr/local/bin/bumblebee-bugreport
 chmod +x /usr/local/bin/bumblebee-uninstall
 chmod +x /usr/local/bin/bumblebee-config
+chmod +x /usr/local/bin/bumblebee-enablecard
+chmod +x /usr/local/bin/bumblebee-disablecard
 
 case "$DISTRO" in
 
@@ -735,7 +740,7 @@ case "$DISTRO" in
 UBUNTU)
 groupadd bumblebee
 gpasswd -a `env |grep SUDO_USER |cut -f2 -d=` bumblebee
-grep -Ev 'bumblebee' /etc/sudoers /etc/sudoers.optiorig
+grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
 mv /etc/sudoers.optiorig /etc/sudoers
 echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /etc/init.d/bumblebee" >> /etc/sudoers
 ;;

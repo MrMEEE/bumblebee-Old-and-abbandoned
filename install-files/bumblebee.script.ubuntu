@@ -24,6 +24,8 @@ DAEMON=/usr/bin/X
 VGLDAEMON=/usr/bin/vglclient
 DAEMON_ARGS="-ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9"
 VGLDAEMON_ARGS="-gl"
+ENABLECARD=/usr/local/bin/bumblebee-enablecard
+DISABLECARD=/usr/local/bin/bumblebee-disablecard
 PIDFILE=/tmp/.X1-lock
 SCRIPTNAME=/etc/init.d/$NAME
 
@@ -33,12 +35,14 @@ SCRIPTNAME=/etc/init.d/$NAME
 do_start()
 {
 ! ps -p `cat $PIDFILE 2>&1` > /dev/null 2>&1 || return 1
+$ENABLECARD
 start-stop-daemon --start --quiet --background --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_ARGS
 while  [ `ps a |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
  sleep 1
  log_daemon_msg "."
 done
 start-stop-daemon --start --quiet --background --exec $VGLDAEMON -- $VGLDAEMON_ARGS
+
 return 0
 }
 
@@ -52,6 +56,7 @@ while  [ `ps a |grep xorg.conf.nvidia |wc -l` -ne 1 ]; do
  sleep 1
  log_daemon_msg "."
 done
+$DISABLECARD
 return $RETVAL
 }
 
