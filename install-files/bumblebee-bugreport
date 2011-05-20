@@ -81,9 +81,19 @@ echo >> /tmp/bug-report/bumblebee-report
 echo "library info" >> /tmp/bug-report/bumblebee-report
 echo >> /tmp/bug-report/bumblebee-report
 ls -la /usr/lib/nvidia-current >> /tmp/bug-report/bumblebee-report
+echo >> /tmp/bug-report/bumblebee-report
+echo "/usr/lib32/nvidia-current/" >> /tmp/bug-report/bumblebee-report
+echo >> /tmp/bug-report/bumblebee-report
 if [ -d /usr/lib32/nvidia-current ]; then
  ls -la /usr/lib32/nvidia-current >> /tmp/bug-report/bumblebee-report
 fi
+echo >> /tmp/bug-report/bumblebee-report
+echo "/usr/lib64/nvidia-current/" >> /tmp/bug-report/bumblebee-report
+echo >> /tmp/bug-report/bumblebee-report
+if [ -d /usr/lib64/nvidia-current ]; then
+ ls -la /usr/lib64/nvidia-current >> /tmp/bug-report/bumblebee-report
+fi >> /tmp/bug-report/bumblebee-report
+ 
 
 echo >> /tmp/bug-report/bumblebee-report
 echo "modules info" >> /tmp/bug-report/bumblebee-report
