@@ -265,6 +265,7 @@ case "$DISTRO" in
    DEBIAN)
     apt-get update
     apt-get -y install nvidia-kernel-dkms nvidia-glx
+    apt-get -y --reinstall install xserver-xorg-core
     if [ $? -ne 0 ]; then
      echo
      echo "Package manager failed to install needed packages..."
@@ -331,7 +332,8 @@ case "$DISTRO" in
  rm /etc/alternatives/libglx.so
  rm /etc/alternatives/libGL.so
  rm /etc/alternatives/libGL.so.1
- /usr/lib/xorg/modules/drivers/nvidia_drv.so
+ rm /usr/lib/xorg/modules/drivers/nvidia_drv.so
+# rm -rf /usr/lib/xorg/extra-modules
  if [ "$ARCH" = "x86_64" ]; then
   echo
   echo "64-bit system detected"
