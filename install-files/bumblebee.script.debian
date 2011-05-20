@@ -29,6 +29,10 @@ do_start()
 {
 ! ps -p `cat $PIDFILE 2>&1` > /dev/null 2>&1 || return 1
 start-stop-daemon --start --quiet --background --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_ARGS
+while  [ `ps a |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
+ sleep 1
+ log_daemon_msg "."
+done
 return 0
 }
 
@@ -37,6 +41,10 @@ do_stop()
 kill `cat $PIDFILE 2>&1` > /dev/null 2>&1
 RETVAL=$?
 rm -f $PIDFILE
+while  [ `ps a |grep xorg.conf.nvidia |wc -l` -eq 2 ]; do
+ sleep 1
+ log_daemon_msg "."
+done
 return $RETVAL
 }
 
