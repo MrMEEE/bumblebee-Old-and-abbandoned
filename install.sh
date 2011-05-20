@@ -37,7 +37,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.4.20
+BUMBLEBEEVERSION=1.4.21
 
 
 ROOT_UID=0
@@ -618,7 +618,7 @@ echo
 echo "Enabling Optimus Service"
 echo
 
-# Should be removed when changes from v.1.4.19 has been implemented on Fedora, OpenSuSE and Debian. 
+# Should be removed when changes from v.1.4.19+20 has been implemented on Fedora, OpenSuSE and Debian. 
 case "$DISTRO" in
  UBUNTU)
   update-rc.d -f bumblebee remove
@@ -725,7 +725,7 @@ fi
 echo
 echo "Starting Services:"
 echo
-# Should be removed when changes from v.1.4.19 has been implemented on Fedora, OpenSuSE and Debian.
+# Should be removed when changes from v.1.4.19+20 has been implemented on Fedora, OpenSuSE and Debian.
 
 if [ "$DISTRO" != UBUNTU ]; then 
 /etc/init.d/bumblebee start
@@ -750,7 +750,7 @@ echo
 echo
 echo "Ok... Installation complete..."
 echo
-# Should be removed when changes from v.1.4.19 has been implemented on Fedora, OpenSuSE and Debian.
+# Should be removed when changes from v.1.4.19+20 has been implemented on Fedora, OpenSuSE and Debian.
 
 if [ "$DISTRO" != UBUNTU ]; then
  echo "Now you need to make sure that the command \"vglclient -gl\" is run after your Desktop Enviroment is started"
@@ -761,6 +761,9 @@ if [ "$DISTRO" != UBUNTU ]; then
  echo
 else
  echo "Please logout and back in to activate new groups."
+ echo
+ echo "If you want power saving by shutting the nVidia down when not in use. Please adjust the scripts:"
+ echo "/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard for your machine."
  echo
 fi
 if [ "$ARCH" = "x86_64" ]; then
