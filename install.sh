@@ -69,6 +69,14 @@ elif [ `cat /etc/issue |grep -nir "Arch Linux" |wc -l` -gt 0  ]; then
   echo 
   read
   exit 0
+elif [ `cat /etc/issue |grep -nir "gentoo" |wc -l` -gt 0  ]; then
+  DISTRO=GENTOO
+  echo "You are running Gento Linux, please see the ebuild here for support:"
+  echo
+  echo "https://github.com/iegor/bumblebee-Gentoo-support"
+  echo
+  read
+  exit 0
 fi
 
 echo
