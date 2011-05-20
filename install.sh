@@ -320,15 +320,24 @@ case "$DISTRO" in
   ldconfig 
  ;;
  DEBIAN)
+ rm /etc/alternatives/libglx.so
+ rm /etc/alternatives/libGL.so
+ rm /etc/alternatives/libGL.so.1
  if [ "$ARCH" = "x86_64" ]; then
   echo
   echo "64-bit system detected"
   echo
   dpkg -i install-files/VirtualGL_amd64.deb
+  ln -s /usr/lib64/xorg/modules/extensions/libglx.so /etc/alternatives/libglx.so
+  ln -s /usr/lib64/libGL.so /etc/alternatives/libGL.so
+  ln -s /usr/lib64/libGL.so.1 /etc/alternatives/libGL.so.1
  elif [ "$ARCH" = "i686" ]; then
   echo
   echo "32-bit system detected"
   echo
+  ln -s /usr/lib/xorg/modules/extensions/libglx.so /etc/alternatives/libglx.so
+  ln -s /usr/lib/libGL.so /etc/alternatives/libGL.so
+  ln -s /usr/lib/libGL.so.1 /etc/alternatives/libGL.so.1
   dpkg -i install-files/VirtualGL_i386.deb
  fi
  if [ $? -ne 0 ]; then
@@ -338,9 +347,6 @@ case "$DISTRO" in
   exit 20
  fi
  cp install-files/bumblebee.script.debian /etc/init.d/bumblebee
- rm /etc/alternatives/libglx.so
- rm /etc/alternatives/libGL.so
- rm /etc/alternatives/libGL.so.1
  mkdir /usr/local/lib/bumblebee
  ln -s /usr/lib/nvidia/libglx.so /usr/local/lib/bumblebee/libglx.so
  ldconfig
