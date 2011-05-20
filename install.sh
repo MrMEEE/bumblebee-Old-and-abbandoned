@@ -694,7 +694,8 @@ elif [ -d $HOME/.kde/Autostart ]; then
    	rm $HOME/.kde/Autostart/vglclient-service
    fi
    ln -s /usr/bin/vglclient-service $HOME/.kde/Autostart/vglclient-service
-elif [ -d $HOME/.config/autostart ]; then
+fi
+if [ -d $HOME/.config/autostart ]; then
    if [ -f $HOME/.config/autostart/vglclient-service ]; then
         rm $HOME/.config/autostart/vglclient-service
    fi
