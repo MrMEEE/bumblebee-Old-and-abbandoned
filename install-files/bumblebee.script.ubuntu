@@ -61,7 +61,7 @@ return $RETVAL
 }
 
 case "$1" in
-  start)
+  enable)
 log_daemon_msg "Starting $DESC" "$NAME "
 do_start
 case $? in
@@ -69,7 +69,7 @@ case $? in
 1) log_action_end_msg 1 "already running" ;;
 esac
 ;;
-  stop)
+  disable | stop | start)
 log_daemon_msg "Stopping $DESC" "$NAME "
 do_stop
 case $? in
@@ -99,7 +99,7 @@ log_end_msg 1
 esac
 ;;
   *)
-echo "Usage: $SCRIPTNAME {start|stop|status|restart}" >&2
+echo "Usage: $SCRIPTNAME {enable|disable|start|stop|status|restart}" >&2
 exit 3
 ;;
 esac

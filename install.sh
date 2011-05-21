@@ -37,7 +37,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.4.22
+BUMBLEBEEVERSION=1.4.23
 
 
 ROOT_UID=0
@@ -288,7 +288,6 @@ if [ `cat $BASHRC |grep VGL |wc -l` -ne 0 ]; then
    cp $BASHRC.optiorig $BASHRC
 fi
 
-cp -n /etc/modprobe.d/blacklist.conf /etc/modprobe.d/blacklist.conf.optiorig
 cp -n /etc/modules /etc/modules.optiorig
 cp -n /etc/X11/xorg.conf /etc/X11/xorg.conf.optiorig
 
@@ -468,9 +467,12 @@ fi
 ;;
 esac
 
-if [ "`cat /etc/modprobe.d/blacklist.conf |grep "blacklist nouveau" |wc -l`" -eq "0" ]; then
-  echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
+if [ "`cat /etc/modprobe.d/blacklist.conf |grep "blacklist nouveau" |wc -l`" -ne "0" ]; then
+  grep -Ev 'nouveau' /etc/modprobe.d/blacklist.conf > /etc/modprobe.d/blacklist.conf.tmp
+  mv /etc/modprobe.d/blacklist.conf.tmp /etc/modprobe.d/blacklist.conf
 fi
+
+echo "blacklist nouveau" >> /etc/modprobe.d/nouveau-blacklist.conf
 
 INTELBUSID=`echo "PCI:"\`${LSPCI} |grep VGA |grep Intel |cut -f1 -d:\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d. |cut -f1 -d" "\``
 if [ `${LSPCI} |grep VGA |wc -l` -eq 2 ]; then 
@@ -618,10 +620,9 @@ echo
 echo "Enabling Optimus Service"
 echo
 
-# Should be removed when changes from v.1.4.19+20 has been implemented on Fedora, OpenSuSE and Debian. 
 case "$DISTRO" in
  UBUNTU)
-  update-rc.d -f bumblebee remove
+  update-rc.d bumblebee defaults
  ;; 
  DEBIAN)
   update-rc.d bumblebee defaults
@@ -744,6 +745,7 @@ grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
 mv /etc/sudoers.optiorig /etc/sudoers
 echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /etc/init.d/bumblebee" >> /etc/sudoers
 chmod 0440 /etc/sudoers
+/etc/init.d/bumblebee start
 ;;
 esac
 
