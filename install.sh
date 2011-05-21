@@ -37,7 +37,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.4.23
+BUMBLEBEEVERSION=1.4.24
 
 
 ROOT_UID=0
@@ -622,7 +622,7 @@ echo
 
 case "$DISTRO" in
  UBUNTU)
-  update-rc.d bumblebee defaults
+  update-rc.d -f bumblebee remove
  ;; 
  DEBIAN)
   update-rc.d bumblebee defaults
@@ -745,6 +745,10 @@ grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
 mv /etc/sudoers.optiorig /etc/sudoers
 echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /etc/init.d/bumblebee" >> /etc/sudoers
 chmod 0440 /etc/sudoers
+grep -Ev 'bumblebee' /etc/rc.local > /etc/rc.local.tmp
+mv /etc/rc.local.tmp /etc/rc.local
+chmod +x /etc/rc.local
+sed -i '/exit 0/ i\/etc/init.d/bumblebee start' /etc/rc.local
 /etc/init.d/bumblebee start
 ;;
 esac
