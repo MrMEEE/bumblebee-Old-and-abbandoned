@@ -748,7 +748,7 @@ chmod 0440 /etc/sudoers
 grep -Ev 'bumblebee' /etc/rc.local > /etc/rc.local.tmp
 mv /etc/rc.local.tmp /etc/rc.local
 chmod +x /etc/rc.local
-sed -i '/exit 0/ i\/etc/init.d/bumblebee start' /etc/rc.local
+sed -i '$i\/etc/init.d/bumblebee start' /etc/rc.local
 /etc/init.d/bumblebee start
 ;;
 esac
