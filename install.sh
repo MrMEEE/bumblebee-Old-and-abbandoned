@@ -37,7 +37,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.4.21
+BUMBLEBEEVERSION=1.4.22
 
 
 ROOT_UID=0
@@ -743,7 +743,9 @@ gpasswd -a `env |grep SUDO_USER |cut -f2 -d=` bumblebee
 grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
 mv /etc/sudoers.optiorig /etc/sudoers
 echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /etc/init.d/bumblebee" >> /etc/sudoers
+chmod 0440 /etc/sudoers
 ;;
+esac
 
 echo
 echo
