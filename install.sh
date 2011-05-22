@@ -37,7 +37,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.4.26
+BUMBLEBEEVERSION=1.4.27
 
 
 ROOT_UID=0
@@ -352,7 +352,9 @@ case "$DISTRO" in
    exit 20
   fi
   cp install-files/bumblebee.script.ubuntu /etc/init.d/bumblebee
-  update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
+#  update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
+  rm /etc/alternatives/gl_conf
+  ln -s /usr/lib/mesa/ld.so.conf /etc/alternatives/gl_conf
   rm /etc/alternatives/xorg_extra_modules
   rm /etc/alternatives/xorg_extra_modules-bumblebee
   rm /usr/lib/nvidia-current/xorg/xorg
