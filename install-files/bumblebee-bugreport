@@ -93,6 +93,12 @@ echo >> /tmp/bug-report/bumblebee-report
 if [ -d /usr/lib64/nvidia-current ]; then
  ls -la /usr/lib64/nvidia-current >> /tmp/bug-report/bumblebee-report
 fi >> /tmp/bug-report/bumblebee-report
+
+echo "/usr/lib/nvidia-current/" >> /tmp/bug-report/bumblebee-report
+echo >> /tmp/bug-report/bumblebee-report
+if [ -d /usr/lib/nvidia-current ]; then
+ ls -la /usr/lib/nvidia-current >> /tmp/bug-report/bumblebee-report
+fi >> /tmp/bug-report/bumblebee-report
  
 
 echo >> /tmp/bug-report/bumblebee-report
