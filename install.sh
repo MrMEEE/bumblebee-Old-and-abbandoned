@@ -58,6 +58,7 @@ elif [ `cat /etc/issue |grep -nir ubuntu |wc -l` -gt 0 ]; then
 elif [ `cat /etc/issue |grep -nir openSUSE |wc -l` -gt 0 ]; then
   DISTRO=OPENSUSE
   BASHRC=/etc/bash.bashrc
+  ROOT_UID=1000
 elif [ `cat /etc/issue |grep -nir debian |wc -l` -gt 0 ]; then
   DISTRO=DEBIAN
   BASHRC=/etc/bash.bashrc
