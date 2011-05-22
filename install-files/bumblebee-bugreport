@@ -80,8 +80,6 @@ echo >> /tmp/bug-report/bumblebee-report
 
 echo "library info" >> /tmp/bug-report/bumblebee-report
 echo >> /tmp/bug-report/bumblebee-report
-ls -la /usr/lib/nvidia-current >> /tmp/bug-report/bumblebee-report
-echo >> /tmp/bug-report/bumblebee-report
 echo "/usr/lib32/nvidia-current/" >> /tmp/bug-report/bumblebee-report
 echo >> /tmp/bug-report/bumblebee-report
 if [ -d /usr/lib32/nvidia-current ]; then
