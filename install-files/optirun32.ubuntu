@@ -2,7 +2,7 @@
 if [ ! -f /tmp/.X1-lock ]; then
  sudo /etc/init.d/bumblebee enable
 fi
- screen -Dm vglrun -ld /usr/lib32/nvidia-current $@
+ screen vglrun -ld /usr/lib32/nvidia-current $@
 if [ `ps aux |grep vglrun |wc -l` -lt 2 ]; then
  sudo /etc/init.d/bumblebee disable
 fi

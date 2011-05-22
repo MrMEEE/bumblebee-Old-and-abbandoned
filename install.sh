@@ -37,7 +37,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.4.24
+BUMBLEBEEVERSION=1.4.25
 
 
 ROOT_UID=0
@@ -297,8 +297,36 @@ echo
 
 cp install-files/xorg.conf.intel /etc/X11/xorg.conf
 cp install-files/xorg.conf.nvidia /etc/X11/
-cp install-files/bumblebee-enablecard /usr/local/bin/
-cp install-files/bumblebee-disablecard /usr/local/bin/
+
+case `diff install-files/bumblebee-enablecard /usr/local/bin/bumblebee-enablecard` in 
+
+0) # No differens
+;;
+
+1) # Differs
+echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard, has been modified, not overwriting"
+;;
+
+2) # Not installed 
+ cp install-files/bumblebee-enablecard /usr/local/bin/ 
+;;
+
+esac
+
+case `diff install-files/bumblebee-disablecard /usr/local/bin/bumblebee-disablecard` in          
+
+0) # No differens
+;;
+
+1) # Differs
+echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard, has been modified, not overwriting"
+;;
+  
+2) # Not installed 
+ cp install-files/bumblebee-disablecard /usr/local/bin/
+;;
+     
+esac
 
 cp -n $BASHRC $BASHRC.optiorig
 
@@ -745,11 +773,6 @@ grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
 mv /etc/sudoers.optiorig /etc/sudoers
 echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /etc/init.d/bumblebee" >> /etc/sudoers
 chmod 0440 /etc/sudoers
-grep -Ev 'bumblebee' /etc/rc.local > /etc/rc.local.tmp
-mv /etc/rc.local.tmp /etc/rc.local
-chmod +x /etc/rc.local
-sed -i '$i\/etc/init.d/bumblebee start' /etc/rc.local
-/etc/init.d/bumblebee start
 ;;
 esac
 
