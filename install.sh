@@ -37,7 +37,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.4.28
+BUMBLEBEEVERSION=1.4.29
 
 
 ROOT_UID=0
@@ -346,9 +346,9 @@ case "$DISTRO" in
 #  update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
   rm /etc/alternatives/gl_conf
   ln -s /usr/lib/mesa/ld.so.conf /etc/alternatives/gl_conf
-  rm /etc/alternatives/xorg_extra_modules
-  rm /etc/alternatives/xorg_extra_modules-bumblebee
-  rm /usr/lib/nvidia-current/xorg/xorg
+  rm -rf /etc/alternatives/xorg_extra_modules
+  rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
+  rm -rf /usr /lib/nvidia-current/xorg/xorg
   ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
   ldconfig 
  ;;
