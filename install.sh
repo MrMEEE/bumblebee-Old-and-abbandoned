@@ -551,7 +551,7 @@ echo "6) Dell Vostro 3300"
 echo "7) Dell Vostro 3400/3500/3700"
 echo "8) Samsung RF511/RF711/QX410-J01"
 echo "9) Toshiba Satellite M645-SP4132L"
-echo "10) Asus U30J/U35J/U36JC/U43JC/U35JC/U43JC/U53JC/P52JC/K52JC/X52JC/N53SV/N61JV/X64JV"
+echo "10) Asus U30J/U31JG/U35J/U36JC/U43JC/U35JC/U43JC/U53JC/P52JC/K52JC/X52JC/N53SV/N61JV/X64JV"
 echo
 echo "97) Manually Set Output to CRT-0"
 echo "98) Manually Set Output to DFP-0"
