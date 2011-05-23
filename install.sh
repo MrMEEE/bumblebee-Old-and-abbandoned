@@ -37,7 +37,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.4.30
+BUMBLEBEEVERSION=1.4.31
 
 
 ROOT_UID=0

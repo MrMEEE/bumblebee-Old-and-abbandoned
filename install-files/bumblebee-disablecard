@@ -7,6 +7,10 @@
 # http://linux-hybrid-graphics.blogspot.com/2010/07/using-acpicall-module-to-switch-onoff.html
 
 #rmmod nvidia
+#if lsmod | grep -q nvidia; then
+# echo "Error: could not unload nvidia module, leaving card turned on
+# exit
+#fi
 #modprobe acpi_call
 
 #if ! lsmod | grep -q acpi_call; then
