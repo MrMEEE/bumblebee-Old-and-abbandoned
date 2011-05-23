@@ -300,7 +300,7 @@ echo
 cp install-files/xorg.conf.intel /etc/X11/xorg.conf
 cp install-files/xorg.conf.nvidia /etc/X11/
 
-if [ ! -f install-files/bumblebee-enablecard ]; then
+if [ ! -f /usr/local/bin/bumblebee-enablecard ]; then
  # Not installed
  cp install-files/bumblebee-enablecard /usr/local/bin/
 else
@@ -310,7 +310,7 @@ else
  echo
 fi
 
-if [ ! -f install-files/bumblebee-disablecard ]; then
+if [ ! -f /usr/local/bin/bumblebee-disablecard ]; then
  # Not installed
  cp install-files/bumblebee-disablecard /usr/local/bin/
 else
