@@ -529,16 +529,16 @@ echo
 
 case "$DISTRO" in
  
- if [ -f /usr/local/bin/bumblebee-enablecard ]
-  /usr/local/bin/bumblebee-enablecard
- fi
  UBUNTU)
-  modprobe nvidia-current
+  if [ -f /usr/local/bin/bumblebee-enablecard ]; then
+   /usr/local/bin/bumblebee-enablecard
+  fi
+  ${MODPROBE} nvidia-current
   if [ `LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig  --query-gpu-info |grep "Display Devices" |cut -f2 -d":"` -gt 0 ]; then
    CONNECTEDMONITOR=`LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig  --query-gpu-info |grep "Display Device 0" | cut -f2 -d\( | cut -f1 -d\)`
   fi
-  rmmod nvidia-current
-  if [ -f /usr/local/bin/bumblebee-disablecard ]
+  ${MODPROBE} -r nvidia-current
+  if [ -f /usr/local/bin/bumblebee-disablecard ]; then
    /usr/local/bin/bumblebee-disablecard
   fi
  ;;
