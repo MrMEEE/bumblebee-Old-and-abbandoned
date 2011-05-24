@@ -37,7 +37,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.4.32
+BUMBLEBEEVERSION=1.4.33
 
 
 ROOT_UID=0
@@ -528,10 +528,18 @@ echo "Auto-detecting hardware"
 echo
 
 case "$DISTRO" in
-
+ 
+ if [ -f /usr/local/bin/bumblebee-enablecard ]
+  /usr/local/bin/bumblebee-enablecard
+ fi
  UBUNTU)
+  modprobe nvidia-current
   if [ `LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig  --query-gpu-info |grep "Display Devices" |cut -f2 -d":"` -gt 0 ]; then
    CONNECTEDMONITOR=`LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig  --query-gpu-info |grep "Display Device 0" | cut -f2 -d\( | cut -f1 -d\)`
+  fi
+  rmmod nvidia-current
+  if [ -f /usr/local/bin/bumblebee-disablecard ]
+   /usr/local/bin/bumblebee-disablecard
   fi
  ;;
 
