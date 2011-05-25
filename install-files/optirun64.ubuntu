@@ -1,8 +1,18 @@
 #!/bin/bash
+source /etc/default/bumblebee
+
 if [ ! -f /tmp/.X1-lock ]; then
  sudo /etc/init.d/bumblebee enable
 fi
- screen vglrun -ld /usr/lib/nvidia-current $@
-if [ `ps aux |grep vglrun |wc -l` -lt 2 ]; then
- sudo /etc/init.d/bumblebee disable
+
+if [ "$USE_SCREEN" != "NO" ]; then
+    SCREEN=screen
+fi
+
+$SCREEN vglrun -ld /usr/lib/nvidia-current $@
+
+if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
+    if [ `ps aux |grep vglrun |wc -l` -lt 2 ]; then
+        sudo /etc/init.d/bumblebee disable
+    fi
 fi

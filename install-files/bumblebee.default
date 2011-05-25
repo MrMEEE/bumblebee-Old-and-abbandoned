@@ -1,0 +1,11 @@
+# Bumblebee Defaults
+
+# STOP_SERVICE_ON_EXIT YES|NO
+# Should bumblebee service be stopped after last vgl program is finished?
+# Defaults to yes.
+STOP_SERVICE_ON_EXIT=YES
+
+# USE_SCREEN YES|NO
+# Use screen when running vglrun?
+# Defaults to yes.
+USE_SCREEN=YES
