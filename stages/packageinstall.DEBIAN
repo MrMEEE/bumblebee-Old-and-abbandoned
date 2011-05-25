@@ -1,3 +1,19 @@
+echo "Support for Debian is currently broken... very broken..."
+echo
+echo "Are you sure you want to continue?? (Y/N)"
+
+read answer
+
+case "$answer" in
+
+y | Y )
+;;
+
+*)
+exit 0
+;;
+esac
+
 apt-get update
 apt-get -y install nvidia-kernel-dkms nvidia-glx
 apt-get -y --reinstall install xserver-xorg-core
