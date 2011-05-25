@@ -13,6 +13,8 @@ else
  echo "If you want power saving by shutting the nVidia down when not in use. Please adjust the scripts:"
  echo "/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard for your machine."
  echo
+ echo "Examples and documentation is available in /usr/share/doc/bumblebee/"
+ echo
 fi
 if [ "$ARCH" = "x86_64" ]; then
 echo "After that you should be able to start applications with \"optirun32 <application>\" or \"optirun64 <application>\""
