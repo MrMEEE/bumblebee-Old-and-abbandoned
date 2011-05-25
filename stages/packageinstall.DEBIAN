@@ -1,28 +1,16 @@
-echo "Support for Debian is currently broken... very broken..."
-echo
-echo "Are you sure you want to continue?? (Y/N)"
-
-read answer
-
-case "$answer" in
-
-y | Y )
-;;
-
-*)
-exit 0
-;;
-esac
-
 apt-get update
-apt-get -y install nvidia-kernel-dkms nvidia-glx
-apt-get -y --reinstall install xserver-xorg-core
+apt-get -y install nvidia-kernel-dkms nvidia-xconfig
+
 if [ $? -ne 0 ]; then
  echo
  echo "Package manager failed to install needed packages..."
  echo "Please check that you have non-free repository enabled."
  echo
  exit 21
+fi
+
+if [ $ARCH = x86_64 ]; then
+ apt-get -y install nvidia-glx-ia32
 fi
 
 ${MODPROBE} -r nouveau

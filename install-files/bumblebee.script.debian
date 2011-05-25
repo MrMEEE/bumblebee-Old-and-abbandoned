@@ -11,8 +11,6 @@
 # Description: Bumblebee initscript for Optimus Graphics support
 ### END INIT INFO
 
-# Author: Igor Urazov <z0rc3r@gmail.com>
-
 PATH=/sbin:/usr/local/sbin:/usr/sbin:/bin:/usr/local/bin:/usr/bin
 LD_LIBRARY_PATH=/usr/lib/nvidia
 DESC="Bumblebee X server"
