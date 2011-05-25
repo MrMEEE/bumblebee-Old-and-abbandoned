@@ -20,7 +20,7 @@ fi
 
 if [ ! -f /etc/default/bumblebee ]; then
   # Not installed
-  cp install-files/bumblebee.default /etc/default
+  cp install-files/bumblebee.default /etc/default/bumblebee
 else
   # Already Exists
   echo

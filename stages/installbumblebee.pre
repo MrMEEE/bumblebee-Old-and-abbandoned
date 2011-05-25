@@ -4,6 +4,7 @@ if [ "`cat /etc/modprobe.d/blacklist.conf |grep "blacklist nouveau" |wc -l`" -ne
 fi
   
 echo "blacklist nouveau" >> /etc/modprobe.d/nouveau-blacklist.conf
+mkdir -p /usr/local/bin/
 cp install-files/xorg.conf.intel /etc/X11/xorg.conf
 cp install-files/xorg.conf.nvidia /etc/X11/
 cp install-files/virtualgl.conf /etc/modprobe.d/
