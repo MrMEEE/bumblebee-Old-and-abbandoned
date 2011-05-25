@@ -18,6 +18,16 @@ else
  echo
 fi
 
+if [ ! -f /etc/default/bumblebee ]; then
+  # Not installed
+  cp install-files/bumblebee.default /etc/default
+else
+  # Already Exists
+  echo
+  echo "Default settings file: /etc/default/bumblebee, already exists. Not overwriting."
+  echo
+fi
+
 if [ "$ARCH" = "x86_64" ]; then
  echo
  echo "64-bit system detected"
