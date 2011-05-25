@@ -1,0 +1,39 @@
+if [ `cat /etc/issue |grep -nir fedora |wc -l` -gt 0 ]; then
+  DISTRO=FEDORA
+  BASHRC=/etc/bashrc
+elif [ `cat /etc/issue |grep -nir ubuntu |wc -l` -gt 0 ]; then
+  DISTRO=UBUNTU
+  BASHRC=/etc/bash.bashrc
+elif [ `cat /etc/issue |grep -nir openSUSE |wc -l` -gt 0 ]; then
+  DISTRO=OPENSUSE
+  BASHRC=/etc/bash.bashrc
+  ROOT_UID=1000
+elif [ `cat /etc/issue |grep -nir debian |wc -l` -gt 0 ]; then
+  DISTRO=DEBIAN
+  BASHRC=/etc/bash.bashrc
+elif [ `cat /etc/issue |grep -nir "Arch Linux" |wc -l` -gt 0  ]; then
+  DISTRO=ARCH
+  echo "You are running Arch Linux, please see the buildscript here for
+support:"
+  echo
+  echo "http://aur.archlinux.org/packages.php?ID=48866"
+  echo 
+  read
+  exit 1
+elif [ `cat /etc/issue |grep -nir "gentoo" |wc -l` -gt 0  ]; then
+  DISTRO=GENTOO
+  echo "You are running Gento Linux, please see the ebuild here for
+support:"
+  echo
+  echo "https://github.com/iegor/bumblebee-Gentoo-support"
+  echo
+  read
+  exit 1
+else
+ echo 
+ echo "Your Distribution could not be determined or is not supported."
+ echo "Please report a bug at:"
+ echo
+ echo "https://github.com/MrMEEE/bumblebee/issues"
+ exit 1
+fi

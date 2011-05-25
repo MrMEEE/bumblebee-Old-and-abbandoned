@@ -1,0 +1,31 @@
+cp install-files/bumblebee.script.fedora /etc/init.d/bumblebee
+if [ "$ARCH" = "x86_64" ]; then
+ echo
+ echo "64-bit system detected"
+ echo
+ echo $PWD
+ yum -y --nogpgcheck install install-files/VirtualGL.x86_64.rpm
+ sed -i 's$/usr/lib/$/usr/lib64/$g' /etc/init.d/bumblebee
+elif [ "$ARCH" = "i686" ]; then
+ echo
+ echo "32-bit system detected"
+ echo
+ yum -y --nogpgcheck install install-files/VirtualGL.i386.rpm
+fi
+if [ $? -ne 0 ]; then
+ echo
+ echo "Package manager failed to install VirtualGL..."
+ echo
+ exit 1
+fi
+
+if [ "$ARCH" = "x86_64" ]; then
+ cp install-files/optirun32.fedora /usr/local/bin/optirun32
+ cp install-files/optirun64.fedora /usr/local/bin/optirun64
+else
+ cp install-files/optirun32.fedora /usr/local/bin/optirun
+fi
+
+if [ "`cat /etc/modules |grep "nvidia" |wc -l`" -eq "0" ]; then        
+  echo "nvidia" >> /etc/modules
+fi

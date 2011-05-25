@@ -1,0 +1,14 @@
+apt-get update
+apt-get -y install nvidia-kernel-dkms nvidia-glx
+apt-get -y --reinstall install xserver-xorg-core
+if [ $? -ne 0 ]; then
+ echo
+ echo "Package manager failed to install needed packages..."
+ echo "Please check that you have non-free repository enabled."
+ echo
+ exit 21
+fi
+
+${MODPROBE} -r nouveau
+${MODPROBE} nvidia
+

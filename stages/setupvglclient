@@ -1,0 +1,21 @@
+echo '#!/bin/sh' > /usr/bin/vglclient-service
+echo 'vglclient -gl' >> /usr/bin/vglclient-service
+chmod +x /usr/bin/vglclient-service  
+if [ -d $HOME/.kde4/Autostart ]; then
+   if [ -f $HOME/.kde4/Autostart/vglclient-service ]; then
+        rm $HOME/.kde4/Autostart/vglclient-service
+   fi
+   ln -s /usr/bin/vglclient-service $HOME/.kde4/Autostart/vglclient-service
+elif [ -d $HOME/.kde/Autostart ]; then
+   if [ -f $HOME/.kde/Autostart/vglclient-service ]; then
+        rm $HOME/.kde/Autostart/vglclient-service
+   fi
+   ln -s /usr/bin/vglclient-service $HOME/.kde/Autostart/vglclient-service
+fi
+if [ -d $HOME/.config/autostart ]; then
+   if [ -f $HOME/.config/autostart/vglclient-service ]; then
+        rm $HOME/.config/autostart/vglclient-service
+   fi
+   ln -s /usr/bin/vglclient-service $HOME/.config/autostart/vglclient-service
+fi
+

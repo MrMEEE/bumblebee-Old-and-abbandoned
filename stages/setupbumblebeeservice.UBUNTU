@@ -1,0 +1,1 @@
+update-rc.d -f bumblebee remove
