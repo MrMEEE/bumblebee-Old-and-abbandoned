@@ -9,7 +9,7 @@ if [ "$USE_SCREEN" != "NO" ]; then
     SCREEN=screen
 fi
 
-$SCREEN vglrun -ld /usr/lib/nvidia-current $@
+$SCREEN -L vglrun -ld /usr/lib/nvidia-current $@
 
 if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
     if [ `ps aux |grep vglrun |wc -l` -lt 2 ]; then
