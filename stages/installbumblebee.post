@@ -1,1 +1,2 @@
 chmod +x /usr/local/bin/optirun*
+chmod +x /usr/local/bin/bumblebee-*
