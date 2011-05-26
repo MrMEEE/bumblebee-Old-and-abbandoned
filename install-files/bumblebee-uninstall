@@ -157,6 +157,8 @@ mv $HOME/.oldbashrc $HOME/.bashrc
 grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
 mv /etc/sudoers.optiorig /etc/sudoers
 
+chmod 0440 /etc/sudoers
+
 killall -9 vglclient
 
 echo
