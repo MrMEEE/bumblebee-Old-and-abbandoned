@@ -112,7 +112,10 @@ ls -la /etc/alternatives >> /tmp/bug-report/bumblebee-report
 echo >> /tmp/bug-report/bumblebee-report
 echo "dmidecode" >> /tmp/bug-report/bumblebee-report
 echo >> /tmp/bug-report/bumblebee-report
-dmidecode >> /tmp/bug-report/bumblebee-report
+dmidecode --string baseboard-manufacturer >> /tmp/bug-report/bumblebee-report
+dmidecode --string baseboard-product-name >> /tmp/bug-report/bumblebee-report
+dmidecode --string system-manufacturer >> /tmp/bug-report/bumblebee-report
+dmidecode --string system-product-name >> /tmp/bug-report/bumblebee-report
 
 tar zcf $HOME/bumblebee-bugreport-`date +2%3y%m%d_%H%M%S`.tar.gz /tmp/bug-report/
 
