@@ -19,3 +19,5 @@ echo "/usr/local/bin/bumblebee-enablecard"
 echo "/usr/local/bin/bumblebee-enablecard"
 echo "for automatic switching on/off of the card."
 echo
+echo "Press any key to Continue"
+read
