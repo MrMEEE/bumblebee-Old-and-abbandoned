@@ -3,8 +3,9 @@ while [ "$CONNECTEDMONITOR" = "UNDEFINED" ]; do
 
 echo
 echo "Select your Laptop:"
-echo "1) Alienware M11X"  
-echo "2) Dell XPS 15/17"  
+echo "0) Alienware M11X"  
+echo "1) Dell XPS 15/17 L502x/L702x"
+echo "2) Dell XPS 15/17 L501x/L701x"  
 echo "3) CLEVO W150HNQ"   
 echo "4) Asus EeePC 1215N"
 echo "5) Acer Aspire 5745PG/5742G"
@@ -25,8 +26,12 @@ echo
 
 case "$machine" in
 
-1)
+0)
 CONNECTEDMONITOR="CRT-0"
+;;
+
+1)
+CONNECTEDMONITOR="DFP-0"
 ;;
   
 2)
