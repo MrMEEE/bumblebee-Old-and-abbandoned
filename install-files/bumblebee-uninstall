@@ -154,7 +154,7 @@ fi
 
 grep -Ev 'VGL|optirun' $HOME/.bashrc > $HOME/.oldbashrc
 mv $HOME/.oldbashrc $HOME/.bashrc
-grep -Ev 'bumblebee' /etc/sudoers /etc/sudoers.optiorig
+grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
 mv /etc/sudoers.optiorig /etc/sudoers
 
 killall -9 vglclient
