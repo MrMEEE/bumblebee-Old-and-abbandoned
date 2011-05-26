@@ -11,7 +11,7 @@ else
  apt-add-repository ppa:ubuntu-x-swat/x-updates
 fi
 apt-get update
-apt-get -y install nvidia-current screen
+apt-get -y install nvidia-current
 if [ $? -ne 0 ]; then
  echo
  echo "Package manager failed to install needed packages..."

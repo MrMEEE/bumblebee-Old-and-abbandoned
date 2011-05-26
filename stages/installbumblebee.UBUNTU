@@ -18,15 +18,16 @@ else
  echo
 fi
 
-if [ ! -f /etc/default/bumblebee ]; then
-  # Not installed
-  cp install-files/bumblebee.default /etc/default/bumblebee
-else
+if [ -f /etc/default/bumblebee ]; then
   # Already Exists
   echo
-  echo "Default settings file: /etc/default/bumblebee, already exists. Not overwriting."
+  echo "Default settings file: /etc/default/bumblebee, already exists."
+  echo "Installing new, old configuration file saved as: /etc/default/bumblebee.old."
   echo
+  mv /etc/default/bumblebee /etc/default/bumblebee.old
 fi
+
+cp install-files/bumblebee.default /etc/default/bumblebee
 
 mkdir -p /usr/share/doc/bumblebee
 cp install-files/documentation /usr/share/doc/bumblebee

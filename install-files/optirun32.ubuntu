@@ -1,18 +1,21 @@
 #!/bin/bash
+
 source /etc/default/bumblebee
 
 if [ ! -f /tmp/.X1-lock ]; then
  sudo /etc/init.d/bumblebee enable
 fi
 
-if [ "$USE_SCREEN" != "NO" ]; then
-    SCREEN=screen
-fi
+trap "echo 'Caught Ctrl+C'" INT
 
-$SCREEN -L vglrun -ld /usr/lib32/nvidia-current $@
+vglrun -ld /usr/lib32/nvidia-current $@
 
-if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
-    if [ `ps aux |grep vglrun |wc -l` -lt 2 ]; then
-        sudo /etc/init.d/bumblebee disable
-    fi
+if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then 
+ if [ `ps aux |grep vglrun |wc -l` -lt 2 ]; then
+  sudo /etc/init.d/bumblebee disable
+ else
+  echo "Another bumblebee powered application is running, keeping bumblebee alive."
+ fi
 fi
+       
+

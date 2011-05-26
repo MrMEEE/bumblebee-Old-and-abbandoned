@@ -1,0 +1,9 @@
+sudo apt-get install dkms git
+        git clone http://github.com/mkottman/acpi_call.git
+        mkdir /usr/src/acpi_call-0.0.1
+        cp -rp acpi_call/* /usr/src/acpi_call-0.0.1
+        cp dkms.conf /usr/src/acpi_call-0.0.1
+        dkms add -m acpi_call -v 0.0.1
+        dkms build -m acpi_call -v 0.0.1
+        dkms install -m acpi_call -v 0.0.1
+

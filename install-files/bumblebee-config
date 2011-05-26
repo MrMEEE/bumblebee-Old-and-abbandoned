@@ -94,11 +94,12 @@ INSERTMONITORLIST
 
 sed -i 's/'$CURRENTMONITOR'/'$CONNECTEDMONITOR'/g' /etc/X11/xorg.conf.nvidia
 
-#if [ `cat $BASHRC |grep VGL |wc -l` -ne 0 ]; then
-# cp $BASHRC.optiorig $BASHRC
-#fi
- 
-CURRENTIMAGETRANSPORT=`cat /etc/bash.bashrc |grep VGL_COMPRESS= |cut -f2 -d=`
+if [ $DISTRO != UBUNTU ]; then
+ CURRENTIMAGETRANSPORT=`cat /etc/bash.bashrc |grep VGL_COMPRESS= |cut -f2 -d=`
+else
+ CURRENTIMAGETRANSPORT=`cat /etc/default/bumblebee |grep VGL_COMPRESS= |cut -f2 -d=`
+fi
+
 IMAGETRANSPORT="UNDEFINED"
 
 while [ "$IMAGETRANSPORT" = "UNDEFINED" ]; do
@@ -167,7 +168,11 @@ clear
 esac 
 done 
 
-sed -i 's/VGL_COMPRESS='$CURRENTIMAGETRANSPORT'/VGL_COMPRESS='$IMAGETRANSPORT'/g' $BASHRC
+if [ $DISTRO != UBUNTU ]; then
+ sed -i 's/VGL_COMPRESS='$CURRENTIMAGETRANSPORT'/VGL_COMPRESS='$IMAGETRANSPORT'/g' $BASHRC
+else
+ sed -i 's/VGL_COMPRESS='$CURRENTIMAGETRANSPORT'/VGL_COMPRESS='$IMAGETRANSPORT'/g' /etc/default/bumblebee
+fi
 
 echo
 echo "Configuration Completed."

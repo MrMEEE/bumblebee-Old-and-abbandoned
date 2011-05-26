@@ -3,7 +3,6 @@ if [ `cat /etc/issue |grep -nir fedora |wc -l` -gt 0 ]; then
   BASHRC=/etc/bashrc
 elif [ `cat /etc/issue |grep -nir ubuntu |wc -l` -gt 0 ]; then
   DISTRO=UBUNTU
-  BASHRC=/etc/bash.bashrc
 elif [ `cat /etc/issue |grep -nir openSUSE |wc -l` -gt 0 ]; then
   DISTRO=OPENSUSE
   BASHRC=/etc/bash.bashrc

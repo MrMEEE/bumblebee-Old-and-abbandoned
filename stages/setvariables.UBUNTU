@@ -1,0 +1,1 @@
+sed -i 's/VGL_COMPRESS.*/VGL_COMPRESS='$IMAGETRANSPORT'/' /etc/default/bumblebee

@@ -37,7 +37,7 @@ do_start()
 ! ps -p `cat $PIDFILE 2>&1` > /dev/null 2>&1 || return 1
 $ENABLECARD
 start-stop-daemon --start --quiet --background --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_ARGS
-while  [ `ps a |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
+while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
  sleep 1
  log_daemon_msg "."
 done
@@ -52,7 +52,7 @@ kill `cat $PIDFILE 2>&1` > /dev/null 2>&1
 killall vglclient > /dev/null 2>&1
 RETVAL=$?
 rm -f $PIDFILE
-while  [ `ps a |grep xorg.conf.nvidia |wc -l` -ne 1 ]; do
+while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -ne 1 ]; do
  sleep 1
  log_daemon_msg "."
 done

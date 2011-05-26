@@ -34,7 +34,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.5.8
+BUMBLEBEEVERSION=1.5.9
 
 #Determine Arch x86_64 or i686
 ARCH=`uname -m`
@@ -107,6 +107,8 @@ echo "Setting up Enviroment variables"
 echo
 
 source stages/enviromentvariables
+
+source stages/setvariables.$DISTRO
 
 source stages/setupvglclient
 
