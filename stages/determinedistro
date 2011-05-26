@@ -3,7 +3,12 @@ if [ `cat /etc/issue |grep -nir fedora |wc -l` -gt 0 ]; then
   BASHRC=/etc/bashrc
 elif [ `cat /etc/issue |grep -nir debian |wc -l` -gt 0 ]; then
   DISTRO=DEBIAN
-  BASHRC=/etc/bash.bashrc
+  echo "You are running Arch Linux, please see the debumblebee project for support:"
+  echo 
+  echo "https://github.com/z0rc/debumblebee"
+  echo
+  read
+  exit 1
 elif [ `cat /etc/issue |grep -nir ubuntu |wc -l` -gt 0 ] || [ `cat /etc/issue |grep -nir "Linux Mint" |wc -l` -gt 0 ]; then
   DISTRO=UBUNTU
 elif [ `cat /etc/issue |grep -nir openSUSE |wc -l` -gt 0 ]; then
@@ -20,8 +25,7 @@ elif [ `cat /etc/issue |grep -nir "Arch Linux" |wc -l` -gt 0  ]; then
   exit 1
 elif [ `cat /etc/issue |grep -nir "gentoo" |wc -l` -gt 0  ]; then
   DISTRO=GENTOO
-  echo "You are running Gento Linux, please see the ebuild here for
-support:"
+  echo "You are running Gento Linux, please see the ebuild here for support:"
   echo
   echo "https://github.com/iegor/bumblebee-Gentoo-support"
   echo
