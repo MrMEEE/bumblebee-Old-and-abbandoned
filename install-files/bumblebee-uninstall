@@ -88,7 +88,7 @@ echo
 if [ $DISTRO = UBUNTU  ] || [ $DISTRO = DEBIAN  ]; then
  echo "Removing nVidia driver package"
  echo
- apt-get -y --purge remove nvidia-current screen
+ apt-get -y --purge remove nvidia-current
  echo "Removing VirtualGL package"
  echo
  dpkg -r VirtualGL
