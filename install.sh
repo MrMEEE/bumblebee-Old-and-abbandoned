@@ -34,7 +34,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.5.11
+BUMBLEBEEVERSION=1.5.12
 
 #Determine Arch x86_64 or i686
 ARCH=`uname -m`
@@ -51,7 +51,7 @@ IMAGETRANSPORT="UNDEFINED"
 source stages/determinedistro
 
 echo
-echo $DISTRO" distribution found."
+echo $DISTRO"-based distribution found."
 echo
 
 source stages/checkrights.$DISTRO
