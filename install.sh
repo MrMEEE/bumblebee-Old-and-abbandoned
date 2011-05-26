@@ -295,6 +295,13 @@ echo
 echo "Installing Optimus Configuration and files"
 echo
 
+echo
+echo "Make sure you edit the following files:"
+echo "/usr/local/bin/bumblebee-enablecard"
+echo "/usr/local/bin/bumblebee-enablecard"
+echo "for automatic switching on/off of the card."
+echo
+
 cp install-files/xorg.conf.intel /etc/X11/xorg.conf
 cp install-files/xorg.conf.nvidia /etc/X11/
 cp install-files/bumblebee-enablecard /usr/local/bin/
