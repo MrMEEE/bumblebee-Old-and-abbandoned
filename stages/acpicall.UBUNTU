@@ -25,3 +25,5 @@ AUTOINSTALL="yes"' > /usr/src/acpi_call-$ACPICALLVERSION/dkms.conf
 dkms add -m acpi_call -v $ACPICALLVERSION
 dkms build -m acpi_call -v $ACPICALLVERSION
 dkms install -m acpi_call -v $ACPICALLVERSION
+
+cd $BUMBLEBEEPWD
