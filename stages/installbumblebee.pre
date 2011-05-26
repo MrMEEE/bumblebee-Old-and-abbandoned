@@ -11,7 +11,6 @@ cp install-files/virtualgl.conf /etc/modprobe.d/
 cp install-files/bumblebee-bugreport /usr/local/bin/
 cp install-files/bumblebee-uninstall /usr/local/bin/
 sed -e "/INSERTMONITORLIST/r stages/manualselectmonitor" -e "/INSERTMONITORLIST/d" install-files/bumblebee-config > /usr/local/bin/bumblebee-config
-chmod +x /etc/init.d/bumblebee
 
 echo
 echo "Make sure you edit the following files:"
