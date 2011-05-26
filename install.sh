@@ -34,7 +34,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.5.17
+BUMBLEBEEVERSION=1.5.18
 
 #Determine Arch x86_64 or i686
 ARCH=`uname -m`
@@ -63,6 +63,12 @@ echo "Installing needed packages."
 echo 
 
 source stages/packageinstall.$DISTRO
+
+echo
+echo "Installing acpi_module"
+echo
+
+source stages/acpicall.$DISTRO
 
 echo
 echo "Backing up Configuration"

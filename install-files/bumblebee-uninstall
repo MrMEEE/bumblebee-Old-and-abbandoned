@@ -134,6 +134,11 @@ if [ -d /opt/bumblebee ]; then
 rm -rf /opt/bumblebee
 fi
 
+if [ `dkms status |grep acpi_call | wc -l` > 0 ]; then
+ dkms uninstall -m acpi_call -v `dkms status |grep acpi_call |cut -f2 -d,`  
+ dkms remove -m acpi_call -v `dkms status |grep acpi_call |cut -f2 -d,` --all
+fi
+
 rm /etc/alternatives/xorg_extra_modules-bumblebee 
 ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules
 

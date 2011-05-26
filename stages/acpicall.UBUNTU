@@ -1,0 +1,27 @@
+sudo apt-get install dkms git
+
+ACPICALLVERSION=1.0
+
+if [ `dkms status |grep acpi_call | wc -l` -gt 0 ]; then
+ dkms uninstall -m acpi_call -v `dkms status |grep acpi_call |cut -f2 -d, |cut -f1 -d:`
+ dkms remove -m acpi_call -v `dkms status |grep acpi_call |cut -f2 -d, |cut -f1 -d:` --all
+fi
+
+rm -rf /usr/src/acpi_call*
+cd /tmp
+git clone http://github.com/mkottman/acpi_call.git
+mv acpi_call /usr/src/acpi_call-$ACPICALLVERSION
+
+echo 'PACKAGE_NAME="acpi_call"
+PACKAGE_VERSION="'$ACPICALLVERSION'"
+CLEAN="make clean"
+BUILT_MODULE_NAME[0]="acpi_call"
+DEST_MODULE_NAME[0]="acpi_call"
+MAKE[0]="make IGNORE_CC_MISMATCH=1 KDIR=$kernel_source_dir
+PWD=$dkms_tree/acpi_call/1.0/build"
+DEST_MODULE_LOCATION[0]="/updates/dkms/"
+AUTOINSTALL="yes"' > /usr/src/acpi_call-$ACPICALLVERSION/dkms.conf
+
+dkms add -m acpi_call -v $ACPICALLVERSION
+dkms build -m acpi_call -v $ACPICALLVERSION
+dkms install -m acpi_call -v $ACPICALLVERSION
