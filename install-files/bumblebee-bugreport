@@ -110,6 +110,12 @@ echo >> /tmp/bug-report/bumblebee-report
 ls -la /etc/alternatives >> /tmp/bug-report/bumblebee-report
 
 echo >> /tmp/bug-report/bumblebee-report
+echo "/etc/default/bumblebee" >> /tmp/bug-report/bumblebee-report
+echo >> /tmp/bug-report/bumblebee-report
+cat /etc/default/bumblebee >> /tmp/bug-report/bumblebee-report
+
+
+echo >> /tmp/bug-report/bumblebee-report
 echo "dmidecode" >> /tmp/bug-report/bumblebee-report
 echo >> /tmp/bug-report/bumblebee-report
 dmidecode --string baseboard-manufacturer >> /tmp/bug-report/bumblebee-report
