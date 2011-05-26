@@ -15,7 +15,7 @@ sed -e "/INSERTMONITORLIST/r stages/manualselectmonitor" -e "/INSERTMONITORLIST/
 echo
 echo "Make sure you edit the following files:"
 echo "/usr/local/bin/bumblebee-enablecard"
-echo "/usr/local/bin/bumblebee-enablecard"
+echo "/usr/local/bin/bumblebee-disablecard"
 echo "for automatic switching on/off of the card."
 echo
 echo "Press any key to Continue"
