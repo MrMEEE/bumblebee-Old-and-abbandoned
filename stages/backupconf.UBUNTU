@@ -1,0 +1,2 @@
+cp -n /etc/modules /etc/modules.optiorig
+cp -n /etc/X11/xorg.conf /etc/X11/xorg.conf.optiorig

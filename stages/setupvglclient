@@ -1,0 +1,11 @@
+echo '#!/bin/sh' > /usr/bin/vglclient-service
+echo 'vglclient -gl' >> /usr/bin/vglclient-service
+chmod +x /usr/bin/vglclient-service  
+
+if [ ! -d $HOME/.config/autostart ]; then
+   mkdir $HOME/.config/autostart
+fi
+
+cp install-files/vglclient.desktop $HOME/.config/autostart/
+
+chmod +x $HOME/.config/autostart/vglclient.desktop

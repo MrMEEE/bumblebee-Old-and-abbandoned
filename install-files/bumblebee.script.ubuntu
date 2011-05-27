@@ -37,9 +37,15 @@ do_start()
 ! ps -p `cat $PIDFILE 2>&1` > /dev/null 2>&1 || return 1
 $ENABLECARD
 start-stop-daemon --start --quiet --background --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_ARGS
-while  [ `ps a |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
+i=1
+while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
  sleep 1
  log_daemon_msg "."
+ i=`expr $i + 1`
+ if [ $i -gt 10 ]; then
+  echo "Bumblebee server failed to start"
+  exit 1
+ fi 
 done
 start-stop-daemon --start --quiet --background --exec $VGLDAEMON -- $VGLDAEMON_ARGS
 
@@ -52,9 +58,15 @@ kill `cat $PIDFILE 2>&1` > /dev/null 2>&1
 killall vglclient > /dev/null 2>&1
 RETVAL=$?
 rm -f $PIDFILE
-while  [ `ps a |grep xorg.conf.nvidia |wc -l` -ne 1 ]; do
+i=0
+while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -ne 1 ]; do
  sleep 1
  log_daemon_msg "."
+ i=`expr $i + 1`
+ if [ $i -gt 10 ]; then
+   echo "Bumblebee server failed to stop"
+   exit 1
+ fi
 done
 $DISABLECARD
 return $RETVAL

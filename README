@@ -4,10 +4,7 @@
 # in any spare time. If you need extended support, you can fuel him up by
 # donating a Red Bull here to get him through the nights..:
 #
-# https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=mj%40casalogic
-# %2edk&lc=US&item_name=The%20Bumblebee%20Project%20by%20Martin%20Juhl&amount=
-# 3%2e00&currency_code=EUR&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donateC
-# C_LG%2egif%3aNonHosted
+# http://tinyurl.com/bumblebee-project
 #
 # ----------------------------------------------------------------------------
 
@@ -43,11 +40,25 @@ bumblebee is Optimus support for Linux, with real offloading, and not
 switchable graphics.. More important.. it works on Optimus Laptops without a
 graphical multiplexer..
 
-Version 1.4.24 of the bumblebee project has been released!!! (version number has
+Version 1.5.16 of the bumblebee project has been released!!! (version number has
 been reset from the prime-ng project)
 
-Bumblebee Supports: Ubuntu, Debian, OpenSuSE, Fedora and Arch Linux. More
+Bumblebee Supports: Ubuntu, Linux Mint, OpenSuSE and Fedora. More
 are comming.
+
+
+Arch Linux Support:
+
+http://aur.archlinux.org/packages.php?ID=48866
+
+Debian Linux Support:
+
+https://github.com/z0rc/debumblebee
+
+Gentoo Linux Support:
+
+https://github.com/iegor/bumblebee-Gentoo-support
+
 
 The Installation should now be completely automatic...
 
@@ -72,6 +83,10 @@ balance which applications should be run on which card..
 Support for automatically shutting down and starting up the nVidia card has
 been added in version 1.4.20 for Ubuntu. Other distributions are in
 progress.
+
+The nVidia card WILL be draining battery unless the two scripts:
+/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard
+are configured correctly..."
 
 But still I think it is a good step forward...
 
@@ -107,6 +122,25 @@ Dell Vostro 3500			Carlos
 Acer Aspire 5742G			Dardan
 Samsung RF711				Tomasz Karczmarski
 Asus U30J				Gianni Borghesan
+Asus U36JC				DeeKey
+Dell Vostro 3700			andresrommier
+Asus U31JG				kedazo
+Asus X53SV/K53SV			rom251
+Asus P31JG				ouafnico
+Asus N73JN				Sasin91
+Asus UL30VT				Akta
+Samsung QX310				BenjaminEvenson
+Dell Latitude E6420			Scotchy49
+Dell XPS 17 L702x			Stephen Brooks
 
-Status updates can be found here: http://www.martin-juhl.dk or on twitter
+Machines working with automatic power management of the nVidia card:
+
+Machine					User
+Alienware M11X R2                       Martin Juhl
+Asus P31JG                              ouafnico
+Asus 1215n				BarzantMD
+Dell Vostro 3500			pauloxnet
+Dell XPS 15				rockorequin
+
+Status updates can be found here: http://www.martin-juhl.dk or on twitter:
 http://twitter.com/martinjuhl

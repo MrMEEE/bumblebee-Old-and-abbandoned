@@ -26,7 +26,7 @@ start() {
 	/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9 &
 	touch "$lockfile" && success || failure
 	RETVAL=$?
-	while  [ `ps a |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
+	while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
 	 sleep 1
          echo "."
 	done
@@ -38,7 +38,7 @@ stop() {
 	kill `ps aux | grep "/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia" |grep -Ev grep |awk '/^root/{print $2}'`
 	/bin/rm "$lockfile" 2> /dev/null && success || failure
 	RETVAL=$?
-	while  [ `ps a |grep xorg.conf.nvidia |wc -l` -eq 2 ]; do
+	while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 2 ]; do
 	 sleep 1
          echo "."
         done
