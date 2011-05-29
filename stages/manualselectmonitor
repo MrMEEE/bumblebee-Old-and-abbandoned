@@ -15,6 +15,7 @@ echo "8) Samsung RF511/RF711/QX410-J01/QX310"
 echo "9) Toshiba Satellite M645-SP4132L"
 echo "10) Asus U30J/UL30VT/U30JC/U31JG/P31JG/U35J/U36JC/U43JC/U35JC/U43JC/U53JC/P52JC/K52JC/X52JC/N53SV/X53SV/N61JV/X64JV/N73JN"
 echo "11) Dell Latitude E6420"
+echo "12) MSI FX700"
 echo
 echo "97) Manually Set Output to CRT-0"
 echo "98) Manually Set Output to DFP-0"
@@ -73,6 +74,11 @@ CONNECTEDMONITOR="CRT-0"
 11) 
 CONNECTEDMONITOR="CRT-0"
 ;;
+
+12)
+CONNECTEDMONITOR="CRT-0"
+;;
+
   
 97)
 CONNECTEDMONITOR="CRT-0"
@@ -102,5 +108,4 @@ clear
 esac
 
 done
-
 

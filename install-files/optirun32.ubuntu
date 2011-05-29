@@ -13,7 +13,7 @@ export $VGL_READBACK
 vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld /usr/lib32/nvidia-current $@
 
 if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then 
- if [ `ps aux |grep vglrun |wc -l` -lt 2 ]; then
+ if [ `ps aux |grep optirun |wc -l` -lt 4 ]; then
   sudo /etc/init.d/bumblebee disable
  else
   echo "Another bumblebee powered application is running, keeping bumblebee alive."

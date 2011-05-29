@@ -34,7 +34,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.5.21
+BUMBLEBEEVERSION=1.5.22
 
 #Determine Arch x86_64 or i686
 ARCH=`uname -m`
@@ -47,6 +47,8 @@ MODPROBE=`which modprobe`
 BUMBLEBEEPWD=$PWD
 CONNECTEDMONITOR="UNDEFINED"
 IMAGETRANSPORT="UNDEFINED"
+POWERON="UNDEFINED"
+POWEROFF="UNDEFINED"
 
 source stages/determinedistro
 
@@ -95,6 +97,8 @@ echo
 source stages/autodetectmonitor.$DISTRO
 
 source stages/manualselectmonitor
+
+#source stages/powerconfiguration.$DISTRO
 
 echo
 echo "Setting output device to: $CONNECTEDMONITOR"

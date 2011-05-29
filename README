@@ -40,7 +40,7 @@ bumblebee is Optimus support for Linux, with real offloading, and not
 switchable graphics.. More important.. it works on Optimus Laptops without a
 graphical multiplexer..
 
-Version 1.5.21 of the bumblebee project has been released!!! (version number has
+Version 1.5.22 of the bumblebee project has been released!!! (version number has
 been reset from the prime-ng project)
 
 Bumblebee Supports: Ubuntu, Linux Mint, OpenSuSE and Fedora. More
@@ -96,8 +96,8 @@ I left the old releases up there in the old/ folder.. if someone needs it..
 
 Machines Confirmed Working:
 
-Machine					User
-Alienware M11X R2			Martin Juhl
+Machine					User			Distro
+Alienware M11X R2			Martin Juhl		Ubuntu 11.04
 Asus N82Jv				André Ventura
 Asus EeePC 1215N			Ellington Santos
 Asus N61Jv (X64Jv)			Ted
@@ -135,7 +135,8 @@ Dell XPS 17 L702x			Stephen Brooks
 Asus U30JC				paralocatucalva
 Alienware M11X R1			Joseph Livecchi
 Acer Aspire 8951G			Paul Hinds
-Asus UL80VT                             Maegras
+Asus UL80VT                             Maegras			Ubuntu 11.04
+
 
 Machines working with automatic power management of the nVidia card:
 
