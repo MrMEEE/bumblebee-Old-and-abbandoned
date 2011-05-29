@@ -97,7 +97,7 @@ if [ $DISTRO = UBUNTU  ] || [ $DISTRO = DEBIAN  ]; then
 elif [ $DISTRO = FEDORA  ] || [ $DISTRO = OPENSUSE  ]; then
  echo "Removing VirtualGL package"
  echo
- rpm -e VirtualGL
+ yum -y remove VirtualGL
  chkconfig bumblebee off 
 fi
 
@@ -110,9 +110,12 @@ echo "Restoring old configuration"
 mv $BASHRC.optiorig $BASHRC
 mv /etc/modprobe.d/blacklist.conf.optiorig /etc/modprobe.d/blacklist.conf
 mv /etc/modules.optiorig /etc/modules
-rm /etc/X11/xorg.conf
-mv /etc/X11/xorg.conf.optiorig /etc/X11/xorg.conf
+
+if [ -f /etc/X11/xorg.conf.optiorig ]
+    mv -f /etc/X11/xorg.conf.optiorig /etc/X11/xorg.conf
+fi
 rm /etc/X11/xorg.conf.nvidia
+
 rm -rf /etc/X11/xdm-optimus
 rm -rf /etc/X11/bumblebee
 rm /etc/init.d/xdm-optimus
