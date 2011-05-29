@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+DISABLECARD=/usr/local/bin/bumblebee-disablecard
+
+####
+## This script disables Nvidia card if no optirun is running.
+####
+if [  `ps aux |grep optirun|wc -l` -lt 2 ]; then
+	$DISABLECARD
+fi
