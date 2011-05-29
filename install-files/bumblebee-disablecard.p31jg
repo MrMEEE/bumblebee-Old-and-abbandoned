@@ -31,4 +31,4 @@ acpi_call () {
     esac   
 }
 
-echo _PS3 $(acpi_call "_SB.PCI0.PEG1.GFX0._PS3")
+echo _PS3 $(acpi_call "\_SB.PCI0.PEG1.GFX0._PS3")
