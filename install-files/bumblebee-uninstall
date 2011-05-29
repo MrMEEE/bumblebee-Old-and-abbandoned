@@ -111,7 +111,7 @@ mv $BASHRC.optiorig $BASHRC
 mv /etc/modprobe.d/blacklist.conf.optiorig /etc/modprobe.d/blacklist.conf
 mv /etc/modules.optiorig /etc/modules
 
-if [ -f /etc/X11/xorg.conf.optiorig ]
+if [ -f /etc/X11/xorg.conf.optiorig ]; then
     mv -f /etc/X11/xorg.conf.optiorig /etc/X11/xorg.conf
 fi
 rm /etc/X11/xorg.conf.nvidia
