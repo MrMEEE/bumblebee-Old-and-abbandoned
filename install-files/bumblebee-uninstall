@@ -93,6 +93,7 @@ if [ $DISTRO = UBUNTU  ] || [ $DISTRO = DEBIAN  ]; then
  echo
  dpkg -r VirtualGL
  update-rc.d -f bumblebee remove
+ rm /etc/pm/power.d/bumblebee-disablecard-on-powerup
 elif [ $DISTRO = FEDORA  ] || [ $DISTRO = OPENSUSE  ]; then
  echo "Removing VirtualGL package"
  echo
@@ -123,6 +124,7 @@ rm /usr/bin/xdm-optimus
 rm -rf /usr/lib64/nvidia-current
 rm -rf /usr/lib/nvidia-current
 rm /usr/local/bin/optirun*
+rm /usr/local/bin/bumblebee-disablecard-on-powerup
 rm /usr/bin/vglclient-service
 rm /etc/modprobe.d/nouveau-blacklist.conf
 rm -rf /usr/share/doc/bumblebee
@@ -156,7 +158,6 @@ grep -Ev 'VGL|optirun' $HOME/.bashrc > $HOME/.oldbashrc
 mv $HOME/.oldbashrc $HOME/.bashrc
 grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
 mv /etc/sudoers.optiorig /etc/sudoers
-
 chmod 0440 /etc/sudoers
 
 killall -9 vglclient
