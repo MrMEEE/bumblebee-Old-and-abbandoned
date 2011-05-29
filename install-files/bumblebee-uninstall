@@ -96,7 +96,7 @@ if [ $DISTRO = UBUNTU  ] || [ $DISTRO = DEBIAN  ]; then
 elif [ $DISTRO = FEDORA  ] || [ $DISTRO = OPENSUSE  ]; then
  echo "Removing VirtualGL package"
  echo
- rpm -e VirtualGL
+ yum -y remove VirtualGL
  chkconfig bumblebee off 
 fi
 
