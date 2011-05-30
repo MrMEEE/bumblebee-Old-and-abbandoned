@@ -30,7 +30,7 @@ case `cat /tmp/machineinfo | wc -l` in
  echo "Confirmed working by: "$USER
  echo
 
- CONNECTEDMONTIOR=`cat /tmp/machineinfo |cut -f3 -d\| | sed -e 's/ //g'`
+ CONNECTEDMONITOR=`cat /tmp/machineinfo |cut -f3 -d\| | sed -e 's/ //g'`
  INTELBUSID=`cat /tmp/machineinfo |cut -f4 -d\| | sed -e 's/ //g'`
  NVIDIABUSID=`cat /tmp/machineinfo |cut -f5 -d\| | sed -e 's/ //g'`
  POWERON=`cat /tmp/machineinfo |cut -f6 -d\|`
@@ -47,6 +47,7 @@ case `cat /tmp/machineinfo | wc -l` in
  do
   echo $i") "`cat /tmp/machineinfo |sed -n \`echo $i\`p|cut -f1 -d\|` `cat /tmp/machineinfo |sed -n \`echo $i\`p|cut -f2 -d\|`
   echo "   Confirmed working by: "`cat /tmp/machineinfo |sed -n \`echo $i\`p|cut -f9 -d\|` 
+  echo "   On: "`cat /tmp/machineinfo |sed -n \`echo $i\`p|cut -f10 -d\|`
   POWERSTATUS=`cat /tmp/machineinfo |sed -n \`echo $i\`p|cut -f6 -d\| | sed -e 's/ //g'`
   REF=UNAVAILABLE
   if [ "$POWERSTATUS" = "$REF"  ]; then
@@ -59,7 +60,7 @@ case `cat /tmp/machineinfo | wc -l` in
  echo
  read CONFIG
  echo
- CONNECTEDMONTIOR=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f3 -d\| | sed -e 's/ //g'`
+ CONNECTEDMONITOR=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f3 -d\| | sed -e 's/ //g'`
  INTELBUSID=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f4 -d\| | sed -e 's/ //g'`
  NVIDIABUSID=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f5 -d\| | sed -e 's/ //g'`
  POWERON=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f6 -d\|`

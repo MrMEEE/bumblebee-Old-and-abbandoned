@@ -106,7 +106,6 @@ CONNECTEDMONITOR=`echo $manualinput`
 echo
 echo "Please choose a valid option, Press any key to try again"
 read
-clear
 
 ;;
   

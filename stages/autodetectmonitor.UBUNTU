@@ -1,6 +1,8 @@
 echo
 echo "Auto-detecting hardware"
+echo $CONNECTEDMONITOR
 echo
+
 if [ "$CONNECTEDMONITOR" = "UNDEFINED" ]; then
 if [ -f /usr/local/bin/bumblebee-enablecard ]; then
  /usr/local/bin/bumblebee-enablecard
