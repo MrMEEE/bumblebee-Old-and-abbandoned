@@ -160,7 +160,7 @@ fi
 
 grep -Ev 'VGL|optirun' $HOME/.bashrc > $HOME/.oldbashrc
 mv $HOME/.oldbashrc $HOME/.bashrc
-chown $USER:$USER .bashrc
+chown $USER:$USER $HOME/.bashrc
 grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
 mv /etc/sudoers.optiorig /etc/sudoers
 chmod 0440 /etc/sudoers
