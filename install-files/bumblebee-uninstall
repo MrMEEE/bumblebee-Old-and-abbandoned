@@ -160,6 +160,7 @@ fi
 
 grep -Ev 'VGL|optirun' $HOME/.bashrc > $HOME/.oldbashrc
 mv $HOME/.oldbashrc $HOME/.bashrc
+chown $USER:$USER .bashrc
 grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
 mv /etc/sudoers.optiorig /etc/sudoers
 chmod 0440 /etc/sudoers
@@ -173,5 +174,3 @@ echo "bumblebee has been uninstalled :("
 echo
 
 rm /etc/bumblebee
-
-rm /usr/local/bin/bumblebee-uninstall
