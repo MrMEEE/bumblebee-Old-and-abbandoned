@@ -3,7 +3,7 @@ echo "Autodetecting Hardware and fetching installation information."
 echo
 
 rm /tmp/machineinfo
-wget -O /tmp/machineinfo "http://martin-juhl.dk/bumblebee/?searchitem=`dmidecode --string baseboard-product-name`&search=1" 1>/dev/null 2>/dev/null
+wget -O /tmp/machineinfo "http://martin-juhl.dk/bumblebee/?searchitem=`dmidecode --string system-product-name`&search=1" 1>/dev/null 2>/dev/null
 
 
 
