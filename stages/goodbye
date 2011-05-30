@@ -31,6 +31,8 @@ echo "Or even better.. create an issue on github... this really makes bugfixing 
 echo
 echo "If you need to reconfigure bumblebee the script bumblebee-config as available."
 echo
+echo "And please... I your system is working.. run the bumblebee-submitsystem utility"
+echo
 echo "Good luck... MrMEEE / Martin Juhl"
 echo
 echo "http://www.martin-juhl.dk, http://twitter.com/martinjuhl, https://github.com/MrMEEE/bumblebee"

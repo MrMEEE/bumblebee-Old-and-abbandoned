@@ -1,3 +1,4 @@
+if [ "$INTELBUSID" = "UNAVAILABLE" ]; then
 INTELBUSID=`echo "PCI:"\`${LSPCI} |grep VGA |grep Intel |cut -f1 -d:\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d. |cut -f1 -d" "\``
 if [ `${LSPCI} |grep VGA |wc -l` -eq 2 ]; then 
    NVIDIABUSID=`echo "PCI:"\`${LSPCI} |grep VGA |grep nVidia |cut -f1 -d:\`":"\`${LSPCI} |grep VGA |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep VGA |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``
@@ -13,6 +14,7 @@ else
  echo
  read
 fi 
+fi
 
 echo
 echo "Changing Configuration to match your Machine."

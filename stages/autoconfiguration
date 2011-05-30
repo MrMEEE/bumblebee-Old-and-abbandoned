@@ -1,0 +1,71 @@
+echo
+echo "Autodetecting Hardware and fetching installation information."
+echo
+
+rm /tmp/machineinfo
+wget -O /tmp/machineinfo "http://martin-juhl.dk/bumblebee/?searchitem=`dmidecode --string baseboard-product-name`&search=1" 1>/dev/null 2>/dev/null
+
+
+
+case `cat /tmp/machineinfo | wc -l` in 
+
+0)
+ echo
+ echo "Your machine is not registered in the database, starting manual"
+ echo "configuration."
+ echo "If you get bumblebee running, please run bumblebee-submitsystem."
+ echo
+;;
+
+1)
+ MANUFACTURER=`cat /tmp/machineinfo |cut -f1 -d\|`
+ MODEL=`cat /tmp/machineinfo |cut -f2 -d\|`
+ USER=`cat /tmp/machineinfo |cut -f9 -d\|`
+ echo
+ echo "Machine configuration found"
+ echo "Hardware detected: "
+ echo
+ echo $MANUFACTURER $MODEL
+ echo
+ echo "Confirmed working by: "$USER
+ echo
+
+ CONNECTEDMONTIOR=`cat /tmp/machineinfo |cut -f3 -d\| | sed -e 's/ //g'`
+ INTELBUSID=`cat /tmp/machineinfo |cut -f4 -d\| | sed -e 's/ //g'`
+ NVIDIABUSID=`cat /tmp/machineinfo |cut -f5 -d\| | sed -e 's/ //g'`
+ POWERON=`cat /tmp/machineinfo |cut -f6 -d\|`
+ POWEROFF=`cat /tmp/machineinfo |cut -f7 -d\|`
+;;
+
+*)
+ echo
+ echo "Several configurations found for your machine"
+ echo
+ echo "Please Select"
+ echo
+ for i in `seq 1 \`cat /tmp/machineinfo |wc -l\``;
+ do
+  echo $i") "`cat /tmp/machineinfo |sed -n \`echo $i\`p|cut -f1 -d\|` `cat /tmp/machineinfo |sed -n \`echo $i\`p|cut -f2 -d\|`
+  echo "   Confirmed working by: "`cat /tmp/machineinfo |sed -n \`echo $i\`p|cut -f9 -d\|` 
+  POWERSTATUS=`cat /tmp/machineinfo |sed -n \`echo $i\`p|cut -f6 -d\| | sed -e 's/ //g'`
+  REF=UNAVAILABLE
+  if [ "$POWERSTATUS" = "$REF"  ]; then
+   echo "   Power Configuration is NOT available."
+  else
+   echo "   Power Configuration IS available."
+  fi
+  echo
+ done
+ echo
+ read CONFIG
+ echo
+ CONNECTEDMONTIOR=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f3 -d\| | sed -e 's/ //g'`
+ INTELBUSID=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f4 -d\| | sed -e 's/ //g'`
+ NVIDIABUSID=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f5 -d\| | sed -e 's/ //g'`
+ POWERON=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f6 -d\|`
+ POWEROFF=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f7 -d\|`
+;;
+
+esac
+
+

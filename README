@@ -40,7 +40,7 @@ bumblebee is Optimus support for Linux, with real offloading, and not
 switchable graphics.. More important.. it works on Optimus Laptops without a
 graphical multiplexer..
 
-Version 1.5.23 of the bumblebee project has been released!!! (version number has
+Version 1.6.0 of the bumblebee project has been released!!! (version number has
 been reset from the prime-ng project)
 
 Bumblebee Supports: Ubuntu, Linux Mint, OpenSuSE and Fedora. More
@@ -137,7 +137,9 @@ Alienware M11X R1			Joseph Livecchi
 Acer Aspire 8951G			Paul Hinds
 Asus UL80VT                             Maegras			Ubuntu 11.04
 MSI-FX700                               Mrssheep
-
+Samsung QX410 J01			Ben Sanders
+Asus U30JC				Julien-Charles		Ubuntu 10.10
+Lenovo T410				innoscopio		Linux Mint 11
 
 Machines working with automatic power management of the nVidia card:
 

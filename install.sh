@@ -34,7 +34,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.5.23
+BUMBLEBEEVERSION=1.6.0
 
 #Determine Arch x86_64 or i686
 ARCH=`uname -m`
@@ -49,6 +49,8 @@ CONNECTEDMONITOR="UNDEFINED"
 IMAGETRANSPORT="UNDEFINED"
 POWERON="UNDEFINED"
 POWEROFF="UNDEFINED"
+INTELBUSID="UNDEFINED"
+NVIDIABUSID="UNDEFINED"
 
 source stages/determinedistro
 
@@ -88,17 +90,19 @@ source stages/installbumblebee.$DISTRO
 
 source stages/installbumblebee.post
 
-source stages/busiddetection
-
 echo
 echo "Auto-detecting hardware"
 echo
+
+source stages/autoconfiguration
+
+source stages/busiddetection
 
 source stages/autodetectmonitor.$DISTRO
 
 source stages/manualselectmonitor
 
-#source stages/powerconfiguration.$DISTRO
+source stages/powerconfiguration
 
 echo
 echo "Setting output device to: $CONNECTEDMONITOR"

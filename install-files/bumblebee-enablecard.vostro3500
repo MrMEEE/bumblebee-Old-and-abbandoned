@@ -26,5 +26,5 @@ acpi_call () {
     esac
 }
 
-echo _PS0 $(acpi_call "\_SB.PCI0.POP1.PEGP._ON")
+echo _PS0 $(acpi_call "\_SB.PCI0.P0P1.PEGP._ON")
 modprobe nvidia-current
