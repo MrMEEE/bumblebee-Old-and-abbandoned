@@ -56,6 +56,7 @@ if [ "$ARCH" = "x86_64" ]; then
  cp install-files/optirun64.ubuntu /usr/local/bin/optirun64
  cp install-files/optirun64.bash_completion /etc/bash_completion.d/optirun64
  cp install-files/optirun32.bash_completion /etc/bash_completion.d/optirun32
+ ln -s /usr/local/bin/optirun64 /usr/local/bin/optirun
 else
  cp install-files/optirun64.ubuntu /usr/local/bin/optirun
  cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
