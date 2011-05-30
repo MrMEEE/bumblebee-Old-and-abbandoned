@@ -34,7 +34,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.6.1
+BUMBLEBEEVERSION=1.6.2
 
 #Determine Arch x86_64 or i686
 ARCH=`uname -m`
