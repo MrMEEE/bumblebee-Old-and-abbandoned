@@ -131,6 +131,7 @@ rm /usr/local/bin/bumblebee-disablecard-on-powerup
 rm /usr/bin/vglclient-service
 rm /etc/modprobe.d/nouveau-blacklist.conf
 rm -rf /usr/share/doc/bumblebee
+rm -rf /usr/local/bin/bumblebee*
 rm -rf /etc/default/bumblebee*
 if [ -d /opt/prime-ng ]; then
 rm -rf /opt/prime-ng

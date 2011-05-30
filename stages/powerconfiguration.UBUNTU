@@ -1,0 +1,53 @@
+if [ "$POWERON" != "UNDEFINED" ]; then
+ cp install-files/bumblebee-enablecard.template.ubuntu /usr/local/bin/bumblebee-enablecard
+ cp install-files/bumblebee-disablecard.template.ubuntu /usr/local/bin/bumblebee-disablecard
+ echo
+ echo "Configuring Power Management."
+ echo
+ for x in `seq 1 \`echo $POWERON| sed -e 's/;/\n/g' |wc -l\``; do
+  LINE=`echo $POWERON| sed -e 's/;/\n/g' | sed -n \`echo $x\`p`
+  echo $LINE
+  sed -i '/INSERTPOWERON/i\echo $(acpi_call \"\'"`echo $LINE`"'\")' /usr/local/bin/bumblebee-enablecard
+ done
+ sed -i 's/INSERTPOWERON//g' /usr/local/bin/bumblebee-enablecard
+
+ for x in `seq 1 \`echo $POWEROFF| sed -e 's/;/\n/g' |wc -l\``; do
+  LINE=`echo $POWEROFF| sed -e 's/;/\n/g' | sed -n \`echo $x\`p`
+  echo $LINE
+  sed -i '/INSERTPOWEROFF/i\echo $(acpi_call \"\'"`echo $LINE`"'\")' /usr/local/bin/bumblebee-disablecard
+ done
+ sed -i 's/INSERTPOWEROFF//g' /usr/local/bin/bumblebee-disablecard
+ echo  
+ chmod +x /usr/local/bin/bumblebee*
+else
+ echo
+ echo "No power-on/off configuration has been reported for your machine"
+ echo "please manully enter configuration in:"
+ echo
+ echo "/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard"
+ echo
+ echo "Some examples are available in /usr/share/doc/bumblebee/."
+ echo
+ echo "Press any key to continue..."
+ read
+ echo
+  
+ if [ ! -f /usr/local/bin/bumblebee-enablecard ]; then
+  # Not installed
+  cp install-files/bumblebee-enablecard /usr/local/bin/
+ else
+  # Already Exists
+  echo
+  echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard, already exists not overwriting."
+  echo
+ fi
+ if [ ! -f /usr/local/bin/bumblebee-disablecard ]; then
+  # Not installed
+  cp install-files/bumblebee-disablecard /usr/local/bin/
+ else
+  # Already Exists
+  echo
+  echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard, already exists not overwriting."
+  echo
+ fi
+fi 
