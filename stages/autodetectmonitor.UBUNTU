@@ -1,6 +1,5 @@
 echo
 echo "Auto-detecting hardware"
-echo $CONNECTEDMONITOR
 echo
 
 if [ "$CONNECTEDMONITOR" = "UNDEFINED" ]; then
