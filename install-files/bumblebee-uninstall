@@ -165,6 +165,8 @@ chmod 0440 /etc/sudoers
 
 killall -9 vglclient
 
+rm -rf /etc/bash_completion.d/optirun*
+
 echo
 echo "bumblebee has been uninstalled :("
 echo
