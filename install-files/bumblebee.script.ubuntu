@@ -73,7 +73,7 @@ return $RETVAL
 }
 
 case "$1" in
-  enable)
+  enable | stop)
 log_daemon_msg "Starting $DESC" "$NAME "
 do_start
 case $? in
@@ -81,7 +81,7 @@ case $? in
 1) log_action_end_msg 1 "already running" ;;
 esac
 ;;
-  disable | stop | start)
+  disable | start)
 log_daemon_msg "Stopping $DESC" "$NAME "
 do_stop
 case $? in
