@@ -3,6 +3,10 @@ if [ $VERSION = 11.04 ]; then
  echo
  echo "Ubuntu 11.04 Detected."
  echo
+elif [ $VERSION = oneiric ]; then
+ echo
+ echo "Ubuntu 11.10 oneiric detected."
+ echo
 else 
  echo
  echo "Ubuntu "$VERSION" Detected."
