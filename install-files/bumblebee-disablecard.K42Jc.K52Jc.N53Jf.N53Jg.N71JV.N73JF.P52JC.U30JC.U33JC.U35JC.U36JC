@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script should contain the command(s) nessesary to switch off the
 # nVidia card.
-# As an example i've included the script for the Dell Vostro 3500, provided by pauloxnet..
+# As an example i've included the script for the Asus machines..
 # Please note that the acpi_call module is need for these operations:
 #
 # http://linux-hybrid-graphics.blogspot.com/2010/07/using-acpicall-module-to-switch-onoff.html

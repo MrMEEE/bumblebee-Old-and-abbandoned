@@ -40,7 +40,7 @@ bumblebee is Optimus support for Linux, with real offloading, and not
 switchable graphics.. More important.. it works on Optimus Laptops without a
 graphical multiplexer..
 
-Version 1.6.10 of the bumblebee project has been released!!! (version number has
+Version 1.6.11 of the bumblebee project has been released!!! (version number has
 been reset from the prime-ng project)
 
 Bumblebee Supports: Ubuntu, Linux Mint, OpenSuSE and Fedora. More
@@ -90,7 +90,19 @@ are configured correctly..."
 
 But still I think it is a good step forward...
 
-Just download the install.sh and the install-files folder..
+There are several ways to start using bumblebee:
+
+Download the .zip or .tar.gz by clicking the 'Downloads' button on the
+'Source' page to a directory of your liking. Unzip or untar and run the install
+script with 'sudo ./install.sh' (or 'sudo -E ./install.sh' on Fedora)
+
+Go to the directory of your liking and:
+1. git clone http://github.com/MrMEEE/bumblebee.git
+2. cd bumblebee/
+3. sudo ./install.sh (or 'sudo -E ./install.sh' on Fedora)
+
+(The second method makes it easier to regularly update bumblebee if you're
+willing to invest a little bit of time in working with git.)
 
 I left the old releases up there in the old/ folder.. if someone needs it..
 
