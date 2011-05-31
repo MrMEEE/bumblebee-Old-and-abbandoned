@@ -31,4 +31,4 @@ acpi_call () {
     esac   
 }
 
-echo _PS0 $(acpi_call " \_SB.PCI0.P0P1.PEGP._OFF")
+echo _PS0 $(acpi_call "\_SB.PCI0.P0P1.PEGP._OFF")
