@@ -114,6 +114,13 @@ echo "/etc/default/bumblebee" >> /tmp/bug-report/bumblebee-report
 echo >> /tmp/bug-report/bumblebee-report
 cat /etc/default/bumblebee >> /tmp/bug-report/bumblebee-report
 
+echo >> /tmp/bug-report/bumblebee-report
+echo "Enable/Disable Scripts" >> /tmp/bug-report/bumblebee-report
+echo >> /tmp/bug-report/bumblebee-report
+
+cat /usr/local/bin/bumblebee-enablecard >> /tmp/bug-report/bumblebee-report
+echo >> /tmp/bug-report/bumblebee-report
+cat /usr/local/bin/bumblebee-disablecard >> /tmp/bug-report/bumblebee-report
 
 echo >> /tmp/bug-report/bumblebee-report
 echo "dmidecode" >> /tmp/bug-report/bumblebee-report
