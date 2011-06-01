@@ -1,60 +1,75 @@
 yum -y install wget binutils gcc kernel-devel mesa-libGL mesa-libGLU
-  if [ $? -ne 0 ]; then
-   echo 
-   echo "Package manager failed to install needed packages..."
-   echo     
-   exit 21  
-  fi
-  rm -rf /tmp/NVIDIA*
-  echo "Getting latest NVidia drivers version"
-  NV_DRIVERS_VERSION=`wget -q -O - http://www.nvidia.com/object/unix.html | grep "Linux x86_64/AMD64/EM64T" | cut -f5 -d">" | cut -f1 -d"<"`
-  echo "Latest NVidia drivers version is $NV_DRIVERS_VERSION"
-  if [ "$ARCH" = "x86_64" ]; then  
-    wget http://us.download.nvidia.com/XFree86/Linux-x86_64/${NV_DRIVERS_VERSION}/NVIDIA-Linux-x86_64-${NV_DRIVERS_VERSION}.run -O /tmp/NVIDIA-Linux-driver.run
-  elif [ "$ARCH" = "i686" ]; then
-    wget http://us.download.nvidia.com/XFree86/Linux-x86/${NV_DRIVERS_VERSION}/NVIDIA-Linux-x86-${NV_DRIVERS_VERSION}.run -O /tmp/NVIDIA-Linux-driver.run
-  fi
-  chmod +x /tmp/NVIDIA-Linux-driver.run
-  cd /tmp/
-  /tmp/NVIDIA-Linux-driver.run -x
-  if [ "$ARCH" = "x86_64" ]; then
-    cd /tmp/NVIDIA-Linux-x86_64-${NV_DRIVERS_VERSION}/kernel
-  elif [ "$ARCH" = "i686" ]; then
-    cd /tmp/NVIDIA-Linux-x86-${NV_DRIVERS_VERSION}/kernel
-  fi
-  make install
-  cd $BUMBLEBEEPWD
-  depmod -a
-  ldconfig 
-  ${MODPROBE} -r nouveau
-  ${MODPROBE} nvidia
+if [ $? -ne 0 ]; then
+    echo
+    echo "Package manager failed to install needed packages..."
+    echo
+    exit 21
+fi
 
-  if [ "$ARCH" = "x86_64" ]; then
-   rm -rf /usr/lib64/nvidia-current/
-   rm -rf /usr/lib/nvidia-current/  
-   rm -rf /usr/lib32/nvidia-current/
-   mkdir -p /usr/lib64/nvidia-current/
-   mv /tmp/NVIDIA-Linux-x86_64-${NV_DRIVERS_VERSION}/* /usr/lib64/nvidia-current/
-   ln -s /usr/lib64/nvidia-current/32 /usr/lib/nvidia-current
-   mkdir -p /usr/lib64/nvidia-current/xorg
-   ln -s /usr/lib64/nvidia-current/libglx.so.${NV_DRIVERS_VERSION} /usr/lib64/nvidia-current/xorg/libglx.so
-   ln -s /usr/lib64/nvidia-current/nvidia_drv.so /usr/lib64/nvidia-current/xorg/nvidia_drv.so
-   rm -rf /usr/lib64/nvidia-current/xorg/xorg
-   ln -s /usr/lib64/nvidia-current/xorg/ /usr/lib/nvidia-current/xorg
-   rm -rf /usr/lib64/xorg/xorg
-   ln -s /usr/lib64/xorg/ /usr/lib/xorg
-  elif [ "$ARCH" = "i686" ]; then
-   rm -rf /usr/lib/nvidia-current/
-   mkdir -p /usr/lib/nvidia-current/
-   mv /tmp/NVIDIA-Linux-x86-${NV_DRIVERS_VERSION}/* /usr/lib/nvidia-current/
-   mkdir -p /usr/lib/nvidia-current/xorg
-   ln -s /usr/lib/nvidia-current/libglx.so.${NV_DRIVERS_VERSION} /usr/lib/nvidia-current/xorg/libglx.so
-   ln -s /usr/lib/nvidia-current/nvidia_drv.so /usr/lib/nvidia-current/xorg/nvidia_drv.so
-  fi
-if [ "`cat /etc/modules |grep "nvidia" |wc -l`" -eq "0" ]; then        
-  echo "nvidia" >> /etc/modules
-fi  
-echo
-echo "Regenerating initramfs."
-echo 
-mkinitrd -f /boot/initramfs-$(uname -r).img $(uname -r)
+rm -rf /tmp/NVIDIA*
+echo "Getting latest NVidia drivers version"
+if [ "$ARCH" = "x86_64" ]; then
+    BASEDIR="ftp://download.nvidia.com/XFree86/Linux-x86_64/"
+elif [ "$ARCH" = "i686" ]; then
+    BASEDIR="ftp://download.nvidia.com/XFree86/Linux-x86/"
+fi
+LATEST=`wget -q -O - ${BASEDIR}/latest.txt | cut -f2 -d" "`
+cd /tmp
+wget -nv ${BASEDIR}/${LATEST}
+
+NV_DRIVERS_VERSION=`echo ${LATEST} | cut -f1 -d"/"`
+NV_DRIVER=`echo ${LATEST} | cut -f2 -d"/" | sed s/.run//`
+echo "Latest NVidia drivers version is ${NV_DRIVERS_VERSION}"
+
+# Extract the binary
+sh /tmp/${NV_DRIVER}.run -x
+
+# New method for x86_64 but still the old one for i686
+if [ "$ARCH" = "x86_64" ]; then
+
+    rm -rf /usr/lib64/nvidia-current
+    rm -rf /usr/lib/nvidia-current
+
+    cd /tmp/${NV_DRIVER}
+
+    ${MODPROBE} -r nouveau
+    ./nvidia-installer --no-x-check\
+                        -s\
+                       --x-prefix=/usr/lib64/nvidia-current\
+                       --x-library-path=/usr/lib64/nvidia-current\
+                       --installer-prefix=/usr/lib64/nvidia-current\
+                       --x-module-path=/usr/lib64/nvidia-current/xorg/modules\
+                       --utility-prefix=/usr/lib64/nvidia-current --utility-libdir=.\
+                       --opengl-prefix=/usr/lib64/nvidia-current --opengl-libdir=.\
+                       --compat32-prefix=/usr/lib/nvidia-current --compat32-libdir=.
+    ${MODPROBE} nvidia
+
+    # Make sure we still have 3D on our Intel card
+    yum -y reinstall mesa-libGL xorg-x11-server-Xorg
+
+    # Make sure we can run the nvidia X-server without all kind of library issues
+    # See also http://us.download.nvidia.com/XFree86/Linux-x86_64/270.41.19/README/installedcomponents.html
+    rm /usr/lib64/nvidia-current/xorg/modules/libnvidia-wfb.so.270.41.19
+    rm /usr/lib64/nvidia-current/xorg/modules/libnvidia-wfb.so.1
+    rm /usr/lib64/nvidia-current/xorg/modules/libwfb.so
+
+    cd $BUMBLEBEEPWD
+
+elif [ "$ARCH" = "i686" ]; then
+
+    cd /tmp/${NV_DRIVER}/kernel
+    make install
+    cd $BUMBLEBEEPWD
+    depmod -a
+    ldconfig
+    ${MODPROBE} -r nouveau
+    ${MODPROBE} nvidia
+
+    rm -rf /usr/lib/nvidia-current/
+    mkdir -p /usr/lib/nvidia-current/
+    mv /tmp/${NV_DRIVER}/* /usr/lib/nvidia-current/
+    mkdir -p /usr/lib/nvidia-current/xorg
+    ln -s /usr/lib/nvidia-current/libglx.so.${NV_DRIVERS_VERSION} /usr/lib/nvidia-current/xorg/libglx.so
+    ln -s /usr/lib/nvidia-current/nvidia_drv.so /usr/lib/nvidia-current/xorg/nvidia_drv.so
+
+fi
