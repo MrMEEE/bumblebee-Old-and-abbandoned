@@ -1,10 +1,12 @@
 #!/bin/bash
 # This script should contain the command(s) nessesary to switch off the
 # nVidia card.
-# As an example i've included the script for the Dell Vostro 3500, provided by pauloxnet..
 # Please note that the acpi_call module is need for these operations:
 #
 # http://linux-hybrid-graphics.blogspot.com/2010/07/using-acpicall-module-to-switch-onoff.html
+
+# acpi_call method to turn OFF nVidia Card
+NV_SWITCH_OFF=  #Put your method here
 
 rmmod nvidia
 if lsmod | grep -q nvidia; then
@@ -14,7 +16,8 @@ fi
 modprobe acpi_call
 
 if ! lsmod | grep -q acpi_call; then
-    echo "Error: acpi_call module not loaded"
+    echo "Error: acpi_call module not loaded,"
+    echo "you won't be able to turn off nVidia card"
     exit
 fi
 
@@ -26,9 +29,9 @@ acpi_call () {
       echo "Disabling nVidia Card failed ($result)."
       ;;                          
      *)                                   
-      echo "Disabling nVidia Card Succeded."                                                                                
-     ;;                                                                   
+      echo "Disabling nVidia Card Succeded."
+      ;;                                                                   
     esac   
 }
 
-echo _PS0 $(acpi_call "\_SB.PCI0.P0P1.PEGP._OFF")
+echo _PS0 $(acpi_call $NV_SWITCH_OFF)
