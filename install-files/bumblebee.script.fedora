@@ -23,9 +23,11 @@ export LD_LIBRARY_PATH
 
 start() {
 	echo -n $"Starting up bumblebee X server: "
-	/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9 &
-	touch "$lockfile" && success || failure
+        # Dirty hack to get rid of nouveau, blacklisting and kernel parameters don't seem to work on Fedora 15 and removing nouveau is even hackier.
+        modprobe -r nouveau
+	/usr/bin/Xorg -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9 &
 	RETVAL=$?
+	touch "$lockfile" && success || failure
 	while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
 	 sleep 1
          echo "."
@@ -35,9 +37,9 @@ start() {
 
 stop() {
 	echo -n $"Stopping bumblebee X server: "
-	kill `ps aux | grep "/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia" |grep -Ev grep |awk '/^root/{print $2}'`
-	/bin/rm "$lockfile" 2> /dev/null && success || failure
+	kill `ps aux | grep "/usr/bin/Xorg -ac -config /etc/X11/xorg.conf.nvidia" |grep -Ev grep |awk '/^root/{print $2}'`
 	RETVAL=$?
+	/bin/rm "$lockfile" 2> /dev/null && success || failure
 	while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 2 ]; do
 	 sleep 1
          echo "."
