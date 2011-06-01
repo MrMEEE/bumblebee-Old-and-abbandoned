@@ -98,6 +98,9 @@ elif [ $DISTRO = FEDORA  ] || [ $DISTRO = OPENSUSE  ]; then
  echo "Removing VirtualGL package"
  echo
  yum -y remove VirtualGL
+ if [ -f /etc/profile.d/virtualgl.sh ]; then
+     rm /etc/profile.d/virtualgl.sh
+ fi
  chkconfig bumblebee off 
 fi
 
