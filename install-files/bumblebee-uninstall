@@ -159,6 +159,7 @@ if [ -f /usr/bin/xdm-optimus ]; then
 fi
 rm -rf /usr/lib64/nvidia-current
 rm -rf /usr/lib/nvidia-current
+rm -rf /usr/lib/bumblebee
 rm /usr/local/bin/optirun*
 rm /usr/local/bin/bumblebee-disablecard-on-powerup
 rm /usr/bin/vglclient-service

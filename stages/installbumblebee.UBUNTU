@@ -66,3 +66,12 @@ if [ "`cat /etc/modules |grep "nvidia-current" |wc -l`" -eq "0" ]; then
   echo "nvidia-current" >> /etc/modules
 fi
 
+mkdir /usr/lib/bumblebee
+ln -s /usr/lib/xorg/modules/extensions/libdbe.so /usr/lib/bumblebee/libdbe.so
+ln -s /usr/lib/xorg/modules/extensions/libextmod.so /usr/lib/bumblebee/libextmod.so
+ln -s /usr/lib/xorg/modules/extensions/libdri2.so /usr/lib/bumblebee/libdri2.so
+ln -s /usr/lib/xorg/modules/extensions/libdri.so /usr/lib/bumblebee/libdri.so
+ln -s /usr/lib/xorg/modules/extensions/librecord.so /usr/lib/bumblebee/librecord.so
+ln -s /usr/lib/xorg/modules/libfb.so /usr/lib/bumblebee/libfb.so
+ln -s /usr/lib/xorg/modules/input/evdev_drv.so /usr/lib/bumblebee/evdev_drv.so
+ln -s /usr/lib/xorg/modules/libwfb.so /usr/lib/bumblebee/libwfb.so
