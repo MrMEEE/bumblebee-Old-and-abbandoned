@@ -107,9 +107,15 @@ ${MODPROBE} -r nvidia
 
 echo
 echo "Restoring old configuration"
-mv $BASHRC.optiorig $BASHRC
-mv /etc/modprobe.d/blacklist.conf.optiorig /etc/modprobe.d/blacklist.conf
-mv /etc/modules.optiorig /etc/modules
+if [ -f ${BASHRC}.optiorig ]; then
+    mv $BASHRC.optiorig $BASHRC
+fi
+if [ -f /etc/modprobe.d/blacklist.conf.optiorig ]; then
+    mv /etc/modprobe.d/blacklist.conf.optiorig /etc/modprobe.d/blacklist.conf
+fi
+if [ -f /etc/modules.optiorig ]; then
+    mv /etc/modules.optiorig /etc/modules
+fi
 
 if [ -f /etc/X11/xorg.conf.optiorig ]; then
     mv -f /etc/X11/xorg.conf.optiorig /etc/X11/xorg.conf
@@ -118,12 +124,20 @@ rm /etc/X11/xorg.conf.nvidia
 
 rm -rf /etc/X11/xdm-optimus
 rm -rf /etc/X11/bumblebee
-rm /etc/init.d/xdm-optimus
+if [ -f /etc/init.d/xdm-optimus ]; then
+    rm /etc/init.d/xdm-optimus
+fi
 rm /etc/init.d/bumblebee
-rm /etc/modprobe.d/virtualgl.conf
-rm /usr/local/bin/optimusXserver
+if [ -f /etc/modprobe.d/virtualgl.conf ]; then
+    rm /etc/modprobe.d/virtualgl.conf
+fi
+if [ -f /usr/local/bin/optimusXserver ]; then
+    rm /usr/local/bin/optimusXserver
+fi
 rm /usr/local/bin/bumblebee-bugreport
-rm /usr/bin/xdm-optimus
+if [ -f /usr/bin/xdm-optimus ]; then
+    rm /usr/bin/xdm-optimus
+fi
 rm -rf /usr/lib64/nvidia-current
 rm -rf /usr/lib/nvidia-current
 rm /usr/local/bin/optirun*
@@ -134,10 +148,10 @@ rm -rf /usr/share/doc/bumblebee
 rm -rf /usr/local/bin/bumblebee*
 rm -rf /etc/default/bumblebee*
 if [ -d /opt/prime-ng ]; then
-rm -rf /opt/prime-ng
+    rm -rf /opt/prime-ng
 fi
 if [ -d /opt/bumblebee ]; then
-rm -rf /opt/bumblebee
+    rm -rf /opt/bumblebee
 fi
 
 if [ `dkms status |grep acpi_call | wc -l` > 0 ]; then
