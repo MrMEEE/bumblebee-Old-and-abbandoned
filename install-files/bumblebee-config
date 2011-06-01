@@ -94,10 +94,12 @@ INSERTMONITORLIST
 
 sed -i 's/'$CURRENTMONITOR'/'$CONNECTEDMONITOR'/g' /etc/X11/xorg.conf.nvidia
 
-if [ $DISTRO != UBUNTU ]; then
- CURRENTIMAGETRANSPORT=`cat /etc/bash.bashrc |grep VGL_COMPRESS= |cut -f2 -d=`
-else
+if [ $DISTRO = UBUNTU ]; then
  CURRENTIMAGETRANSPORT=`cat /etc/default/bumblebee |grep VGL_COMPRESS= |cut -f2 -d=`
+elif [ $DISTRO = FEDORA ]; then
+ CURRENTIMAGETRANSPORT=`cat /etc/profile/virtualgl.sh |grep VGL_COMPRESS= |cut -f2 -d=`
+else
+ CURRENTIMAGETRANSPORT=`cat ${BASHRC} |grep VGL_COMPRESS= |cut -f2 -d=`
 fi
 
 IMAGETRANSPORT="UNDEFINED"
@@ -168,10 +170,12 @@ clear
 esac 
 done 
 
-if [ $DISTRO != UBUNTU ]; then
- sed -i 's/VGL_COMPRESS='$CURRENTIMAGETRANSPORT'/VGL_COMPRESS='$IMAGETRANSPORT'/g' $BASHRC
+if [ $DISTRO = UBUNTU ]; then
+  sed -i 's/VGL_COMPRESS='$CURRENTIMAGETRANSPORT'/VGL_COMPRESS='$IMAGETRANSPORT'/g' /etc/default/bumblebee
+elif [ $DISTRO = FEDORA ]; then
+ sed -i 's/VGL_COMPRESS='$CURRENTIMAGETRANSPORT'/VGL_COMPRESS='$IMAGETRANSPORT'/g' /etc/profile.d/virtualgl.sh
 else
- sed -i 's/VGL_COMPRESS='$CURRENTIMAGETRANSPORT'/VGL_COMPRESS='$IMAGETRANSPORT'/g' /etc/default/bumblebee
+ sed -i 's/VGL_COMPRESS='$CURRENTIMAGETRANSPORT'/VGL_COMPRESS='$IMAGETRANSPORT'/g' ${BASHRC}
 fi
 
 echo
