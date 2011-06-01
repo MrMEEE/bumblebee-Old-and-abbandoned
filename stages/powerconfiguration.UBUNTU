@@ -51,3 +51,5 @@ else
   echo
  fi
 fi 
+
+chmod +x /usr/local/bin/bumblebee-*
