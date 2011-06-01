@@ -42,6 +42,8 @@ elif [ `cat /etc/issue |grep -nir debian |wc -l` -gt 0 ]; then
  BASHRC=/etc/bash.bashrc
 fi
     
+ARCH=`uname -m`
+MODPROBE=`which modprobe`
 
 if [ $UID != $ROOT_UID ]; then
     echo "You don't have sufficient privileges to run this script."
@@ -60,9 +62,14 @@ fi
 echo "Welcome to the bumblebee uninstallation"
 echo "Licensed under BEER-WARE License and GPL"
 echo
-echo "This scripts will remove bumblebee completely"
+echo "This script will remove bumblebee completely"
 echo "and also clean up after earlier versions"
 echo
+if [ $DISTRO = FEDORA ] && [ "$ARCH" = "x86_64" ]; then
+    echo "Uninstalling will most likely kill your X-session"
+    echo "please make sure that all your data is saved"
+    echo
+fi
 echo "Are you sure you want to proceed?? (Y/N)"
 echo
 
@@ -79,7 +86,6 @@ exit 0
 esac
 
 #Kill the nvidia X server
-
 /etc/init.d/bumblebee stop
 
 sleep 5
@@ -94,18 +100,28 @@ if [ $DISTRO = UBUNTU  ] || [ $DISTRO = DEBIAN  ]; then
  dpkg -r VirtualGL
  update-rc.d -f bumblebee remove
  rm /etc/pm/power.d/bumblebee-disablecard-on-powerup
-elif [ $DISTRO = FEDORA  ] || [ $DISTRO = OPENSUSE  ]; then
+elif [ $DISTRO = OPENSUSE ]; then
  echo "Removing VirtualGL package"
  echo
  yum -y remove VirtualGL
- if [ -f /etc/profile.d/virtualgl.sh ]; then
-     rm /etc/profile.d/virtualgl.sh
- fi
  chkconfig bumblebee off 
+elif [ $DISTRO = FEDORA ]; then
+    echo "Removing VirtualGL package"
+    echo
+    yum -y remove VirtualGL
+    if [ -f /etc/profile.d/virtualgl.sh ]; then
+        rm /etc/profile.d/virtualgl.sh
+    fi
+    chkconfig bumblebee off 
+    # New method for x86_64 but still the old one for i686
+    if [ "$ARCH" = "x86_64" ]; then
+        echo "Removing nVidia driver package"
+        ${MODPROBE} -r nvidia
+        /usr/lib64/nvidia-current/bin/nvidia-installer -s --uninstall
+    fi
 fi
 
 #Unload the nvidia module
-MODPROBE=`which modprobe`
 ${MODPROBE} -r nvidia
 
 echo
