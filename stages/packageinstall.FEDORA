@@ -6,10 +6,6 @@ if [ $? -ne 0 ]; then
     exit 21
 fi
 
-#remove when pushing
-ARCH=`uname -m`
-MODPROBE=`which modprobe`
-
 rm -rf /tmp/NVIDIA*
 echo "Getting latest NVidia drivers version"
 if [ "$ARCH" = "x86_64" ]; then
