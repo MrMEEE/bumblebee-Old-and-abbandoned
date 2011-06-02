@@ -1,17 +1,15 @@
 #!/bin/bash
 # This script should contain the command(s) nessesary to switch on the
 # nVidia card.
+# As an example i've included the script for the Dell XPS 15, provided by rockorequin..
 # Please note that the acpi_call module is need for these operations:
 #
 # http://linux-hybrid-graphics.blogspot.com/2010/07/using-acpicall-module-to-switch-onoff.html
 
-# acpi_call method to turn ON nVidia Card
-NV_SWITCH_ON=  # Put your method here
-
 modprobe acpi_call
+
 if ! lsmod | grep -q acpi_call; then
-    echo "Error: acpi_call module not loaded,"
-    echo "you won't be able to turn on nVidia card"
+    echo "Error: acpi_call module not loaded"
     exit
 fi
 
@@ -28,5 +26,5 @@ acpi_call () {
     esac
 }
 
-echo _PS0 $(acpi_call $NV_SWITCH_ON)
+echo _PS0 $(acpi_call "\_SB.PCI0.PEG0.PEGP._ON")
 modprobe nvidia-current

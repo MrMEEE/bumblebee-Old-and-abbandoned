@@ -1,0 +1,50 @@
+post_install() {
+
+echo "Configuring module ..."
+echo "options nvidia NVreg_DeviceFileUID=0 NVreg_DeviceFileGID=0 NVreg_DeviceFileMode=0666" >> /etc/modprobe.d/modprobe.conf
+# This is a bad solution... It should check first if these options exists in modprobe.conf before put them.
+
+#==================================================================================================
+
+if [ `lspci |grep VGA |wc -l` -eq 2 ]; then 
+   NVIDIABUSID=`echo "PCI:"\`lspci |grep VGA |grep nVidia |cut -f1 -d:\`":"\`lspci |grep VGA |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep VGA |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``
+elif [ `lspci |grep 3D |wc -l` -eq 1 ]; then
+   NVIDIABUSID=`echo "PCI:"\`lspci |grep 3D |grep nVidia |cut -f1 -d:\`":"\`lspci |grep 3D |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep 3D |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``   
+else
+echo 
+echo "The BusID of the nVidia card can't be determined"
+echo "You must correct this manually in /etc/X11/xorg.conf.nvidia"
+echo
+fi
+echo "Changing Configuration to match your Machine"
+echo 
+sed -i 's/REPLACEWITHBUSID/'$NVIDIABUSID'/g' /etc/X11/xorg.conf.nvidia
+
+#==================================================================================================
+
+echo
+echo "Setting up default enviroment variables"
+
+echo "VGL_DISPLAY=:1
+export VGL_DISPLAY
+VGL_COMPRESS=xv
+export VGL_COMPRESS
+VGL_READBACK=fbo
+export VGL_READBACK" >> /etc/bash.bashrc
+# Another bad solution... It shoud verify if these values exists and only add them if doesn't.
+
+echo
+echo "Installation complete..."
+echo "You must set output device manually in /etc/X11/xorg.conf.nvidia"
+echo "by replacing \"ConnectedMonitor\" Option (susually CRT-0 or DFP-0)"
+echo
+echo "Now you need to add bumblee to your services in rc.conf:"
+echo "DAEMONS = ( syslog-ng dbus ... bumblebee)"
+echo "Blacklist the nouveau driver in rc.conf and make sure nvidia is loaded:"
+echo "MODULES = (acpi-cpufreq ... !nouveau nvidia)"
+echo "And make sure that the command \"vglclient -gl\" is run after your Desktop Enviroment is started!"
+echo
+echo "Run your programs with: optirun <name of program>"
+
+}
+
