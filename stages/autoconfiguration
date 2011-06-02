@@ -3,7 +3,7 @@ echo "Autodetecting Hardware and fetching installation information."
 echo
 
 if [ -f /tmp/machineinfo ]; then
-rm /tmp/machineinfo
+    rm /tmp/machineinfo
 fi
 wget -O /tmp/machineinfo "http://martin-juhl.dk/bumblebee/?searchitem=`dmidecode --string system-product-name`&search=1" 1>/dev/null 2>/dev/null
 
