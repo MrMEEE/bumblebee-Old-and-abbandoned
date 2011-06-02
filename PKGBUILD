@@ -1,9 +1,12 @@
+# This script is incomplete and in development. To install bumblebee use the one in the AUR
+# http://aur.archlinux.org/packages.php?ID=49469
+
 # Maintainer: Samsagax <samsagax@gmail.com>
 
 pkgname=bumblebee
 pkgver=1.6.10
 nvpkgver=270.41.19
-pkgrel=1
+pkgrel=2
 pkgdesc="Optimus Support for Linux Through VirtualGL. Turning ON/OFF still not supported"
 arch=('i686' 'x86_64')
 depends=('virtualgl-bin' 'dkms-nvidia')
