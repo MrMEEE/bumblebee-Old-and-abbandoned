@@ -30,8 +30,8 @@ CONNECTEDMONITOR=`cat /etc/X11/xorg.conf.nvidia |grep ConnectedMonitor |cut -f4 
 INTELBUSID=`cat /etc/X11/xorg.conf |grep BusID |cut -f2 -d\"`
 NVIDIABUSID=`cat /etc/X11/xorg.conf.nvidia |grep BusID |cut -f2 -d\"`
 if [ `cat /usr/local/bin/bumblebee-enablecard |grep \$\(acpi |wc -l` -gt 0  ]; then
- STARTUP=`cat /usr/local/bin/bumblebee-enablecard |grep \$\(acpi |cut -f2 -d\" |sed -e :a -e '$!N;s/\n/;/;ta'`
- SHUTDOWN=`cat /usr/local/bin/bumblebee-disablecard |grep \$\(acpi |cut -f2 -d\" |sed -e :a -e '$!N;s/\n/;/;ta'`
+ STARTUP="$(awk '/\$\(acpi_call/,/\)/' /usr/local/bin/bumblebee-enablecard | sed ':a;N;$!ba;s/\n/ /g' | sed 's/\" \\ \"/ /g' |tr ')' '\n' | cut -f2 -d\" | sed ':a;N;$!ba;s/\(.*\)\n/\1/' |sed -e :a -e '$!N;s/\n/;/;ta')"
+ SHUTDOWN="$(awk '/\$\(acpi_call/,/\)/' /usr/local/bin/bumblebee-disablecard | sed ':a;N;$!ba;s/\n/ /g' | sed 's/\" \\ \"/ /g' |tr ')' '\n' | cut -f2 -d\" | sed ':a;N;$!ba;s/\(.*\)\n/\1/' |sed -e :a -e '$!N;s/\n/;/;ta')"
 else
  STARTUP=UNAVAILABLE
  SHUTDOWN=UNAVAILABLE
