@@ -185,16 +185,16 @@ ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules
 ldconfig
 
 if [ -f $HOME/.kde/Autostart/vglclient-service ]; then
- rm $HOME/.kde/Autostart/vglclient-service
+    rm $HOME/.kde/Autostart/vglclient-service
 fi
 
 if [ -f $HOME/.config/autostart/vglclient-service ]; then
- rm $HOME/.config/autostart/vglclient-service
+    rm $HOME/.config/autostart/vglclient-service
 fi
 
 grep -Ev 'VGL|optirun' $HOME/.bashrc > $HOME/.oldbashrc
 mv $HOME/.oldbashrc $HOME/.bashrc
-chown $USER:$USER $HOME/.bashrc
+chown $LOGNAME:$LOGNAME $HOME/.bashrc
 grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
 mv /etc/sudoers.optiorig /etc/sudoers
 chmod 0440 /etc/sudoers
