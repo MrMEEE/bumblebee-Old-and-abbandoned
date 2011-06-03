@@ -33,3 +33,10 @@ if [ -f /etc/modules ]; then
         echo "nvidia" >> /etc/modules
     fi
 fi
+
+mkdir -p /usr/share/doc/bumblebee
+cp install-files/documentation /usr/share/doc/bumblebee
+cp install-files/bumblebee-enablecard.fedora.* /usr/share/doc/bumblebee
+cp install-files/bumblebee-enablecard.template.fedora /usr/share/doc/bumblebee
+cp install-files/bumblebee-disablecard.fedora.* /usr/share/doc/bumblebee
+cp install-files/bumblebee-disablecard.template.fedora /usr/share/doc/bumblebee
