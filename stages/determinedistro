@@ -19,7 +19,9 @@ elif [ `cat /etc/issue |grep -nir "Arch Linux" |wc -l` -gt 0  ]; then
   DISTRO=ARCH
   echo "You are running Arch Linux, please see the buildscript here for support:"
   echo
-  echo "http://aur.archlinux.org/packages.php?ID=48866"
+  echo "http://aur.archlinux.org/packages.php?ID=49469"
+  echo
+  echo "Support Here: https://github.com/Samsagax/bumblebee"
   echo 
   read
   exit 1
