@@ -23,18 +23,22 @@ echo "Please enter your name to continue."
 echo
 read CONFIRMINGUSER
 
-DISTRO=`cat /etc/issue`
+DISTRO=$(cat /etc/issue | cut -f1 -d\\)
 MANUFACTURER=`dmidecode --string system-manufacturer`
 MODEL=`dmidecode --string system-product-name`
 CONNECTEDMONITOR=`cat /etc/X11/xorg.conf.nvidia |grep ConnectedMonitor |cut -f4 -d\"`
 INTELBUSID=`cat /etc/X11/xorg.conf |grep BusID |cut -f2 -d\"`
 NVIDIABUSID=`cat /etc/X11/xorg.conf.nvidia |grep BusID |cut -f2 -d\"`
 if [ `cat /usr/local/bin/bumblebee-enablecard |grep \$\(acpi |wc -l` -gt 0  ]; then
- STARTUP="$(awk '/\$\(acpi_call/,/\)/' /usr/local/bin/bumblebee-enablecard | sed ':a;N;$!ba;s/\n/ /g' | sed 's/\" \\ \"/ /g' |tr ')' '\n' | cut -f2 -d\" | sed ':a;N;$!ba;s/\(.*\)\n/\1/' |sed -e :a -e '$!N;s/\n/;/;ta')"
- SHUTDOWN="$(awk '/\$\(acpi_call/,/\)/' /usr/local/bin/bumblebee-disablecard | sed ':a;N;$!ba;s/\n/ /g' | sed 's/\" \\ \"/ /g' |tr ')' '\n' | cut -f2 -d\" | sed ':a;N;$!ba;s/\(.*\)\n/\1/' |sed -e :a -e '$!N;s/\n/;/;ta')"
+ STARTUP=`xxd -p /usr/local/bin/bumblebee-enablecard | sed -e ':a;N;$!ba;s/\n//g'`
+ SHUTDOWN=`xxd -p /usr/local/bin/bumblebee-disablecard | sed -e ':a;N;$!ba;s/\n//g'`
+ STARTUPSTATUS=AVAILABLE
+ SHUTDOWNSTATUS=AVAILABLE
 else
  STARTUP=UNAVAILABLE
  SHUTDOWN=UNAVAILABLE
+ STARTUPSTATUS=UNAVAILABLE
+ SHUTDOWNSTATUS=UNAVAILABLE
 fi
 DMIPRODUCT=`dmidecode --string system-product-name`
 clear
@@ -45,8 +49,8 @@ echo "Model: $MODEL"
 echo "Connected Monitor: $CONNECTEDMONITOR"
 echo "Intel Card BusID: $INTELBUSID"
 echo "nVidia Card BusID: $NVIDIABUSID"
-echo "nVidia Startup acpi_call command(s): $STARTUP"
-echo "nVidia Shutdown acpi_call command(s): $SHUTDOWN"
+echo "nVidia Startup acpi_call command(s): $STARTUPSTATUS"
+echo "nVidia Shutdown acpi_call command(s): $SHUTDOWNSTATUS"
 echo "DMI Product: $DMIPRODUCT"
 echo
 echo "User Reporting: $CONFIRMINGUSER"
@@ -70,7 +74,7 @@ echo
 exit 0
 esac
 
-wget -O /tmp/systemsubmitted "http://martin-juhl.dk/bumblebee/?manufacturer=$MANUFACTURER&model=$MODEL&monitor=$CONNECTEDMONITOR&intelbusid=$INTELBUSID&nvidiabusid=$NVIDIABUSID&start=$STARTUP&shutdown=$SHUTDOWN&dmiproduct=$DMIPRODUCT&user=$CONFIRMINGUSER&distro=$DISTRO&addmachine=1" 1>/dev/null 2>/dev/null
+wget -O /tmp/systemsubmitted "http://mrmeee.eu/bumblebee/?manufacturer=$MANUFACTURER&model=$MODEL&monitor=$CONNECTEDMONITOR&intelbusid=$INTELBUSID&nvidiabusid=$NVIDIABUSID&start=$STARTUP&shutdown=$SHUTDOWN&dmiproduct=$DMIPRODUCT&user=$CONFIRMINGUSER&distro=$DISTRO&addmachine=1" 1>/dev/null 2>/dev/null
 
 if [ `cat /tmp/systemsubmitted | grep "System Added" |wc -l` -gt 0 ];then
   echo

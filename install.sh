@@ -34,7 +34,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.6.16
+BUMBLEBEEVERSION=1.6.20
 
 #Determine Arch x86_64 or i686
 ARCH=`uname -m`
@@ -142,5 +142,9 @@ echo
 source stages/goodbye
 
 echo "Bumblebee Version: "$BUMBLEBEEVERSION > /etc/bumblebee
+
+echo
+echo "Press any key to finish installation..."
+read
 
 exit 0

@@ -86,7 +86,7 @@ exit 0
 esac
 
 #Kill the nvidia X server
-/etc/init.d/bumblebee stop
+/etc/init.d/bumblebee disable
 
 sleep 5
 
@@ -172,6 +172,10 @@ if [ -d /opt/prime-ng ]; then
 fi
 if [ -d /opt/bumblebee ]; then
     rm -rf /opt/bumblebee
+fi
+
+if [ -d /usr/lib/bumblebee ]; then
+    rm -rf /usr/lib/bumblebee
 fi
 
 if [ `dkms status |grep acpi_call | wc -l` > 0 ]; then
