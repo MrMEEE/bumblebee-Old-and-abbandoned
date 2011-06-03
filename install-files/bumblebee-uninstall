@@ -85,40 +85,52 @@ exit 0
 ;;
 esac
 
-#Kill the nvidia X server
-/etc/init.d/bumblebee disable
 
 sleep 5
 
 echo 
 if [ $DISTRO = UBUNTU  ] || [ $DISTRO = DEBIAN  ]; then
- echo "Removing nVidia driver package"
- echo
- apt-get -y --purge remove nvidia-current
- echo "Removing VirtualGL package"
- echo
- dpkg -r VirtualGL
- update-rc.d -f bumblebee remove
- rm /etc/pm/power.d/bumblebee-disablecard-on-powerup
+
+    #Kill the nvidia X server
+    /etc/init.d/bumblebee disable
+    echo "Removing nVidia driver package"
+    echo
+    apt-get -y --purge remove nvidia-current
+    echo "Removing VirtualGL package"
+    echo
+    dpkg -r VirtualGL
+    update-rc.d -f bumblebee remove
+    rm /etc/pm/power.d/bumblebee-disablecard-on-powerup
+
 elif [ $DISTRO = OPENSUSE ]; then
- echo "Removing VirtualGL package"
- echo
- yum -y remove VirtualGL
- chkconfig bumblebee off 
+
+    #Kill the nvidia X server
+    /etc/init.d/bumblebee disable
+    chkconfig bumblebee off 
+    echo "Removing VirtualGL package"
+    echo
+    yum -y remove VirtualGL
+
 elif [ $DISTRO = FEDORA ]; then
+
+    #Stop the nvidia X server
+    service bumblebee stop
+    chkconfig bumblebee off 
+
     echo "Removing VirtualGL package"
     echo
     yum -y remove VirtualGL
     if [ -f /etc/profile.d/virtualgl.sh ]; then
         rm /etc/profile.d/virtualgl.sh
     fi
-    chkconfig bumblebee off 
+
     # New method for x86_64 but still the old one for i686
     if [ "$ARCH" = "x86_64" ]; then
         echo "Removing nVidia driver package"
         ${MODPROBE} -r nvidia
         /usr/lib64/nvidia-current/bin/nvidia-installer -s --uninstall
     fi
+
 fi
 
 #Unload the nvidia module
