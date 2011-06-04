@@ -5,6 +5,7 @@ EndSection
 Section "ServerLayout"
     Identifier     "Layout0"
     Screen         "Screen1"
+    Option         "AutoAddDevices" "false"
 EndSection
 
 Section "Module"
