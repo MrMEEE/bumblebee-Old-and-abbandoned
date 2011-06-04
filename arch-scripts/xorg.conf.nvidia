@@ -4,6 +4,7 @@ EndSection
 
 Section "ServerLayout"
     Identifier     "Layout0"
+    Option         "AutoAddDevices" "false"
 EndSection
 
 Section "Module"
@@ -21,5 +22,5 @@ Section "Device"
     VendorName     "NVIDIA Corporation"
     BusID          "REPLACEWITHBUSID"
     Option         "IgnoreEDID"
-#    Option 	   "ConnectedMonitor" "REPLACEWITHCONNECTEDMONITOR"
+    Option 	   "ConnectedMonitor" "REPLACEWITHCONNECTEDMONITOR"
 EndSection
