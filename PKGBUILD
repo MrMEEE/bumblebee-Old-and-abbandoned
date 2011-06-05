@@ -6,7 +6,7 @@
 pkgname=bumblebee
 pkgver=1.6.10
 nvpkgver=270.41.19
-pkgrel=2
+pkgrel=3
 pkgdesc="Optimus Support for Linux Through VirtualGL. Turning ON/OFF still not supported"
 arch=('i686' 'x86_64')
 depends=('virtualgl-bin' 'dkms-nvidia')
