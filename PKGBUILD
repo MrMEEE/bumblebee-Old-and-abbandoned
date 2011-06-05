@@ -19,14 +19,14 @@ conflicts=('nvidia-utils')
 if [ "$CARCH" = "i686" ]; then
 	_arch='x86'
 	_pkg="NVIDIA-Linux-${_arch}-${nvpkgver}"
-        md5sums=('c167e32702f56599bd600add97943312' '93802d5bc7e754f4edd4b17c12cb4269')
+        md5sums=('c167e32702f56599bd600add97943312' '9ad6873a6d49924849d883f062d6c5f9')
 elif [ "$CARCH" = "x86_64" ]; then
 	_arch='x86_64'
 	_pkg="NVIDIA-Linux-${_arch}-${nvpkgver}"
-        md5sums=('b84143ecb5c0511c5ef9e53e732d9136' '93802d5bc7e754f4edd4b17c12cb4269')
+        md5sums=('b84143ecb5c0511c5ef9e53e732d9136' '9ad6873a6d49924849d883f062d6c5f9')
 fi
 
-source=("ftp://download.nvidia.com/XFree86/Linux-${_arch}/${nvpkgver}/${_pkg}.run" "https://github.com/downloads/Samsagax/bumblebee/bumblebee-1.6.10-2.tar.gz")
+source=("ftp://download.nvidia.com/XFree86/Linux-${_arch}/${nvpkgver}/${_pkg}.run" "https://github.com/downloads/Samsagax/bumblebee/${pkgname}-${pkgver}-${pkgrel}.tar.gz")
 
 package() {
 
@@ -70,7 +70,7 @@ package() {
 
   cd $srcdir/
   install -D -m755 bumblebee/xorg.conf.nvidia $pkgdir/etc/X11/xorg.conf.nvidia
-  install -D -m755 bumblebee/bumblebee.defaults $pkgdir/etc/bumblebee/bumblebee.conf
+  install -D -m755 bumblebee/bumblebee.default $pkgdir/etc/bumblebee/bumblebee.conf
   install -D -m755 bumblebee/bumblebee.daemon $pkgdir/etc/rc.d/bumblebee
   install -D -m755 bumblebee/bumblebee-bugreport $pkgdir/usr/share/bumblebee/bumblebee-bugreport
   install -D -m755 bumblebee/optirun $pkgdir/usr/bin/optirun
