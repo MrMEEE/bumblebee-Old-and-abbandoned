@@ -3,37 +3,60 @@
 . /etc/rc.conf
 . /etc/rc.d/functions
 
+DAEMON=bumblebee
+XDAEMON=/usr/bin/X
+VGLDAEMON=/usr/bin/vglclient
+XDAEMON_ARGS="-ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9"
+VGLDAEMON_ARGS="-gl"
 PIDFILE=/tmp/.X1-lock
 PID=$(cat $PIDFILE 2>/dev/null)
 
-case "$1" in
-  start)
-    stat_busy "Starting up bumblebee X server"
+start() {
+  stat_busy "Starting up bumblebee X server"
     if [ -z "$PID" ]; then
-	LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9 &
+      LD_LIBRARY_PATH=/usr/lib/nvidia-current $XDAEMON $XDAEMON_ARGS
     fi
     if [ ! -z "$PID" -o $? -gt 0 ]; then
       stat_fail
     else
-      add_daemon bumblebee
+      $VGLDAEMON $VGLDAEMON_ARGS  # Should check for VGLclient for succeed
+      add_daemon $DAEMON
       stat_done
     fi
+}
+
+stop() {
+  stat_busy "Stopping bumblebee Daemon"
+  [ ! -z "$PID" ]  && kill -TERM $PID &> /dev/null
+  if [ $? -gt 0 ]; then
+    stat_fail
+  else
+    kill -TERM vglclient # Should check for VGLclient for succeed
+    rm -f $PIDFILE
+    rm_daemon $DAEMON
+    stat_done
+  fi
+}
+
+restart() {
+  stop
+  sleep 1
+  start
+}
+
+case "$1" in
+  start)
+    start
     ;;
   stop)
-    stat_busy "Stopping bumblebee Daemon"
-    [ ! -z "$PID" ]  && kill -TERM $PID &> /dev/null
-    if [ $? -gt 0 ]; then
-      stat_fail
-    else
-      rm_daemon bumblebee
-      stat_done
-    fi
+    stop
     ;;
   restart)
-    $0 stop
-    sleep 1
-    $0 start
+    restart
     ;;
+  status)
+    ck_status bumblebee
+  ;;
   *)
     echo "usage: $0 {start|stop|restart}"  
 esac

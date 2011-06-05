@@ -70,6 +70,7 @@ package() {
 
   cd $srcdir/
   install -D -m755 bumblebee/xorg.conf.nvidia $pkgdir/etc/X11/xorg.conf.nvidia
+  install -D -m755 bumblebee/bumblebee.defaults $pkgdir/etc/bumblebee/bumblebee.conf
   install -D -m755 bumblebee/bumblebee.daemon $pkgdir/etc/rc.d/bumblebee
   install -D -m755 bumblebee/bumblebee-bugreport $pkgdir/usr/share/bumblebee/bumblebee-bugreport
   install -D -m755 bumblebee/optirun $pkgdir/usr/bin/optirun

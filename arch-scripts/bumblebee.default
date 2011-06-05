@@ -1,15 +1,16 @@
 # Bumblebee Defaults
 
+# This is not implemented on Arch yet
 # STOP_SERVICE_ON_EXIT YES|NO
 # Should bumblebee service be stopped after last vgl program is finished?
 # Defaults to yes.
-STOP_SERVICE_ON_EXIT=YES
+# STOP_SERVICE_ON_EXIT=YES
 
 # Display for the nVidia X Server
 VGL_DISPLAY=:1
 
 # Image transport
-VGL_COMPRESS=xv
+VGL_COMPRESS=proxy
 
 # Readback mode
 VGL_READBACK=fbo
