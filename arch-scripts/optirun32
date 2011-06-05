@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source /etc/bumblebee/bumblebee.conf
+
+export $VGL_READBACK
+
+vglrun -ld /usr/lib32/nvidia-current -c $VGL_COMPRESS -d $VGL_DISPLAY $@
