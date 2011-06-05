@@ -45,7 +45,7 @@ if [ "$ARCH" = "x86_64" ]; then
     ${MODPROBE} nvidia
 
     # Make sure we still have 3D on our Intel card
-    yum -y reinstall mesa-libGL xorg-x11-server-Xorg
+    yum -y reinstall libvdpau mesa-libGL xorg-x11-server-Xorg
 
     # Make sure we can run the nvidia X-server without all kind of library issues
     # See also http://us.download.nvidia.com/XFree86/Linux-x86_64/270.41.19/README/installedcomponents.html
