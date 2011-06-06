@@ -86,7 +86,7 @@ package() {
 # Installing Bumblebee scripts
 
   cd $srcdir/
-  install -D -m755 bumblebee/xorg.conf.nvidia $pkgdir/etc/X11/xorg.conf.nvidia
+  install -D -m755 bumblebee/xorg.conf.nvidia $pkgdir/etc/X11/xorg.conf.nvidia.pacnew
   install -D -m755 bumblebee/bumblebee.default $pkgdir/etc/bumblebee/bumblebee.conf
   install -D -m755 bumblebee/bumblebee.daemon $pkgdir/etc/rc.d/bumblebee
   install -D -m755 bumblebee/bumblebee-bugreport $pkgdir/usr/share/bumblebee/bumblebee-bugreport

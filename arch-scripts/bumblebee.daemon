@@ -12,14 +12,15 @@ PIDFILE=/tmp/.X1-lock
 PID=$(cat $PIDFILE 2>/dev/null)
 
 start() {
-  stat_busy "Starting up bumblebee X server"
+  stat_busy "Starting up bumblebee Daemon"
+    PID=$(cat $PIDFILE 2>/dev/null)
     if [ -z "$PID" ]; then
-      LD_LIBRARY_PATH=/usr/lib/nvidia-current $XDAEMON $XDAEMON_ARGS
+      LD_LIBRARY_PATH=/usr/lib/nvidia-current $XDAEMON $XDAEMON_ARGS  &>/dev/null &
     fi
     if [ ! -z "$PID" -o $? -gt 0 ]; then
       stat_fail
     else
-      $VGLDAEMON $VGLDAEMON_ARGS  # Should check for VGLclient for succeed
+      $VGLDAEMON $VGLDAEMON_ARGS &>/dev/null & # Should check for VGLclient for succeed
       add_daemon $DAEMON
       stat_done
     fi
@@ -27,11 +28,12 @@ start() {
 
 stop() {
   stat_busy "Stopping bumblebee Daemon"
-  [ ! -z "$PID" ]  && kill -TERM $PID &> /dev/null
+  kill -TERM $(pidof vglclient) &> /dev/null # Should check for VGLclient for succeed
+  PID=$(cat $PIDFILE 2>/dev/null)
+  [ ! -z "$PID" ]  && kill -TERM $PID #&> /dev/null
   if [ $? -gt 0 ]; then
     stat_fail
   else
-    kill -TERM vglclient # Should check for VGLclient for succeed
     rm -f $PIDFILE
     rm_daemon $DAEMON
     stat_done
@@ -58,5 +60,5 @@ case "$1" in
     ck_status bumblebee
   ;;
   *)
-    echo "usage: $0 {start|stop|restart}"  
+    echo "usage: $0 {start|stop|restart|status}"  
 esac
