@@ -1,4 +1,4 @@
-if [ "$POWERON" != "UNDEFINED" ]; then
+if [ "$POWERON" != "UNAVAILABLE" ]; then
  echo
  echo "Configuring Power Management."
  echo
