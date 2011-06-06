@@ -48,8 +48,8 @@ if [ "$ARCH" = "x86_64" ]; then
     yum -y reinstall libvdpau mesa-libGL xorg-x11-server-Xorg
 
     # Make sure we can run the nvidia X-server without all kind of library issues
-    # See also http://us.download.nvidia.com/XFree86/Linux-x86_64/270.41.19/README/installedcomponents.html
-    rm /usr/lib64/nvidia-current/xorg/modules/libnvidia-wfb.so.270.41.19
+    # See also http://us.download.nvidia.com/XFree86/Linux-x86_64/<version>/README/installedcomponents.html
+    rm /usr/lib64/nvidia-current/xorg/modules/libnvidia-wfb.so.${NV_DRIVERS_VERSION}
     rm /usr/lib64/nvidia-current/xorg/modules/libnvidia-wfb.so.1
     rm /usr/lib64/nvidia-current/xorg/modules/libwfb.so
 
