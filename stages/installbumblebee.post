@@ -1,4 +1,0 @@
-chmod +x /usr/local/bin/optirun*
-chmod +x /usr/local/bin/bumblebee-*
-
-chmod +x /etc/init.d/bumblebee

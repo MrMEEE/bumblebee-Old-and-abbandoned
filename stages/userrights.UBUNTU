@@ -1,7 +1,0 @@
-groupadd bumblebee
-gpasswd -a `env |grep SUDO_USER |cut -f2 -d=` bumblebee
-grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
-mv /etc/sudoers.optiorig /etc/sudoers
-echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /etc/init.d/bumblebee" >> /etc/sudoers
-chmod 0440 /etc/sudoers
-

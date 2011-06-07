@@ -1,5 +1,0 @@
-echo
-echo "bumblebee does not yet support power management on your distribution"
-echo
-echo "not installing acpi_call"
-echo
