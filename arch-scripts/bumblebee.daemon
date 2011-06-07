@@ -5,9 +5,9 @@
 
 DAEMON=bumblebee
 XDAEMON=/usr/bin/X
-VGLDAEMON=/usr/bin/vglclient
+#VGLDAEMON=/usr/bin/vglclient
 XDAEMON_ARGS="-ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9"
-VGLDAEMON_ARGS="-gl"
+#VGLDAEMON_ARGS="-gl"
 PIDFILE=/tmp/.X1-lock
 PID=$(cat $PIDFILE 2>/dev/null)
 
@@ -20,7 +20,7 @@ start() {
     if [ ! -z "$PID" -o $? -gt 0 ]; then
       stat_fail
     else
-      $VGLDAEMON $VGLDAEMON_ARGS &>/dev/null & # Should check for VGLclient for succeed
+      # $VGLDAEMON $VGLDAEMON_ARGS &>/dev/null & # Should check for VGLclient for succeed
       add_daemon $DAEMON
       stat_done
     fi
@@ -28,9 +28,10 @@ start() {
 
 stop() {
   stat_busy "Stopping bumblebee Daemon"
-  kill -TERM $(pidof vglclient) &> /dev/null # Should check for VGLclient for succeed
+  # kill -TERM $(pidof vglclient) &> /dev/null # Should check for VGLclient for succeed
   PID=$(cat $PIDFILE 2>/dev/null)
-  [ ! -z "$PID" ]  && kill -TERM $PID #&> /dev/null
+  #[ ! -z "$PID" ]  && 
+  kill -TERM $PID &> /dev/null
   if [ $? -gt 0 ]; then
     stat_fail
   else
