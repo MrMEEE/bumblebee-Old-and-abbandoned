@@ -1,5 +1,8 @@
 if [ "$POWERON" != "UNAVAILABLE" ]; then
 
+    # Needed for xxd
+    yum -y install vim-common
+
     echo
     echo "Configuring Power Management."
     echo
@@ -24,8 +27,8 @@ else
     if [ ! -f /usr/local/bin/bumblebee-enablecard ]; then
 
         # Not installed
-
         cp install-files/bumblebee-enablecard /usr/local/bin/
+
     else
 
         # Already Exists

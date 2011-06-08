@@ -57,19 +57,29 @@ if [ "$ARCH" = "x86_64" ]; then
 
 elif [ "$ARCH" = "i686" ]; then
 
-    cd /tmp/${NV_DRIVER}/kernel
-    make install
-    cd $BUMBLEBEEPWD
-    depmod -a
-    ldconfig
+    rm -rf /usr/lib/nvidia-current
+
+    cd /tmp/${NV_DRIVER}
+
     ${MODPROBE} -r nouveau
+    ./nvidia-installer --no-x-check\
+                        -s\
+                       --x-prefix=/usr/lib/nvidia-current\
+                       --x-library-path=/usr/lib/nvidia-current\
+                       --installer-prefix=/usr/lib/nvidia-current\
+                       --x-module-path=/usr/lib/nvidia-current/xorg/modules\
+                       --utility-prefix=/usr/lib/nvidia-current --utility-libdir=.\
+                       --opengl-prefix=/usr/lib/nvidia-current --opengl-libdir=.
     ${MODPROBE} nvidia
 
-    rm -rf /usr/lib/nvidia-current/
-    mkdir -p /usr/lib/nvidia-current/
-    mv /tmp/${NV_DRIVER}/* /usr/lib/nvidia-current/
-    mkdir -p /usr/lib/nvidia-current/xorg
-    ln -s /usr/lib/nvidia-current/libglx.so.${NV_DRIVERS_VERSION} /usr/lib/nvidia-current/xorg/libglx.so
-    ln -s /usr/lib/nvidia-current/nvidia_drv.so /usr/lib/nvidia-current/xorg/nvidia_drv.so
+    # Make sure we still have 3D on our Intel card
+    yum -y reinstall libvdpau mesa-libGL xorg-x11-server-Xorg
 
+    # Make sure we can run the nvidia X-server without all kind of library issues
+    # See also http://us.download.nvidia.com/XFree86/Linux-x86/<version>/README/installedcomponents.html
+    rm /usr/lib/nvidia-current/xorg/modules/libnvidia-wfb.so.${NV_DRIVERS_VERSION}
+    rm /usr/lib/nvidia-current/xorg/modules/libnvidia-wfb.so.1
+    rm /usr/lib/nvidia-current/xorg/modules/libwfb.so
+
+    cd $BUMBLEBEEPWD
 fi
