@@ -63,7 +63,6 @@ case `cat /tmp/machineinfo | wc -l` in
  CONNECTEDMONITOR=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f3 -d\| | sed -e 's/ //g'`
  INTELBUSID=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f4 -d\| | sed -e 's/ //g'`
  NVIDIABUSID=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f5 -d\| | sed -e 's/ //g'`
- cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f6 -d\|
  POWERON=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f6 -d\|`
  POWEROFF=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f7 -d\|`
 ;;
