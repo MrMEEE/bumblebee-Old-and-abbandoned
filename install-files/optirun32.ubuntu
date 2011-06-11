@@ -9,15 +9,14 @@ trap "echo 'Caught Ctrl+C'" INT
 source /etc/default/bumblebee
 
 export $VGL_READBACK
-
-vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld /usr/lib32/nvidia-current "$@"
+vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld /usr/lib32/nvidia-current "$@" 
 
 if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then 
- if [ `ps aux |grep optirun |wc -l` -lt 4 ]; then
-  sudo /etc/init.d/bumblebee disable
- else
+ until [ `lsof |grep nvidia |wc -l` -lt 1 ]; do
   echo "Another bumblebee powered application is running, keeping bumblebee alive."
- fi
+  sleep 1
+ done
+ sudo /etc/init.d/bumblebee disable
 fi
        
 
