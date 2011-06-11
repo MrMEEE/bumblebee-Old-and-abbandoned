@@ -5,7 +5,6 @@ fi
   
 echo "blacklist nouveau" >> /etc/modprobe.d/nouveau-blacklist.conf
 mkdir -p /usr/local/bin/
-cp install-files/xorg.conf.intel /etc/X11/xorg.conf
 cp install-files/xorg.conf.nvidia /etc/X11/
 cp install-files/bumblebee-bugreport /usr/local/bin/
 cp install-files/bumblebee-uninstall /usr/local/bin/

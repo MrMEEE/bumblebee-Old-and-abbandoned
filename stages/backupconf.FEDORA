@@ -8,9 +8,5 @@ if [ -f /etc/modules ]; then
     cp -n /etc/modules /etc/modules.optiorig
 fi
 
-if [ -f /etc/X11/xorg.conf ]; then
-    cp -n /etc/X11/xorg.conf /etc/X11/xorg.conf.optiorig
-fi
-
 # No need to fiddle with ${BASHRC} on Fedora as we use
 # /etc/profile.d here with our own file

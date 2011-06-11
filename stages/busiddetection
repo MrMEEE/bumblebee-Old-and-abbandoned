@@ -1,5 +1,4 @@
-if [ "$INTELBUSID" = "UNDEFINED" ]; then
-INTELBUSID=`echo "PCI:"\`${LSPCI} |grep VGA |grep Intel |cut -f1 -d:\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep VGA |grep Intel |cut -f2 -d. |cut -f1 -d" "\``
+if [ "$NVIDIABUSID" = "UNDEFINED" ]; then
 if [ `${LSPCI} |grep VGA |wc -l` -eq 2 ]; then 
    NVIDIABUSID=`echo "PCI:"\`${LSPCI} |grep VGA |grep nVidia |cut -f1 -d:\`":"\`${LSPCI} |grep VGA |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep VGA |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``
 elif [ `${LSPCI} |grep 3D |wc -l` -eq 1 ]; then
@@ -20,5 +19,4 @@ echo
 echo "Changing Configuration to match your Machine."
 echo
 
-sed -i 's/REPLACEWITHBUSID/'$INTELBUSID'/g' /etc/X11/xorg.conf
 sed -i 's/REPLACEWITHBUSID/'$NVIDIABUSID'/g' /etc/X11/xorg.conf.nvidia
