@@ -13,7 +13,7 @@ if [ "$ARCH" = "x86_64" ]; then
 elif [ "$ARCH" = "i686" ]; then
     BASEDIR="ftp://download.nvidia.com/XFree86/Linux-x86/"
 fi
-LATEST=`wget -q -O - ${BASEDIR}/latest.txt | cut -f2 -d" "`
+LATEST=`wget -q -O - ${BASEDIR}/latest.txt | cut -f2 -d" " | tr -d '\n' | tr -d '\r'`
 cd /tmp
 wget -nv ${BASEDIR}/${LATEST}
 
@@ -24,7 +24,6 @@ echo "Latest NVidia drivers version is ${NV_DRIVERS_VERSION}"
 # Extract the binary
 sh /tmp/${NV_DRIVER}.run -x
 
-# New method for x86_64 but still the old one for i686
 if [ "$ARCH" = "x86_64" ]; then
 
     rm -rf /usr/lib64/nvidia-current
