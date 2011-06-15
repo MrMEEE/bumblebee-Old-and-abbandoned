@@ -34,101 +34,41 @@
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-bumblebee is Optimus support for Linux, with real offloading, and not
+This is a modified version of Martin Juhl's README to fit present project.
+Please reffer to the original in this link:
+https://github.com/MrMEEE/bumblebee/blob/master/README
+
+Bumblebee is Optimus support for Linux, with real offloading, and not
 switchable graphics. More important, it works on Optimus Laptops without a
-graphical multiplexer
+graphical multiplexer.
 
 This project is containing ArchLinux modification of bumblebee by Martin Juhl (Formerly known as prime-ng)
 
-Version 1.6.10 of the bumblebee project has been re-released!!!
+Documentation can be found in the ArchWiki page about Bumblebee:
+http://wiki.archlinux.org/index.php/Bumblebee
 
 The Installation can be made from AUR with this package:
 http://aur.archlinux.org/packages.php?ID=49469
-
-Documentation can be found in the ArchWiki page about Bumblebee:
-http://wiki.archlinux.org/index.php/Bumblebee
 
 First of all: If you have any problem, please create a bug report package
 with the bumblebee-bugreport tool
 
 Then create an issue on Martin Jhul's GitHub project site.
 
-
-Now 3D is enabled on both the Intel and the nVidia at the same time.
-
-The Intel card is running the Desktop and the nVidia card can be used for
-the thougher applications with the command "optirun32 <application>" or
-"optirun64 <application>"
-
-Support for automatically shutting down and starting up the nVidia card has
+This package features:
+     - 3D is enabled on both the Intel and the nVidia at the same time.
+     - The Intel card is running the Desktop and the nVidia card can be used for
+the thougher applications with the command "optirun <application>" or
+"optirun32 <application>"
+     - Support for automatically shutting down and starting up the nVidia card has
 been added in version 1.4.20 for Ubuntu. For ArchLinux this is a work in progress, 
 we won't support it until there is a safe way to turn on/off the dedicated card
-and be able to use it again.
-
+and be able to use it again. Yo will find more information about this in the wiki. 
 The nVidia card WILL be draining battery unless the two scripts:
 /usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard
 are configured correctly
 
 But still I think it is a good step forward...
-
-
-Machines Confirmed Working:
-
-Machine					User			Distro
-Alienware M11X R2			Martin Juhl		Ubuntu 11.04
-Asus N82Jv				André Ventura
-Asus EeePC 1215N			Ellington Santos
-Asus N61Jv (X64Jv)			Ted
-Acer Aspire 5745PG			Miguel Belmonte
-Dell Vostro 3300			Peter Liedler
-Asus EeePC 1215N			Fedor Indutny
-Dell XPS 15 (L501x)			matthew85		Ubuntu 11.04
-Dell XPS 15 (L502x)			Sunil Mujumdar
-Dell Vostro 3400			Sunil Mujumdar
-Toshiba Satellite M645-SP4132L		Leonard Camacho
-Asus U43JC				csdaniels1221
-Samsung RF511				Chuong
-CLEVO W150HNQ				Nix Vitae
-Dell XPS 17 L701x			Samuel Leal
-Asus U53JC				Sven Bettscheider
-Asus K52JC				beta992
-Asus U35JC				Martin Yrjölä
-Asus X52JC				Fiox
-Asus N53SV				theshadow124
-Asus U35J				EselSaft
-Asus P52JC				Paszcza
-Dell Vostro 3500			Carlos
-Acer Aspire 5742G			Dardan
-Samsung RF711				Tomasz Karczmarski
-Asus U30J				Gianni Borghesan
-Asus U36JC				DeeKey
-Dell Vostro 3700			andresrommier
-Asus U31JG				kedazo
-Asus X53SV/K53SV			rom251
-Asus P31JG				ouafnico
-Asus N73JN				Sasin91
-Asus UL30VT				Akta
-Samsung QX310				BenjaminEvenson
-Dell Latitude E6420			Scotchy49
-Dell XPS 17 L702x			Stephen Brooks
-Asus U30JC				paralocatucalva
-Alienware M11X R1			Joseph Livecchi
-Acer Aspire 8951G			Paul Hinds
-Asus UL80VT                             Maegras			Ubuntu 11.04
-MSI-FX700                               Mrssheep
-Samsung QX410 J01			Ben Sanders
-Asus U30JC				Julien-Charles		Ubuntu 10.10
-Lenovo T410				innoscopio		Linux Mint 11
-
-Machines working with automatic power management of the nVidia card:
-
-Machine					User
-Alienware M11X R2                       Martin Juhl
-Asus P31JG                              ouafnico
-Asus 1215n				BarzantMD
-Dell Vostro 3500			pauloxnet
-Dell XPS 15 (L501x)			matthew85
-Dell XPS 15 (L502x)			rockorequin
 
 Status updates can be found here: http://www.martin-juhl.dk 
 or on twitter: http://twitter.com/martinjuhl

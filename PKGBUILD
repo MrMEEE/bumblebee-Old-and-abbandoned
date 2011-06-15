@@ -4,26 +4,26 @@
 # Maintainer: Samsagax <samsagax@gmail.com>
 
 pkgname=bumblebee
-pkgver=1.6.11
-nvpkgver=270.41.19
+pkgver=1.6.12
+nvpkgver=275.09.07
 pkgrel=1
 pkgdesc="Optimus Support for Linux Through VirtualGL. Turning ON/OFF still not supported"
 arch=('i686' 'x86_64')
-depends=('virtualgl-bin' 'dkms-nvidia')
+depends=('virtualgl-bin' "dkms-nvidia=${nvpkgver}")
 optdepends=('acpi_call: turn on/off discrete card (not supported yet)')
 url="https://github.com/MrMEEE/bumblebee/"
 license=("custom: Nvidia + GPL3")
 install=('bumblebee.install')
-conflicts=('bumblebee<=1.6.10' 'nvidia-utils')
+conflicts=('bumblebee<=1.6.11' 'nvidia-utils')
 
 if [ "$CARCH" = "i686" ]; then
 	_arch='x86'
 	_pkg="NVIDIA-Linux-${_arch}-${nvpkgver}"
-        md5sums=('c167e32702f56599bd600add97943312' 'fa13be1dbd0edaa89e989da537c29fa5')
+        md5sums=('d779057af3a2f96a05ddda201606618b' 'fa13be1dbd0edaa89e989da537c29fa5')
 elif [ "$CARCH" = "x86_64" ]; then
 	_arch='x86_64'
 	_pkg="NVIDIA-Linux-${_arch}-${nvpkgver}"
-        md5sums=('b84143ecb5c0511c5ef9e53e732d9136' 'fa13be1dbd0edaa89e989da537c29fa5')
+        md5sums=('29f28cd59e2647cdb517eca2381d3dbd' '1ebb6fd43f4e2140c7e44ee29f9b15e2')
 fi
 
 source=("ftp://download.nvidia.com/XFree86/Linux-${_arch}/${nvpkgver}/${_pkg}.run" "https://github.com/downloads/Samsagax/bumblebee/${pkgname}-${pkgver}-${pkgrel}.tar.gz")

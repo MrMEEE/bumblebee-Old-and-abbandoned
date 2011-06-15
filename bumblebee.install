@@ -1,5 +1,4 @@
 post_upgrade() {
-
      echo "A new xorg.conf.pacnew file is created"
      post_install
 }
