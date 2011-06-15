@@ -19,69 +19,51 @@
 lockfile=/var/lock/bumblebee
 
 RETVAL=0
+ENABLECARD=/usr/local/bin/bumblebee-enablecard
+DISABLECARD=/usr/local/bin/bumblebee-disablecard
 
 LD_LIBRARY_PATH=/usr/lib64/nvidia-current
 export LD_LIBRARY_PATH
 
 start() {
-	#echo -n $"Starting up bumblebee X server: "
+	echo -n $"Starting up bumblebee X server: "
+	$ENABLECARD
 	/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib64/nvidia-current/xorg,/usr/lib64/xorg/modules -nolisten tcp -noreset :1 vt9 &
+	i=1
+	while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
+	 sleep 1
+	 log_daemon_msg "."
+	 i=`expr $i + 1`   
+	 if [ $i -gt 10 ]; then
+	  echo "Bumblebee server failed to start"
+	  exit 1
+	 fi 
+	done
 	touch "$lockfile" && echo "success" > /dev/null || echo "failure"
 	RETVAL=$?
-	#while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
-	# sleep 1
-        # echo "."
-        #done
 	ps aux | grep "/usr/bin/X -ac -config" | grep -Ev grep | awk '/^root/{print $2}' > $lockfile
+	vglclient -gl &
 	echo
 }
 
 stop() {
 	#echo -n $"Stopping bumblebee X server: "
 	kill `cat $lockfile`
+	killall vglclient > /dev/null 2>&1
 	/bin/rm "$lockfile" 2> /dev/null && echo "success" > /dev/null || echo "failure"
 	RETVAL=$?
-	while  [ `ps aux | grep "/usr/bin/X " | wc -l` -gt 1 ]; do  #`ps aux |grep xorg.conf.nvidia |wc -l`
+	i=0
+	while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -ne 1 ]; do
 	 sleep 1
-	 echo "." 
-	done
+	 log_daemon_msg "."
+	 i=`expr $i + 1`   
+	 if [ $i -gt 10 ]; then
+	  echo "Bumblebee server failed to stop"
+	  exit 1
+	 fi
+        done
+        $DISABLECARD
 	echo
-}
-
-stopnvidia() {
-	#bumblebee-disablecard
-	modprobe -r nvidia
-	echo '\_SB.PCI0.PEGR.GFX0._OFF' > /proc/acpi/call
-        result=$(cat /proc/acpi/call)
-        case "$result" in
-        Error*)
-            echo "Failed to shutdown Nvidia."
-	    rc_failed
-        ;;
-        *)
-            #echo "Shutting down Nvidia..."
-	    rc_status
-            break
-        ;;
-        esac
-}
-
-startnvidia(){
-	# bumblebee-enablecard
-	echo '\_SB.PCI0.PEGR.GFX0._ON' > /proc/acpi/call
-        result=$(cat /proc/acpi/call)
-        case "$result" in
-        Error*)
-            echo "Failed to start Nvidia."
-            rc_failed
-        ;;
-        *)
-            echo "Starting Nvidia..."
-	    modprobe nvidia
-            rc_status
-            break
-        ;;
-        esac
 }
 
 restart() {
@@ -91,20 +73,18 @@ restart() {
 
 case "$1" in
   start)
-	stopnvidia
+	stop
 	;;
   enable)
-	startnvidia
 	start
 	# Remember status and be verbose
         rc_status -v
 	;;
   stop)
-	startnvidia
+	start
 	;;
   disable)
 	stop
-	stopnvidia
 	# Remember status and be verbose
         rc_status -v
 	;;
