@@ -1,6 +1,0 @@
-if [ `cat $BASHRC |grep VGL |wc -l` -ne 0 ]; then
-   cp $BASHRC.optiorig $BASHRC
-fi
-
-cp -n /etc/modules /etc/modules.optiorig
-cp -n $BASHRC $BASHRC.optiorig

@@ -4,12 +4,13 @@ if [ "$ARCH" = "x86_64" ]; then
  echo "64-bit system detected"
  echo
  echo $PWD
- zypper --no-gpg-check install -l install-files/VirtualGL.x86_64.rpm
+ zypper --no-gpg-checks --no-refresh --disable-repositories --non-interactive install -l install-files/VirtualGL.x86_64.rpm
 elif [ "$ARCH" = "i686" ]; then
  echo
  echo "32-bit system detected"
  echo
- zypper --no-gpg-check install -l install-files/VirtualGL.i386.rpm
+ sed -i 's/lib64/lib/g' /etc/init.d/bumblebee
+ zypper --no-gpg-checks --no-refresh --disable-repositories --non-interactive install -l install-files/VirtualGL.i386.rpm
 fi
 if [ $? -ne 0 ]; then
  echo
