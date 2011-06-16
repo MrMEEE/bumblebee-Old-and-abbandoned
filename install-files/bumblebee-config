@@ -54,7 +54,7 @@ MODPROBE=`which modprobe`
 if [ `cat /etc/issue |grep -nir fedora |wc -l` -gt 0 ]; then
   DISTRO=FEDORA
   BASHRC=/etc/bashrc
-elif [ `cat /etc/issue |grep -nir ubuntu |wc -l` -gt 0 ]; then
+elif [ `cat /etc/issue |grep -nir ubuntu |wc -l` -gt 0 ] || [ `cat /etc/issue |grep -nir "Linux Mint" |wc -l` -gt 0 ] || [ `cat /etc/issue |grep -nir "Backtrack 5" |wc -l` -gt 0 ]; then
   DISTRO=UBUNTU
   BASHRC=/etc/bash.bashrc
 elif [ `cat /etc/issue |grep -nir openSUSE |wc -l` -gt 0 ]; then
