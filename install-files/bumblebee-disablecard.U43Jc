@@ -5,6 +5,9 @@
 # Please note that the acpi_call module is need for these operations:
 #
 # http://linux-hybrid-graphics.blogspot.com/2010/07/using-acpicall-module-to-switch-onoff.html
+#
+# Please note that this script needs this fix to work:
+# http://ubuntuforums.org/showthread.php?t=1615564
 
 rmmod nvidia
 if lsmod | grep -q nvidia; then
