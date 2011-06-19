@@ -84,7 +84,7 @@ echo
 echo "Installing Bumblebee Configuration and files"
 echo
 
-source stages/installbumblebee.pre
+source stages/installbumblebee.$DISTRO.pre
 
 source stages/installbumblebee.$DISTRO
 

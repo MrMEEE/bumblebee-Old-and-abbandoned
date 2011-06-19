@@ -1,7 +1,13 @@
 if [ "$POWERON" != "UNAVAILABLE" ]; then
 
     # Needed for xxd
-    zypper install vim-common
+    VERSION=`cat /etc/SuSE-release | grep VERSION | cut -f3 -d" "`
+
+    if [ "$VERSION" == "11.4" ] ; then
+      zypper install vim-base
+    else
+      zypper install vim-common
+    fi
 
     echo
     echo "Configuring Power Management."
