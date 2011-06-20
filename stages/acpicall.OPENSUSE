@@ -6,9 +6,7 @@ ACPICALLVERSION=1.0
 
 if [ `dkms status |grep acpi_call | wc -l` -gt 0 ]; then
  echo 
- echo "acpi_call module already installed, do you want to update/reinstall?"
- echo
- echo "(y/n)"
+ echo "acpi_call module already installed, do you want to update/reinstall? (y/n)"
  echo
  read answer
 

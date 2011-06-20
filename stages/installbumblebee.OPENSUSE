@@ -1,5 +1,30 @@
-cp install-files/bumblebee.script.openSUSE /etc/init.d/bumblebee
-ln -sf /etc/init.d/bumblebee /usr/sbin/rcbumblebee
+if [ ! -f /usr/local/bin/bumblebee-disablecard-on-powerup ]; then
+ # Not installed
+ cp install-files/bumblebee-disablecard-on-powerup /usr/local/bin/
+ ln -s /usr/local/bin/bumblebee-disablecard-on-powerup /etc/pm/power.d/
+else
+ # Already Exists
+ echo
+ echo "nVidia card disable-on-powerup-script: /usr/local/bin/bumblebee-disablecard-on-powerup, already exists not overwriting"
+ echo
+fi
+
+if [ -f /etc/default/bumblebee ]; then
+  # Already Exists
+  echo
+  echo "Default settings file: /etc/default/bumblebee, already exists."
+  echo "Installing new, old configuration file saved as: /etc/default/bumblebee.old."
+  echo
+  mv /etc/default/bumblebee /etc/default/bumblebee.old
+fi
+
+cp install-files/bumblebee.default /etc/default/bumblebee
+
+mkdir -p /usr/share/doc/bumblebee
+cp install-files/documentation /usr/share/doc/bumblebee
+cp install-files/bumblebee-disablecard.* /usr/share/doc/bumblebee
+cp install-files/bumblebee-enablecard.* /usr/share/doc/bumblebee
+
 if [ "$ARCH" = "x86_64" ]; then   
  echo
  echo "64-bit system detected"
@@ -10,7 +35,6 @@ elif [ "$ARCH" = "i686" ]; then
  echo
  echo "32-bit system detected"
  echo
- sed -i 's/lib64/lib/g' /etc/init.d/bumblebee
  zypper --no-gpg-check install -l install-files/VirtualGL.i386.rpm
 fi
 if [ $? -ne 0 ]; then
@@ -19,10 +43,27 @@ if [ $? -ne 0 ]; then
  echo
  exit 20
 fi
+cp install-files/bumblebee.script.openSUSE /etc/init.d/bumblebee
+ln -sf /etc/init.d/bumblebee /usr/sbin/rcbumblebee
+#rm /etc/alternatives/gl_conf
+#ln -s /usr/lib/mesa/ld.so.conf /etc/alternatives/gl_conf
+#rm -rf /etc/alternatives/xorg_extra_modules
+#rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
+#rm -rf /usr/lib/nvidia-current/xorg/xorg
+#ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
+#ldconfig
 
 if [ "$ARCH" = "x86_64" ]; then
  cp install-files/optirun32.opensuse /usr/local/bin/optirun32
  cp install-files/optirun64.opensuse /usr/local/bin/optirun64
+ cp install-files/optirun64.bash_completion /etc/bash_completion.d/optirun64
+ cp install-files/optirun32.bash_completion /etc/bash_completion.d/optirun32
+ ln -s /usr/local/bin/optirun64 /usr/local/bin/optirun
 else
- cp install-files/optirun64.opensuse /usr/local/bin/optirun
+ cp install-files/optirun32.opensuse /usr/local/bin/optirun
+ cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
 fi
+
+#if [ "`cat /etc/modules |grep "nvidia-current" |wc -l`" -eq "0" ]; then
+#  echo "nvidia-current" >> /etc/modules
+#fi
