@@ -85,7 +85,7 @@ echo
 exit 0
 esac
 
-wget -O /tmp/systemsubmitted "http://mrmeee.eu/bumblebee/?manufacturer=$MANUFACTURER&model=$MODEL&monitor=$CONNECTEDMONITOR&intelbusid=$INTELBUSID&nvidiabusid=$NVIDIABUSID&start=$STARTUP&shutdown=$SHUTDOWN&dmiproduct=$DMIPRODUCT&user=$CONFIRMINGUSER&distro=$DISTRO&addmachine=1" 1>/dev/null 2>/dev/null
+wget -O /tmp/systemsubmitted "http://www.martin-juhl.dk/bumblebee/?manufacturer=$MANUFACTURER&model=$MODEL&monitor=$CONNECTEDMONITOR&intelbusid=$INTELBUSID&nvidiabusid=$NVIDIABUSID&start=$STARTUP&shutdown=$SHUTDOWN&dmiproduct=$DMIPRODUCT&user=$CONFIRMINGUSER&distro=$DISTRO&addmachine=1" 1>/dev/null 2>/dev/null
 
 if [ `cat /tmp/systemsubmitted | grep "System Added" |wc -l` -gt 0 ];then
   echo
