@@ -29,7 +29,7 @@ start() {
 	  exit 1
 	fi
 	$ENABLECARD
-	/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -nolisten tcp -noreset :1 vt9 &
+	/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -nolisten tcp -noreset :1 vt9 2>/dev/null >/dev/null &
 	PID_X=$!
 	i=1
 	while [ `ps p $PID_X | wc -l` -eq 1 ] ; do
@@ -37,6 +37,7 @@ start() {
 	 echo -n "."
 	 i=`expr $i + 1`   
 	 if [ $i -gt 10 ]; then
+	  echo
 	  echo "Bumblebee server failed to start"
 	  exit 1
 	 fi 
@@ -45,7 +46,6 @@ start() {
 	RETVAL=$?
 	echo
 	vglclient -gl &
-	echo
 }
 
 stop() {
@@ -65,13 +65,13 @@ stop() {
 	 echo -n "."
 	 i=`expr $i + 1`   
 	 if [ $i -gt 10 ]; then
+	  echo
 	  echo "Bumblebee server failed to stop"
 	  exit 1
 	 fi
         done
 	echo
         $DISABLECARD
-	echo
 }
 
 restart() {
@@ -108,7 +108,7 @@ case "$1" in
 	restart
 	;;
   status)
-	if [ -f $lockfile ]; then
+	if [ -f $LOCKFILE ]; then
 		echo $"Bumblebee X Server is running."
 		RETVAL=0
 	else
