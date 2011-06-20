@@ -47,7 +47,7 @@ start() {
 }
 
 stop() {
-	#echo -n $"Stopping bumblebee X server: "
+	echo -n $"Stopping bumblebee X server: "
 	kill `cat $lockfile`
 	killall vglclient > /dev/null 2>&1
 	/bin/rm "$lockfile" 2> /dev/null && echo "success" > /dev/null || echo "failure"
