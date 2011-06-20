@@ -184,9 +184,7 @@ rm -rf /usr/lib/bumblebee
 rm -f /usr/local/bin/optirun*
 rm -f /usr/local/bin/bumblebee-disablecard-on-powerup
 rm -f /usr/bin/vglclient-service
-if [ "$DISTRO" != "OPENSUSE" ] ; then
-  rm -f /etc/modprobe.d/nouveau-blacklist.conf
-fi
+rm -f /etc/modprobe.d/nouveau-blacklist.conf
 rm -rf /usr/share/doc/bumblebee
 rm -f /usr/local/bin/bumblebee*
 rm -f /etc/default/bumblebee*
@@ -201,7 +199,7 @@ if [ -d /usr/lib/bumblebee ]; then
     rm -rf /usr/lib/bumblebee
 fi
 
-if [ `dkms status |grep acpi_call | wc -l` > 0 ]; then
+if [ `dkms status |grep acpi_call | wc -l` -gt 0 ]; then
  dkms uninstall -m acpi_call -v `dkms status |grep acpi_call |cut -f2 -d,`  
  dkms remove -m acpi_call -v `dkms status |grep acpi_call |cut -f2 -d,` --all
 fi
