@@ -190,7 +190,7 @@ if [ -d /usr/lib/bumblebee ]; then
     rm -rf /usr/lib/bumblebee
 fi
 
-if [ `dkms status |grep acpi_call | wc -l` > 0 ]; then
+if [ `dkms status |grep acpi_call | wc -l` -gt 0 ]; then
  dkms uninstall -m acpi_call -v `dkms status |grep acpi_call |cut -f2 -d,`  
  dkms remove -m acpi_call -v `dkms status |grep acpi_call |cut -f2 -d,` --all
 fi
