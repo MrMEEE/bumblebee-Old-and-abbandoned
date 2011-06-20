@@ -55,7 +55,7 @@ stop() {
 	i=0
 	while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -ne 1 ]; do
 	 sleep 1
-	 log_daemon_msg "."
+	 echo "."
 	 i=`expr $i + 1`   
 	 if [ $i -gt 10 ]; then
 	  echo "Bumblebee server failed to stop"
