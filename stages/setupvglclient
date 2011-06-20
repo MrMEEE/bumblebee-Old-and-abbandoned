@@ -2,6 +2,11 @@ echo '#!/bin/sh' > /usr/bin/vglclient-service
 echo 'vglclient -gl' >> /usr/bin/vglclient-service
 chmod +x /usr/bin/vglclient-service  
 
+if [ `cat /etc/issue |grep -nir opensuse |wc -l` -gt 0 ]; then
+ DISTRO=OPENSUSE
+ HOME=`cat /etc/passwd | grep $SUDO_USER | cut -f6 -d':'`
+fi
+
 if [ ! -d $HOME/.config/autostart ]; then
    mkdir $HOME/.config/autostart
 fi
