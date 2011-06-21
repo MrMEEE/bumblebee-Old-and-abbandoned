@@ -43,16 +43,11 @@ if [ "$ARCH" = "x86_64" ]; then
                        --compat32-prefix=/usr/lib/nvidia-current --compat32-libdir=.
     ${MODPROBE} nvidia
 
-    # Make sure we still have 3D on our Intel card
-    yum -y reinstall libvdpau mesa-libGL xorg-x11-server-Xorg
-
     # Make sure we can run the nvidia X-server without all kind of library issues
     # See also http://us.download.nvidia.com/XFree86/Linux-x86_64/<version>/README/installedcomponents.html
     rm /usr/lib64/nvidia-current/xorg/modules/libnvidia-wfb.so.${NV_DRIVERS_VERSION}
     rm /usr/lib64/nvidia-current/xorg/modules/libnvidia-wfb.so.1
     rm /usr/lib64/nvidia-current/xorg/modules/libwfb.so
-
-    cd $BUMBLEBEEPWD
 
 elif [ "$ARCH" = "i686" ]; then
 
@@ -71,14 +66,15 @@ elif [ "$ARCH" = "i686" ]; then
                        --opengl-prefix=/usr/lib/nvidia-current --opengl-libdir=.
     ${MODPROBE} nvidia
 
-    # Make sure we still have 3D on our Intel card
-    yum -y reinstall libvdpau mesa-libGL xorg-x11-server-Xorg
-
     # Make sure we can run the nvidia X-server without all kind of library issues
     # See also http://us.download.nvidia.com/XFree86/Linux-x86/<version>/README/installedcomponents.html
     rm /usr/lib/nvidia-current/xorg/modules/libnvidia-wfb.so.${NV_DRIVERS_VERSION}
     rm /usr/lib/nvidia-current/xorg/modules/libnvidia-wfb.so.1
     rm /usr/lib/nvidia-current/xorg/modules/libwfb.so
 
-    cd $BUMBLEBEEPWD
 fi
+
+# Make sure we still have 3D on our Intel card (also for developers)
+yum -y reinstall libvdpau mesa-libGL mesa-libGL-devel xorg-x11-server-Xorg
+
+cd "$BUMBLEBEEPWD"
