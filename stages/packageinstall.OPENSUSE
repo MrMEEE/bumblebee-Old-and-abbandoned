@@ -37,11 +37,11 @@ if [ "$FOUND" == "" ] ; then
     zypper install x11-video-nvidiaG02
   ;;
   2)
-    zypper install nvidia-gfxG02-kmp-$KERNEL_TYPE
+    zypper install nvidia-gfxG01-kmp-$KERNEL_TYPE
     zypper install x11-video-nvidiaG01
   ;;
   3)
-    zypper install nvidia-gfxG02-kmp-$KERNEL_TYPE
+    zypper install nvidia-gfxG01-kmp-$KERNEL_TYPE
     zypper install x11-video-nvidiaG01
   ;;
   4)
@@ -54,6 +54,3 @@ if [ "$FOUND" == "" ] ; then
   ;;
   esac
 fi
-
-${MODPROBE} -r nouveau
-${MODPROBE} nvidia
