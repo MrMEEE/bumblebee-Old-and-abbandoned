@@ -14,7 +14,7 @@ optdepends=('acpi_call: turn on/off discrete card (not supported yet)')
 url="https://github.com/MrMEEE/bumblebee/"
 license=("custom: Nvidia + GPL3")
 install=('bumblebee.install')
-conflicts=('bumblebee<=1.6.11' 'nvidia-utils')
+conflicts=("bumblebee<${pkgver}")
 
 if [ "$CARCH" = "i686" ]; then
 	_arch='x86'

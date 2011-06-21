@@ -22,5 +22,5 @@ Section "Device"
     VendorName     "NVIDIA Corporation"
     BusID          "REPLACEWITHBUSID"
     Option         "IgnoreEDID"
-    Option 	   "ConnectedMonitor" "REPLACEWITHCONNECTEDMONITOR"
+    Option 	    "ConnectedMonitor" "CRT-0"
 EndSection

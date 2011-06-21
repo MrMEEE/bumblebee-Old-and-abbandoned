@@ -5,40 +5,45 @@
 
 DAEMON=bumblebee
 XDAEMON=/usr/bin/X
-#VGLDAEMON=/usr/bin/vglclient
-XDAEMON_ARGS="-ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9"
-#VGLDAEMON_ARGS="-gl"
+XDAEMON_ARGS="-ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-bumblebee/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9"
 PIDFILE=/tmp/.X1-lock
-PID=$(cat $PIDFILE 2>/dev/null)
+#PID=$(cat $PIDFILE 2>/dev/null)
 
+#TODO Check different exit status for appropriate feedback
 start() {
-  stat_busy "Starting up bumblebee Daemon"
-    PID=$(cat $PIDFILE 2>/dev/null)
-    if [ -z "$PID" ]; then
-      LD_LIBRARY_PATH=/usr/lib/nvidia-current $XDAEMON $XDAEMON_ARGS  &>/dev/null &
-    fi
-    if [ ! -z "$PID" -o $? -gt 0 ]; then
-      stat_fail
-    else
-      # $VGLDAEMON $VGLDAEMON_ARGS &>/dev/null & # Should check for VGLclient for succeed
+     stat_busy "Starting up bumblebee Daemon"
+     PID=$(cat $PIDFILE 2>/dev/null)
+     if [ -z "$PID" ]; then
+          LD_LIBRARY_PATH=/usr/lib/nvidia-bumblebee $XDAEMON $XDAEMON_ARGS &>/dev/null &
+     fi
+     i=1
+     while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
+          sleep 1
+          i=`expr $i + 1`
+          if [ $i -gt 10 ]; then
+               stat_fail "Bumblebee server failed to start"
+               exit 1
+          fi 
+     done
       add_daemon $DAEMON
       stat_done
-    fi
 }
 
+#TODO Check different exit status for appropriate feedback
 stop() {
-  stat_busy "Stopping bumblebee Daemon"
-  # kill -TERM $(pidof vglclient) &> /dev/null # Should check for VGLclient for succeed
-  PID=$(cat $PIDFILE 2>/dev/null)
-  #[ ! -z "$PID" ]  && 
-  kill -TERM $PID &> /dev/null
-  if [ $? -gt 0 ]; then
-    stat_fail
-  else
-    rm -f $PIDFILE
-    rm_daemon $DAEMON
-    stat_done
-  fi
+     stat_busy "Stopping bumblebee Daemon"
+     kill `cat $PIDFILE 2>&1` > /dev/null 2>&1
+     while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -ne 1 ]; do
+          sleep 1
+          i=`expr $i + 1`
+          if [ $i -gt 10 ]; then
+               stat_fail "Bumblebee server failed to stop"
+               exit 1
+          fi
+     done
+     rm -f $PIDFILE
+     rm_daemon $DAEMON
+     stat_done
 }
 
 restart() {

@@ -1,1 +1,0 @@
-vglrun -ld /usr/lib64/nvidia-current $@

@@ -1,8 +1,3 @@
-post_upgrade() {
-     echo "A new xorg.conf.pacnew file is created"
-     post_install
-}
-
 post_install() {
 
 #==================================================================================================
@@ -17,7 +12,7 @@ echo "You must correct this manually in /etc/X11/xorg.conf.nvidia"
 fi
 echo "Changing Configuration to match your Machine"
 echo 
-sed -i 's/REPLACEWITHBUSID/'$NVIDIABUSID'/g' /etc/X11/xorg.conf.nvidia.pacnew
+sed -i 's/REPLACEWITHBUSID/'$NVIDIABUSID'/g' /etc/X11/xorg.conf.nvidia
 
 #==================================================================================================
 
