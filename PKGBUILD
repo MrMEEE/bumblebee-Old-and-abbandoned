@@ -14,7 +14,7 @@ url="https://github.com/Samsagax/bumblebee"
 license=("GPL3")
 install=('bumblebee.install')
 conflicts=("bumblebee<${pkgver}")
-source=("${pkgname}-${pkgver}-${pkgrel}.tar.gz")
+source=("https://github.com/downloads/Samsagax/bumblebee/${pkgname}-${pkgver}-${pkgrel}.tar.gz")
 md5sums=('f3287306837a9ae05dad3959f9401ea3')
 
 package() {
