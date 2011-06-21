@@ -4,7 +4,7 @@
 # Maintainer: Samsagax <samsagax@gmail.com>
 
 pkgname=bumblebee
-pkgver=1.6.12
+pkgver=1.6.13
 pkgrel=1
 pkgdesc="Optimus Support for Linux Through VirtualGL. Turning ON/OFF still not supported"
 arch=('i686' 'x86_64')
