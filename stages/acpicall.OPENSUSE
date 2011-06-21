@@ -1,6 +1,80 @@
-zypper install -t pattern devel_kernel
-VERSION=`cat /etc/SuSE-release | grep VERSION | cut -f3 -d" "`
-zypper --plus-repo http://packman.inode.at/suse/openSUSE_$VERSION/Extra install dkms
+KERNEL_TYPE=`uname -r | cut -f3 -d"-"`
+
+INSTALLED=`zypper info kernel-$KERNEL_TYPE-devel | grep Installed: | cut -f2 -d' '`
+if [ "$INSTALLED" != "Yes" ] ; then
+  echo "Do you want me to install the kernel-devel and kernel-$KERNEL_TYPE-devel packages"
+  echo "needed for the acpi_call build (y/n) ?"
+  read answer
+  case "$answer" in
+  y|Y)
+    if [ "$INSTALLED" != "Yes" ] ; then
+      zypper install kernel-$KERNEL_TYPE-devel
+      if [ $? -ne 0 ]; then
+	echo
+	echo "Package manager failed to install needed packages..."
+	echo
+	exit 21
+      fi
+    fi
+    zypper update
+  ;;
+  n|N)
+    echo "Packages will NOT be installed."
+  ;;
+  *)
+  ;;
+  esac
+fi
+
+INSTALLED=`zypper info gcc | grep Installed: | cut -f2 -d' '`
+if [ "$INSTALLED" != "Yes" ] ; then
+  echo "Do you want me to install the git, make and gcc packages"
+  echo "needed for the acpi_call build (y/n) ?"
+  read answer
+  case "$answer" in
+  y|Y)
+    if [ "$INSTALLED" != "Yes" ] ; then
+      zypper install git-core make gcc
+      if [ $? -ne 0 ]; then
+	echo
+	echo "Package manager failed to install needed packages..."
+	echo
+	exit 21
+      fi
+    fi
+    zypper update
+  ;;
+  n|N)
+    echo "Packages will NOT be installed."
+  ;;
+  *)
+  ;;
+  esac
+fi
+
+INSTALLED=`zypper info dkms | grep Installed: | cut -f2 -d' '`
+if [ "$INSTALLED" != "Yes" ] ; then
+  echo "Do you want me to install the dkms package needed for the acpi_call build (y/n) ?"
+  read answer
+  case "$answer" in
+  y|Y)
+    VERSION=`cat /etc/SuSE-release | grep VERSION | cut -f3 -d" "`
+    zypper --plus-repo http://packman.inode.at/suse/openSUSE_$VERSION/Extra install dkms
+    if [ $? -ne 0 ]; then
+      echo
+      echo "Package manager failed to install needed package..."
+      echo
+      exit 21
+    fi
+    zypper update
+  ;;
+  n|N)
+    echo "Package will NOT be installed."
+  ;;
+  *)
+  ;;
+  esac
+fi
 
 ACPICALLVERSION=1.0
 
