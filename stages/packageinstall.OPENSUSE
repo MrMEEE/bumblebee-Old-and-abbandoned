@@ -54,6 +54,3 @@ if [ "$FOUND" == "" ] ; then
   ;;
   esac
 fi
-
-${MODPROBE} -r nouveau
-${MODPROBE} nvidia
