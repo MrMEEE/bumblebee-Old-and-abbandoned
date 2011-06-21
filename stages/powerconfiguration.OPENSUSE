@@ -1,7 +1,13 @@
-if [ "$POWERON" != "UNAVAILABLE" ]; then
+if [ "$POWERON" != "UNDEFINED" ]; then
 
     # Needed for xxd
-    zypper install vim-common
+    VERSION=`cat /etc/SuSE-release | grep VERSION | cut -f3 -d" "`
+
+    if [ "$VERSION" == "11.4" ] ; then
+      zypper install vim-base
+    else
+      zypper install vim-common
+    fi
 
     echo
     echo "Configuring Power Management."
@@ -9,8 +15,8 @@ if [ "$POWERON" != "UNAVAILABLE" ]; then
     echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
     echo $POWEROFF | xxd -r -p > /usr/local/bin/bumblebee-disablecard
     chmod +x /usr/local/bin/bumblebee*
-    sed -i 's/nvidia-current/nvidia/g' /usr/local/bin/bumblebee-enablecard
-    sed -i 's/nvidia-current/nvidia/g' /usr/local/bin/bumblebee-disablecard
+#    sed -i 's/nvidia-current/nvidia/g' /usr/local/bin/bumblebee-enablecard
+#    sed -i 's/nvidia-current/nvidia/g' /usr/local/bin/bumblebee-disablecard
 
 else
 

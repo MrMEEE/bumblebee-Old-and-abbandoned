@@ -1,5 +1,5 @@
-ROOT_UID=1000
-if [ $UID != $ROOT_UID ] || [ $HOME = /root ]; then
+ROOT_UID=0
+if [ $UID != $ROOT_UID ] || [ "$SUDO_USER" == "root" ] || [ "$SUDO_USER" == "" ] ; then
   echo "You don't have sufficient privileges to run this script."
   echo
   echo "Do not run this script as the root user."

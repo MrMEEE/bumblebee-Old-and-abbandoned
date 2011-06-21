@@ -37,6 +37,7 @@ elif [ `cat /etc/issue |grep -nir ubuntu |wc -l` -gt 0 ]; then
 elif [ `cat /etc/issue |grep -nir opensuse |wc -l` -gt 0 ]; then
  DISTRO=OPENSUSE
  BASHRC=/etc/bash.bashrc
+ HOME=`cat /etc/passwd | grep $SUDO_USER | cut -f6 -d':'`
 elif [ `cat /etc/issue |grep -nir debian |wc -l` -gt 0 ]; then
  DISTRO=DEBIAN
  BASHRC=/etc/bash.bashrc
@@ -52,7 +53,8 @@ if [ $UID != $ROOT_UID ]; then
     exit 1
 fi
 
-if [ $HOME = /root ]; then
+if ( ( [ "$DISTRO" == "FEDORA" ] || [ "$DISTRO" == "UBUNTU" ] || [ "$DISTRO" == "DEBIAN" ] ) && [ "$HOME" == "/root" ] ) || \
+   ( [ "$DISTRO" == "OPENSUSE" ] && ( [ "$SUDO_USER" == "root" ] || [ "$SUDO_USER" == "" ] ) ) ; then
     echo "Do not run this script as the root user"
     echo
     echo "Please run the script with: sudo bumblebee-uninstall"
@@ -109,7 +111,8 @@ elif [ $DISTRO = OPENSUSE ]; then
     chkconfig bumblebee off 
     echo "Removing VirtualGL package"
     echo
-    yum -y remove VirtualGL
+    zypper remove VirtualGL
+    rm /etc/pm/power.d/bumblebee-disablecard-on-powerup
 
 elif [ $DISTRO = FEDORA ]; then
 
@@ -131,6 +134,12 @@ elif [ $DISTRO = FEDORA ]; then
         /usr/lib64/nvidia-current/bin/nvidia-installer -s --uninstall
     fi
 
+fi
+
+#	Make sure the card is enabled
+#
+if [ -x /usr/local/bin/bumblebee-enablecard ]; then
+  /usr/local/bin/bumblebee-enablecard
 fi
 
 #Unload the nvidia module
@@ -172,13 +181,13 @@ fi
 rm -rf /usr/lib64/nvidia-current
 rm -rf /usr/lib/nvidia-current
 rm -rf /usr/lib/bumblebee
-rm /usr/local/bin/optirun*
-rm /usr/local/bin/bumblebee-disablecard-on-powerup
-rm /usr/bin/vglclient-service
-rm /etc/modprobe.d/nouveau-blacklist.conf
+rm -f /usr/local/bin/optirun*
+rm -f /usr/local/bin/bumblebee-disablecard-on-powerup
+rm -f /usr/bin/vglclient-service
+rm -f /etc/modprobe.d/nouveau-blacklist.conf
 rm -rf /usr/share/doc/bumblebee
-rm -rf /usr/local/bin/bumblebee*
-rm -rf /etc/default/bumblebee*
+rm -f /usr/local/bin/bumblebee*
+rm -f /etc/default/bumblebee*
 if [ -d /opt/prime-ng ]; then
     rm -rf /opt/prime-ng
 fi
@@ -190,29 +199,39 @@ if [ -d /usr/lib/bumblebee ]; then
     rm -rf /usr/lib/bumblebee
 fi
 
-if [ `dkms status |grep acpi_call | wc -l` > 0 ]; then
+if [ `dkms status |grep acpi_call | wc -l` -gt 0 ]; then
  dkms uninstall -m acpi_call -v `dkms status |grep acpi_call |cut -f2 -d,`  
  dkms remove -m acpi_call -v `dkms status |grep acpi_call |cut -f2 -d,` --all
 fi
 
-rm /etc/alternatives/xorg_extra_modules-bumblebee 
-ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules
+if [ -f /etc/alternatives/xorg_extra_modules-bumblebee ] ; then
+  rm -f /etc/alternatives/xorg_extra_modules-bumblebee
+fi
+if [ "$DISTRO" != "OPENSUSE" ] ; then
+  ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules
+fi
 
 ldconfig
 
 if [ -f $HOME/.kde/Autostart/vglclient-service ]; then
-    rm $HOME/.kde/Autostart/vglclient-service
+    rm -f $HOME/.kde/Autostart/vglclient-service
 fi
 
 if [ -f $HOME/.config/autostart/vglclient-service ]; then
-    rm $HOME/.config/autostart/vglclient-service
+    rm -f $HOME/.config/autostart/vglclient-service
 fi
 
-grep -Ev 'VGL|optirun' $HOME/.bashrc > $HOME/.oldbashrc
-mv $HOME/.oldbashrc $HOME/.bashrc
-chown $SUDO_USER:$SUDO_USER $HOME/.bashrc
+if [ -f $HOME/.config/autostart/vglclient.desktop ]; then
+    rm $HOME/.config/autostart/vglclient.desktop
+fi
+
+if [ -f $HOME/.bashrc ] ; then
+  grep -Ev 'VGL|optirun' $HOME/.bashrc > $HOME/.oldbashrc
+  mv -f $HOME/.oldbashrc $HOME/.bashrc
+  chown $SUDO_UID:$SUDO_GID $HOME/.bashrc
+fi
 grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
-mv /etc/sudoers.optiorig /etc/sudoers
+mv -f /etc/sudoers.optiorig /etc/sudoers
 chmod 0440 /etc/sudoers
 
 killall -9 vglclient

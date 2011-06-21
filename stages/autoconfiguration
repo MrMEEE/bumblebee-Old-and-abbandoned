@@ -29,19 +29,26 @@ case `cat /tmp/machineinfo | wc -l` in
  echo
  echo "Confirmed working by: "$USER
  echo
-
- CONNECTEDMONITOR=`cat /tmp/machineinfo |cut -f3 -d\| | sed -e 's/ //g'`
- INTELBUSID=`cat /tmp/machineinfo |cut -f4 -d\| | sed -e 's/ //g'`
- NVIDIABUSID=`cat /tmp/machineinfo |cut -f5 -d\| | sed -e 's/ //g'`
- POWERON=`cat /tmp/machineinfo |cut -f6 -d\|`
- POWEROFF=`cat /tmp/machineinfo |cut -f7 -d\|`
+ echo "Use this setup or do a Manual configuration ? (u/m)"
+ echo
+ read CONFIG
+ echo
+ if  [ "$CONFIG" == "" ] || [ "$CONFIG" == "m" ] || [ "$CONFIG" == "M" ] ; then
+  echo Starting manual configuration
+ else
+  CONNECTEDMONITOR=`cat /tmp/machineinfo |cut -f3 -d\| | sed -e 's/ //g'`
+  INTELBUSID=`cat /tmp/machineinfo |cut -f4 -d\| | sed -e 's/ //g'`
+  NVIDIABUSID=`cat /tmp/machineinfo |cut -f5 -d\| | sed -e 's/ //g'`
+  POWERON=`cat /tmp/machineinfo |cut -f6 -d\|`
+  POWEROFF=`cat /tmp/machineinfo |cut -f7 -d\|`
+ fi
 ;;
 
 *)
  echo
  echo "Several configurations found for your machine"
  echo
- echo "Please Select"
+ echo "Please Select ( 'm' for Manual configuration )"
  echo
  for i in `seq 1 \`cat /tmp/machineinfo |wc -l\``;
  do
@@ -60,11 +67,15 @@ case `cat /tmp/machineinfo | wc -l` in
  echo
  read CONFIG
  echo
- CONNECTEDMONITOR=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f3 -d\| | sed -e 's/ //g'`
- INTELBUSID=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f4 -d\| | sed -e 's/ //g'`
- NVIDIABUSID=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f5 -d\| | sed -e 's/ //g'`
- POWERON=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f6 -d\|`
- POWEROFF=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f7 -d\|`
+ if [ "$CONFIG" == "" ] || [ "$CONFIG" == "m" ] || [ "$CONFIG" == "M" ] ; then
+  echo Starting manual configuration
+ else
+  CONNECTEDMONITOR=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f3 -d\| | sed -e 's/ //g'`
+  INTELBUSID=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f4 -d\| | sed -e 's/ //g'`
+  NVIDIABUSID=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f5 -d\| | sed -e 's/ //g'`
+  POWERON=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f6 -d\|`
+  POWEROFF=`cat /tmp/machineinfo |sed -n \`echo $CONFIG\`p|cut -f7 -d\|`
+ fi
 ;;
 
 esac
