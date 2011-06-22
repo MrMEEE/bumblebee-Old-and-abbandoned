@@ -123,7 +123,7 @@ while [ "$IMAGETRANSPORT" = "UNDEFINED" ] ; do
   echo "3) PROXY"
   echo "4) XV (default)"
   echo "5) RGB"  
-  echo "6) Leave configuration"
+  echo "6) Keep current setting"
 
   echo
   read machine
@@ -171,6 +171,69 @@ if [ "$DISTRO" == "UBUNTU" ] || [ "$DISTRO" == "OPENSUSE" ] ; then
 elif [ "$DISTRO" == "FEDORA" ] ; then
  sed -i "s/VGL_COMPRESS=$CURRENTIMAGETRANSPORT/VGL_COMPRESS=$IMAGETRANSPORT/g" /etc/profile.d/virtualgl.sh
 fi
+
+
+#
+#	Stop service ?
+#
+if [ "$DISTRO" == "UBUNTU" ] || [ "$DISTRO" == "OPENSUSE" ] ; then
+  CURRENTSTOPSERVICE=`cat /etc/default/bumblebee | grep STOP_SERVICE_ON_EXIT= | cut -f2 -d=`
+
+  STOPSERVICE="UNDEFINED"
+
+  while [ "$STOPSERVICE" = "UNDEFINED" ] ; do
+
+    clear
+
+    echo
+    echo "Bumblebee optimus X server will handle all the apllications started with the optirun command."
+    echo "The server can be terminate when nobody is using it. If powermanagement is working for your"
+    echo "system, this setting will save some energy."
+    echo
+    if [ "$CURRENTSTOPSERVICE" == "YES" ] ; then
+      echo "The current setting will stop the NVidia X server when nobody is using it."
+    else
+      echo "The current setting will leave the NVidia X server running."
+    fi
+    echo
+    echo "1) Stop the server on exit"
+    echo "2) Leave server running on exit"
+    echo "3) Keep current setting"
+
+    echo
+    read machine
+    echo
+
+    case "$machine" in
+
+      1)
+      STOPSERVICE="YES"
+      ;;
+	
+      2)
+      STOPSERVICE="NO"
+      ;;
+  
+      3)
+      STOPSERVICE=$CURRENTSTOPSERVICE
+      ;;
+
+      *)
+      echo
+      echo "Please choose a valid option, Press any key to try again."
+      read
+      clear
+	  
+      ;;   
+	
+    esac 
+  done 
+
+  if [ "$DISTRO" == "UBUNTU" ] || [ "$DISTRO" == "OPENSUSE" ] ; then
+    sed -i "s/STOP_SERVICE_ON_EXIT=$CURRENTSTOPSERVICE/STOP_SERVICE_ON_EXIT=$STOPSERVICE/g" /etc/default/bumblebee
+  fi
+fi
+
 
 echo
 echo "Configuration Completed."
