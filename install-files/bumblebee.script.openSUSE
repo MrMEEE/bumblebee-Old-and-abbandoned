@@ -22,6 +22,11 @@ RETVAL=0
 ENABLECARD=/usr/local/bin/bumblebee-enablecard
 DISABLECARD=/usr/local/bin/bumblebee-disablecard
 
+#64 LD_LIBRARY_PATH=/usr/X11R6/lib64-nvidia:/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+#32 LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+
+export LD_LIBRARY_PATH
+
 start() {
 	if [ ! -f $LOCKFILE ] ; then
 	  $ENABLECARD
