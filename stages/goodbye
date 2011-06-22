@@ -1,7 +1,7 @@
 # Should be removed when changes from v.1.4.19+20 has been implemented on Fedora, OpenSuSE and Debian.
 
-if [ "$DISTRO" != UBUNTU ]; then
- echo "Now you need to make sure that the command \"vglclient -gl\" is run after your Desktop Enviroment is started"
+if [ "$DISTRO" != UBUNTU ] && [ "$DISTRO" != OPENSUSE ] ; then
+ echo "Now you need to make sure that the command \"vglclient -gl\" is run after your Desktop Environment is started"
  echo
  echo "In KDE this is done by this script.. Thanks to Peter Liedler."
  echo
