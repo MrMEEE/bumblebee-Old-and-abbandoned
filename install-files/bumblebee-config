@@ -40,7 +40,7 @@ elif [ `cat /etc/issue | grep -nir opensuse | wc -l` -gt 0 ] ; then
   HOME=`cat /etc/passwd | grep $SUDO_USER | cut -f6 -d':'`
  fi
 else
- echo "Cannot handle this distrobution."
+ echo "Cannot handle this distribution."
 fi
 
 if [ "$UID" != "$ROOT_UID" ] ; then
