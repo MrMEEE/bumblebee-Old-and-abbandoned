@@ -1,5 +1,8 @@
-sudo apt-get install dkms git
-
+if [ $(lsb_release -c -s) != "lucid" ]; then
+ sudo apt-get install dkms git
+else
+ sudo apt-get install dkms git-core
+fi
 
 ACPICALLVERSION=1.0
 
