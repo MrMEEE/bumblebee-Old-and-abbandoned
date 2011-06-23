@@ -117,7 +117,7 @@ echo
 source stages/setupbumblebeeservice.$DISTRO
 
 echo
-echo "Setting up Enviroment variables"
+echo "Setting up Environment variables"
 echo
 
 source stages/enviromentvariables

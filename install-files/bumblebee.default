@@ -13,3 +13,6 @@ VGL_COMPRESS=xv
 
 # Readback mode
 VGL_READBACK=fbo
+
+# Readback mode
+VGL_LOG=/dev/null

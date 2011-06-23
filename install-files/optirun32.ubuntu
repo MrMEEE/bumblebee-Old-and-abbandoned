@@ -8,7 +8,8 @@ trap "echo 'Caught Ctrl+C'" INT
 
 source /etc/default/bumblebee
 
-export $VGL_READBACK
+export VGL_READBACK
+export VGL_LOG
 vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld /usr/lib32/nvidia-current "$@" 
 
 if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
