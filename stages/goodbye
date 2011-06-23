@@ -9,7 +9,7 @@ if [ "$DISTRO" != UBUNTU ] && [ "$DISTRO" != OPENSUSE ] ; then
  echo "In GNOME this is done by this script.. Thanks to Peter Liedler."
  echo
 else
- echo "Please logout and back in to activate new groups."
+ echo "Please logout and back in to activate new groups and library setups."
  echo
  echo "If you want power saving by shutting the nVidia down when not in use."
  echo "Please adjust the scripts:"
@@ -30,7 +30,7 @@ echo "After that you should be able to start applications with"
 echo "\"optirun <application>\"."
 fi  
 echo
-echo "If you have any problems in or after the installation, please try
+echo "If you have any problems in or after the installation, please try"
 echo "to run the bumblebee-uninstall script and then rerun this script..."
 echo "If that doesn't work: please run the bumblebee-bugreport tool and"
 echo "send me a bugreport."
