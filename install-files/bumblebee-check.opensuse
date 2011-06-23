@@ -59,7 +59,16 @@ if [ "$DISTRO" != OPENSUSE ] ; then
     echo "You have been warned !!!"
     exit 1
 fi
-  
+
+#
+#	Check for repository
+#
+FOUND=`rpm -qa|grep x11-video-nvidia`
+if [ "$FOUND" == "" ] ; then
+  echo "You are not using the NVidia repository for openSUSE."
+  echo "Sorry, cannot help you."
+  exit 1
+fi
 
 #Determine Arch x86_64 or i686
 ARCH=`uname -m`
