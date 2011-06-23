@@ -22,14 +22,22 @@ RETVAL=0
 ENABLECARD=/usr/local/bin/bumblebee-enablecard
 DISABLECARD=/usr/local/bin/bumblebee-disablecard
 
+#64 LD_LIBRARY_PATH=/usr/X11R6/lib64-nvidia:/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+#32 LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+
+export LD_LIBRARY_PATH
+
 start() {
-	echo "Starting up bumblebee X server: "
+	if [ ! -f $LOCKFILE ] ; then
+	  $ENABLECARD
+	fi
+	echo -n "Starting up bumblebee X server: "
 	if [ -f $LOCKFILE ] ; then
+	  echo
 	  echo "Bumblebee server already running"
 	  exit 1
 	fi
-	$ENABLECARD
-	/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -nolisten tcp -noreset :1 vt9 2>/dev/null >/dev/null &
+	/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -nolisten tcp -noreset :1 vt9 > /dev/null 2>&1 &
 	PID_X=$!
 	i=1
 	while [ `ps p $PID_X | wc -l` -eq 1 ] ; do
@@ -45,12 +53,13 @@ start() {
 	echo $PID_X > $LOCKFILE && echo "success" > /dev/null || echo "failure"
 	RETVAL=$?
 	echo
-	vglclient -gl &
+	vglclient -gl > /dev/null 2>&1 &
 }
 
 stop() {
-	echo "Stopping bumblebee X server: "
+	echo -n "Stopping bumblebee X server: "
 	if [ ! -f $LOCKFILE ] ; then
+	  echo
 	  echo "Bumblebee server not running"
 	  exit 1
 	fi
@@ -82,19 +91,19 @@ restart() {
 case "$1" in
   start)
 	stop
+	# Remember status and be verbose
+        rc_status -v
 	;;
   enable)
 	start
-	# Remember status and be verbose
-        rc_status -v
 	;;
   stop)
 	start
+	# Remember status and be verbose
+        rc_status -v
 	;;
   disable)
 	stop
-	# Remember status and be verbose
-        rc_status -v
 	;;
   try-restart)
         ## Stop the service and if this succeeds (i.e. the 
