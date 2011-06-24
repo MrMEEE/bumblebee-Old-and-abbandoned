@@ -98,7 +98,7 @@ sed -i "s/$CURRENTMONITOR/$CONNECTEDMONITOR/g" /etc/X11/xorg.conf.nvidia
 if [ "$DISTRO" == "UBUNTU" ] || [ "$DISTRO" == "OPENSUSE" ] ; then
  CURRENTIMAGETRANSPORT=`cat /etc/default/bumblebee | grep VGL_COMPRESS= | cut -f2 -d=`
 elif [ "$DISTRO" == "FEDORA" ] ; then
- CURRENTIMAGETRANSPORT=`cat /etc/profile/virtualgl.sh | grep VGL_COMPRESS= | cut -f2 -d=`
+ CURRENTIMAGETRANSPORT=`cat /etc/profile.d/virtualgl.sh | grep VGL_COMPRESS= | cut -f2 -d=`
 fi
 IMAGETRANSPORT="UNDEFINED"
 
