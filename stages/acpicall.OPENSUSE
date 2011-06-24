@@ -107,7 +107,7 @@ if [ `dkms status |grep acpi_call | wc -l` -gt 0 ]; then
    dkms build -m acpi_call -v $ACPICALLVERSION
    dkms install -m acpi_call -v $ACPICALLVERSION
 
-   cd $BUMBLEBEEPWD
+   cd "$BUMBLEBEEPWD"
   ;;
 
   *)
@@ -135,5 +135,5 @@ else
  dkms build -m acpi_call -v $ACPICALLVERSION
  dkms install -m acpi_call -v $ACPICALLVERSION
 
- cd $BUMBLEBEEPWD
+ cd "$BUMBLEBEEPWD"
 fi
