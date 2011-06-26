@@ -95,10 +95,4 @@ if [ "FOUNDREPO" != "" ] ; then
 
     cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
   fi
-
-  #
-  #	Move the NVidia files to a less annoying place.
-  #	( PLEASE make your rpm's relocatable.... )
-  #
-  bumblebee-check
 fi
