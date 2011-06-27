@@ -50,7 +50,7 @@ if [ "$UID" != "$ROOT_UID" ] ; then
     exit 1
 fi
   
-if [ "$HOME" = "/root" ] ; then
+if [ "$HOME" = "/root" ] && [ "$DISTRO" != OPENSUSE ] ; then
     echo "Do not run this script as the root user"
     echo
     echo "Please run the script with: sudo bumblebee-config"
