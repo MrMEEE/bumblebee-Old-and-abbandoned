@@ -1,56 +1,722 @@
+#
+#	Get openSuSE version
+#
 VERSION=`cat /etc/SuSE-release | grep VERSION | cut -f3 -d" "`
-FOUND=`zypper lr ftp://download.nvidia.com/opensuse/${VERSION} 2>/dev/null | grep Cache`
-if [ "$FOUND" == "" ] ; then
-  echo "Do you want me to install NVidia repository for openSUSE $VERSION (y/n) ?"
-  read answer
-  case "$answer" in
-  y|Y)
-    zypper ar -f ftp://download.nvidia.com/opensuse/${VERSION} "nVidia Graphics Drivers"
-    if [ $? -ne 0 ]; then
-    echo
-    echo "Package manager failed to install needed packages..."
-    echo
-    exit 21
-    fi
-    zypper update
-  ;;
-  n|N)
-    echo "NVidia drivers repository will NOT be installed."
-  ;;
-  *)
-  ;;
-  esac
+
+#
+#	Determine Arch x86_64 or i686
+#
+ARCH=`uname -m`
+
+if [ "$ARCH" == "i686" ] ; then
+  ARCH_NVIDIA="x86"
+else
+  ARCH_NVIDIA="x86_64"
 fi
 
-FOUND=`rpm -qa|grep x11-video-nvidia`
-if [ "$FOUND" == "" ] ; then
-  KERNEL_TYPE=`uname -r | cut -f3 -d"-"`
-  echo "What is your NVidia card family ?"
-  echo "1) GF6 or newer"
-  echo "2) FX5XXX"
-  echo "3) GF4 or older"
-  echo "4) Skip NVidia drivers install (you need to do this by yourself in this case)"
-  read card
-  case $card in
+
+########################
+#
+#	Funcs
+#
+
+uninstall_nvidia_package()
+{
+
+  while true ; do
+    echo
+    echo "Old nVidia package installation detected."
+    echo
+    echo "Please use the bumblebee-uninstall script to remove this packages if it"
+    echo "was installed using the bumblebee install.sh"
+    echo "Please remove it by running nvidia-uninstall if you installed it yourself."
+    echo
+    echo "Or if you are feeling lucky, just select 'y'".
+    echo "Remove the old nVidia package ( WARNING X WILL PROBABLY CRASH ) ? (y/n)"
+    echo
+    read opt
+    echo
+
+    case "$opt" in
+    y)
+      echo "Uninstalling old nVidia package."
+
+      #
+      #	Cleanup 3D hack for the nVidia package part 1
+      #
+      if [ "$ARCH" == "i686" ] ; then
+	rm -f /usr/lib/libGL.so.*
+	mv -f /usr/X11R6/nvidia/lib/libnvidia-wfb.* /usr/X11R6/nvidia/lib/xorg/modules
+	pushd /usr/X11R6/nvidia/lib/xorg/modules > /dev/null
+	ln -sf libnvidia-wfb.so.1 libwfb.so
+	popd > /dev/null
+      else
+	rm -f /usr/lib/libGL.so.*
+	rm -f /usr/lib64/libGL.so.*
+	mv -f /usr/X11R6/nvidia/lib64/libnvidia-wfb.* /usr/X11R6/nvidia/lib64/xorg/modules 
+	pushd /usr/X11R6/nvidia/lib64/xorg/modules > /dev/null
+	ln -sf libnvidia-wfb.so.1 libwfb.so
+	popd > /dev/null
+      fi
+
+      #
+      #	Uninstall nVidia package
+      #
+      /usr/bin/nvidia-uninstall -s
+
+      #
+      #	Cleanup 3D hack part 2
+      #
+      rm -rf /usr/X11R6/lib-nvidia
+      rm -rf /usr/X11R6/lib64-nvidia
+      rm -rf /usr/lib/xorg-nvidia
+      rm -rf /usr/lib64/xorg-nvidia
+
+      rm -rf /usr/X11R6/nvidia
+
+      break
+      ;;
+    n)
+      echo "Aborting installation."
+      exit 1
+      ;;
+    *)
+      echo
+      echo "Please select a valid option, Press <enter> to try again."
+      read
+      clear
+      ;;
+    esac
+  done
+
+}
+
+
+########################
+#
+#	Main
+#
+
+
+#
+#	nVidia repo or script install
+#
+NVIDIA_TYPE="UNDEFINED"
+while [ "$NVIDIA_TYPE" == "UNDEFINED" ] ; do
+
+  echo "What kind of nVidia installation do you want ?"
+  echo
+  echo "1) Use the nVidia repository for openSuSE ( stable )"
+  echo "2) Use the nVidia driver package NVIDIA-Linux-$ARCH_NVIDIA-xxxx.run ( unstable ? )"
+  echo "3) Skip nVidia driver installation.( Warning: nVidia drivers have to be installed )"
+  echo
+  read opt
+  echo
+
+  case "$opt" in
   1)
-    zypper install nvidia-gfxG02-kmp-$KERNEL_TYPE
-    zypper install x11-video-nvidiaG02
-  ;;
+    NVIDIA_TYPE="repo"
+    break
+    ;;
   2)
-    zypper install nvidia-gfxG01-kmp-$KERNEL_TYPE
-    zypper install x11-video-nvidiaG01
-  ;;
+    NVIDIA_TYPE="package"
+    break
+    ;;
   3)
-    zypper install nvidia-gfxG01-kmp-$KERNEL_TYPE
-    zypper install x11-video-nvidiaG01
-  ;;
-  4)
-    echo "Skipping driver installation. Please remember that NVidia drivers *HAVE TO BE INSTALLED*"
-  ;;
+    NVIDIA_TYPE="none"
+    break
+    ;;
   *)
     echo
-    echo "Please choose a valid option, Press any key to try again"
+    echo "Please select a valid option, Press <enter> to try again."
     read
-  ;;
+    clear
+    ;;
   esac
+done
+
+#
+#	nVidia X server still running ?
+#
+LOCKFILE=/var/lock/bumblebee
+if [ -f $LOCKFILE ] || [ -f /tmp/.X1-lock ] || [ `ps -ef |grep X | grep nvidia | wc -l` -gt 0 ] ; then
+  while true ; do
+    echo
+    echo "nVidia X server still running. Kill the server ? (y/n)"
+    echo
+    read opt
+
+    case "$opt" in
+    y)
+      if [ -f $LOCKFILE ] ; then
+	kill -9 `cat $LOCKFILE`
+	rm -f $LOCKFILE
+	rm -f /tmp/.X1-lock
+      else
+	#
+	#	Find the pid
+	#
+	PID_X=`pidof X`
+
+	if [ "`ps p $PID_X | grep nvidia`" != "" ] ; then
+	  kill -9 $PID_X
+	fi
+	rm -f /tmp/.X1-lock
+      fi
+
+      #
+      #	Wait for the kill
+      #
+      i=1
+      while [ `ps -ef | grep X | grep nvidia | wc -l` -gt 0  ] ; do
+	sleep 1
+	echo -n "."
+	i=$(( i + 1 ))   
+	if [ $i -gt 10 ]; then
+	echo
+	echo "Cannot kill X server"
+	break
+	fi 
+      done
+
+      #
+      #	Is the system clean ?
+      #
+      if [ ! -f $LOCKFILE ] && [ ! -f /tmp/.X1-lock ] && [ `ps -ef | grep X | grep nvidia | wc -l` -eq 0  ] ; then
+	#
+	#	Yes, continue
+	#
+	break
+      fi
+      ;;
+    n)
+      echo "Cannot continue."
+      exit 1
+      ;;
+    *)
+      echo
+      echo "Please select a valid option, Press <enter> to try again."
+      read
+      clear
+      ;;
+    esac
+  done
+fi
+
+#
+#	Repository installation
+#
+if [ "$NVIDIA_TYPE" == "repo" ] ; then
+
+  echo "Using the nVidia repository to install the driver."
+
+  #
+  #	Check for nVidia package install
+  #
+  if [ -f /usr/bin/nvidia-uninstall ] ; then
+    uninstall_nvidia_package
+  fi
+
+  #
+  #	Mirror repository ?
+  #
+  REPO_MIRROR="UNDEFINED"
+  while [ "$REPO_MIRROR" == "UNDEFINED" ] ; do
+    echo
+    echo "Do you want to use a local mirror of the nVidia repository for openSuSE ? (y/n)"
+    echo "( First time mirror setup requires an approx. 100 MB download )"
+    echo
+    read opt
+    echo
+
+    case "$opt" in
+    y)
+      mkdir -p cache
+      pushd cache
+      /usr/bin/wget -m ftp://download.nvidia.com/opensuse/${VERSION}
+      popd
+  
+      echo
+      echo "Mirror is now synced."
+      echo
+
+      REPO_MIRROR="yes"
+      ;;
+    n)
+      REPO_MIRROR="no"
+      ;;
+    *)
+      echo
+      echo "Please select a valid option, Press <enter> to try again."
+      read
+      clear
+      ;;
+    esac
+  done
+
+  ONLINE_REPO=`zypper lr ftp://download.nvidia.com/opensuse/${VERSION} 2>/dev/null | grep Cache`
+  OFFLINE_REPO=`zypper lr "nVidia Graphics Drivers (local mirror)" 2>/dev/null | grep Cache`
+
+  if [ "$REPO_MIRROR" == "yes" ] ; then
+    #
+    #	Use the mirror 
+    #
+    if [ "$ONLINE_REPO" != "" ] ; then
+      #
+      #	Remove online repo
+      #
+      echo "Removing online repository reference."
+
+      zypper rr ftp://download.nvidia.com/opensuse/${VERSION} >/dev/null 2>&1 
+    fi
+
+    if [ "$OFFLINE_REPO" == "" ] ; then
+      #
+      #	Adding offlone repo
+      #
+      echo "Adding local repository reference."
+
+      zypper ar -f `pwd`/cache/download.nvidia.com/opensuse/${VERSION} "nVidia Graphics Drivers (local mirror)"
+
+      if [ $? -ne 0 ] ; then
+	echo
+	echo "Package manager failed to install needed repository..."
+	echo
+	exit 21
+      fi
+    fi
+  else
+    #
+    #	Use the online repository
+    #
+    if [ "$OFFLINE_REPO" != "" ] ; then
+      #
+      #	Remove local mirror repository
+      #
+      echo "Removing mirror repository reference."
+
+      zypper rr "nVidia Graphics Drivers (local mirror)" >/dev/null 2>&1 
+    fi
+
+    if [ "$ONLINE_REPO" == "" ] ; then
+      #
+      #	Adding offlone repo
+      #
+      echo "Adding online repository reference."
+
+      zypper ar -f  "nVidia Graphics Drivers (local mirror)"
+
+      if [ $? -ne 0 ] ; then
+	echo
+	echo "Package manager failed to install needed repository..."
+	echo
+	exit 21
+      fi
+      zypper update
+    fi
+  fi
+
+  FOUND=`rpm -qa|grep x11-video-nvidia`
+  if [ "$FOUND" == "" ] ; then
+    KERNEL_TYPE=`uname -r | cut -f3 -d"-"`
+    echo "What is your NVidia card family ?"
+    echo "1) GF6 or newer"
+    echo "2) FX5XXX"
+    echo "3) GF4 or older"
+    echo "4) Skip NVidia drivers install (you need to do this by yourself in this case)"
+    read card
+    case $card in
+    1)
+      zypper install nvidia-gfxG02-kmp-$KERNEL_TYPE
+      zypper install x11-video-nvidiaG02
+    ;;
+    2)
+      zypper install nvidia-gfxG01-kmp-$KERNEL_TYPE
+      zypper install x11-video-nvidiaG01
+    ;;
+    3)
+      zypper install nvidia-gfxG01-kmp-$KERNEL_TYPE
+      zypper install x11-video-nvidiaG01
+    ;;
+    4)
+      echo "Skipping driver installation. ( Warning: nVidia drivers have to be installed )"
+    ;;
+    *)
+      echo
+      echo "Please choose a valid option, Press any key to try again"
+      read
+    ;;
+    esac
+  fi
+
+  #
+  #	Full 3D hack for the repository
+  #
+  if [ "$ARCH" == "i686" ] ; then
+    if [ `ls /usr/X11R6/lib/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
+      #
+      #	Move conflicting NVidia libraries to a safer place.
+      #
+      rm -rf /usr/X11R6/lib-nvidia
+      mkdir -p /usr/X11R6/lib-nvidia
+      mv -f /usr/X11R6/lib/libGL.* /usr/X11R6/lib-nvidia/
+      mv -f /usr/X11R6/lib/libXvMCNVIDIA* /usr/X11R6/lib-nvidia/
+    fi
+    if [ -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
+      #
+      #	Move NVidia xorg modules to a safer place
+      #
+      rm -rf /usr/lib/xorg-nvidia
+      cp -a /usr/lib/xorg /usr/lib/xorg-nvidia
+      rm -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so
+      rm -f /usr/lib/xorg/modules/updates/extensions/libglx.*
+    fi
+  else
+    if [ `ls /usr/X11R6/lib/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
+      #
+      #	Move conflicting i686 NVidia libraries to a safer place.
+      #
+      rm -rf /usr/X11R6/lib-nvidia
+      mkdir -p /usr/X11R6/lib-nvidia
+      mv -f /usr/X11R6/lib/libGL.* /usr/X11R6/lib-nvidia/
+    fi
+    if [ `ls /usr/X11R6/lib64/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
+      #
+      #	Move conflicting x86_64 NVidia libraries to a safer place.
+      #
+      rm -rf /usr/X11R6/lib64-nvidia
+      mkdir -p /usr/X11R6/lib64-nvidia
+      mv -f /usr/X11R6/lib64/libGL.* /usr/X11R6/lib64-nvidia/
+      mv -f /usr/X11R6/lib64/libXvMCNVIDIA* /usr/X11R6/lib64-nvidia/
+    fi
+    if [ -f /usr/lib64/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
+      #
+      #	Move NVidia xorg modules to a safer place
+      #
+      rm -rf /usr/lib64/xorg-nvidia
+      cp -a /usr/lib64/xorg /usr/lib64/xorg-nvidia
+      rm -f /usr/lib64/xorg/modules/updates/drivers/nvidia_drv.so
+      rm -f /usr/lib64/xorg/modules/updates/extensions/libglx.*
+    fi
+  fi
+fi
+
+#
+#	Package installation
+#
+if [ "$NVIDIA_TYPE" == "package" ] ; then
+
+  echo "Using a nVidia package to install the driver."
+  echo
+  echo "NVIDIA-Linux-$ARCH_NVIDIA-xxxx.run packages can be copied"
+  echo "in the `pwd` directory for automatic detection."
+  echo
+
+  #
+  #	Check for nVidia package install
+  #
+  if [ -f /usr/bin/nvidia-uninstall ] ; then
+    uninstall_nvidia_package
+  fi
+
+  #
+  #	Check for repository install
+  #
+  FOUND=`rpm -qa|grep x11-video-nvidia`
+  if [ "$FOUND" != "" ] ; then
+    #
+    #	Repository rpm still installed
+    #
+    while true ; do
+      echo
+      echo "nVidia repository detected."
+      echo "The repository is not compatible with the nVidia package installation."
+      echo
+      echo "Remove the nVidia repository ? (y/n)"
+      echo
+      read opt
+      echo
+
+      case "$opt" in
+      y)
+	echo "Uninstalling nVidia rpms and repository."
+  
+	#
+	#	Remove rpm
+	#
+	VIDEO=`rpm -qa | grep x11-video-nvidia`
+	COMPUTE=`rpm -qa | grep nvidia-compute`
+	GFX=`rpm -qa | grep nvidia-gfx`
+
+	if [ "$VIDEO" != "" ] ; then
+	  rpm -e $VIDEO >/dev/null 2>&1
+	fi
+	if [ "$COMPUTE" != "" ] ; then
+	  rpm -e $COMPUTE >/dev/null 2>&1
+	fi
+	if [ "$GFX" != "" ] ; then
+	  rpm -e $GFX >/dev/null 2>&1
+	fi
+
+	#
+	#	Restore the X server link
+	#
+	ln -sf /usr/bin/Xorg /var/lib/X11/X
+
+	#
+	#	Remove repository
+	#
+	ONLINE_REPO=`zypper lr ftp://download.nvidia.com/opensuse/${VERSION} 2>/dev/null | grep Cache`
+	OFFLINE_REPO=`zypper lr "nVidia Graphics Drivers (local mirror)" 2>/dev/null | grep Cache`
+	if [ "$ONLINE_REPO" != "" ] ; then
+	  zypper rr ftp://download.nvidia.com/opensuse/${VERSION} >/dev/null 2>&1 
+	fi
+	if [ "$OFFLINE_REPO" != "" ] ; then
+	  zypper rr "nVidia Graphics Drivers (local mirror)" >/dev/null 2>&1 
+	fi
+
+	#
+	#	Cleanup 3D hack
+	#
+	rm -rf /usr/X11R6/lib-nvidia
+	rm -rf /usr/X11R6/lib64-nvidia
+	rm -rf /usr/lib/xorg-nvidia
+	rm -rf /usr/lib64/xorg-nvidia
+
+	break
+	;;
+      n)
+	echo "Cannot install the nVidia package while the repository is installed."
+	echo "Aborting installation."
+	exit 1
+	;;
+      *)
+	echo
+	echo "Please select a valid option, Press <enter> to try again."
+	read
+	clear
+	;;
+      esac
+    done
+  fi
+
+  #
+  #	Where is the package ?
+  #
+  PACKAGE="UNDEFINED"
+  if [ `ls NVIDIA-Linux-$ARCH_NVIDIA-* | wc -l` -eq 0 ] ; then
+    while true ; do
+      echo
+      echo "Cannot find a nVidia package in `pwd`"
+      echo "Please enter the path for the nVidia package (q = quit) :"
+      echo
+      read path
+      echo
+
+      if [ "$path" == "q" ] ; then
+	exit 1
+      fi
+
+      if [ -f $path ] ; then
+	PACKAGE=path
+	break;
+      fi
+
+      echo "Please select a valid option, Press <enter> to try again."
+      read
+      clear
+
+    done
+  elif [ `ls NVIDIA-Linux-$ARCH_NVIDIA-* | wc -l` -eq 1 ] ; then
+    while true ; do
+      echo
+      echo "Found a nVidia package: `pwd`/`ls NVIDIA-Linux-$ARCH_NVIDIA-*`"
+      echo
+      echo "Use this package ? (y/n)"
+      echo
+      read use
+      echo
+
+      case "$use" in
+	y)
+	  PACKAGE="`pwd`/`ls NVIDIA-Linux-$ARCH_NVIDIA-*`"
+	  break
+	  ;;
+	n)
+	  echo "Aborting installation."
+	  exit 1
+	  ;;
+	*)
+	  echo
+	  echo "Please select a valid option, Press <enter> to try again."
+	  read
+	  clear
+	  ;;
+      esac
+    done
+  else
+    while true ; do
+      echo
+      echo "Multiple nVidia packages found. Please select one (q = quit) : "
+      echo
+      count=1
+      for item in `ls NVIDIA-Linux-$ARCH_NVIDIA-*` ; do
+	echo "$count) $item"
+	count=$((count + 1 ))
+      done
+
+      echo
+      read num
+      echo
+
+      if [ "$num" == "q" ] ; then
+	exit 1
+      fi
+
+      if [[ $num == [0-9]* ]] && [[ $num -gt 0 ]] && [[ $num -lt $count ]] ; then
+	PACKAGE="`pwd`/`ls NVIDIA-Linux-$ARCH_NVIDIA-* | sed -n ${num}p`"
+	break
+      fi
+
+      echo "Please select a valid option, Press <enter> to try again."
+      read
+      clear
+
+    done
+  fi
+
+  #
+  #	Try to enable the card when somebody tries to run the install.sh without uninstalling first.
+  #
+  if [ -f /usr/local/bin/bumblebee-enablecard ] ; then
+    /usr/local/bin/bumblebee-enablecard 2> /dev/null
+  fi
+
+  echo "Installing package $PACKAGE"
+
+  #
+  #	Pheeuw got the package, install it
+  #
+  if [ "$ARCH" == "i686" ] ; then
+    #
+    #	Install the x86 package
+    #
+
+    #
+    #	Backup some files
+    #
+    rm -rf backup
+
+    mkdir -p backup/lib
+    mkdir -p backup/lib/xorg/modules/extensions
+
+    cp -a /usr/lib/libGL.* backup/lib
+    cp -f /usr/lib/xorg/modules/extensions/libglx.so backup/lib/xorg/modules/extensions
+
+    #
+    #	Install package
+    #
+    TARGET=/usr/X11R6/nvidia
+
+    rm -rf $TARGET
+
+    bash $PACKAGE -s --no-x-check \
+	  --x-prefix=$TARGET \
+	  --x-library-path=$TARGET/lib \
+	  --x-module-path=$TARGET/lib/xorg/modules \
+	  --opengl-prefix=$TARGET
+
+    if [ $? -ne 0 ] ; then
+      echo
+      echo "Package failed to install..."
+      echo
+      exit 21
+    fi
+
+    #
+    #	Full 3D hack for the repository
+    #
+    rm -f /usr/X11R6/lib-nvidia
+    ln -sf $TARGET/lib /usr/X11R6/lib-nvidia
+
+    #
+    #	Setup xorg dir
+    #
+    rm -rf /usr/lib/xorg-nvidia
+    cp -a /usr/lib/xorg /usr/lib/xorg-nvidia
+
+    mv -f $TARGET/lib/xorg/modules/libnvidia-wfb.* $TARGET/lib
+    rm -f $TARGET/lib/xorg/modules/libwfb.so
+    cp -a $TARGET/lib/xorg/modules /usr/lib/xorg-nvidia
+
+    #
+    #	Restore some old files
+    #
+    cp -a backup/lib/libGL.* /usr/lib
+    cp -f backup/lib/xorg/modules/extensions/libglx.so /usr/lib/xorg/modules/extensions
+  else
+    #
+    #	Install the x86_64 package
+    #
+
+    #
+    #	Backup some files
+    #
+    rm -rf backup
+
+    mkdir -p backup/lib
+    mkdir -p backup/lib64
+    mkdir -p backup/lib64/xorg/modules/extensions
+
+    cp -a /usr/lib/libGL.* backup/lib
+    cp -a /usr/lib64/libGL.* backup/lib64
+    cp -f /usr/lib64/xorg/modules/extensions/libglx.so backup/lib64/xorg/modules/extensions
+
+    #
+    #	Install package
+    #
+    TARGET=/usr/X11R6/nvidia
+
+    rm -rf $TARGET
+
+    bash $PACKAGE -s --no-x-check \
+	  --x-prefix=$TARGET \
+	  --x-library-path=$TARGET/lib64 \
+	  --x-module-path=$TARGET/lib64/xorg/modules \
+	  --opengl-prefix=$TARGET \
+	  --compat32-prefix=$TARGET
+
+    if [ $? -ne 0 ] ; then
+      echo
+      echo "Package failed to install..."
+      echo
+      exit 21
+    fi
+
+    #
+    #	Full 3D hack for the nVidia package
+    #
+    rm -f /usr/X11R6/lib-nvidia
+    rm -f /usr/X11R6/lib64-nvidia
+
+    ln -sf $TARGET/lib /usr/X11R6/lib-nvidia
+    ln -sf $TARGET/lib64 /usr/X11R6/lib64-nvidia
+
+    #
+    #	Setup xorg dir
+    #
+    rm -rf /usr/lib64/xorg-nvidia
+    cp -a /usr/lib64/xorg /usr/lib64/xorg-nvidia
+
+    mv -f $TARGET/lib64/xorg/modules/libnvidia-wfb.* $TARGET/lib64
+    rm -f $TARGET/lib64/xorg/modules/libwfb.so
+    cp -a $TARGET/lib64/xorg/modules /usr/lib64/xorg-nvidia
+
+    #
+    #	Restore some old files
+    #
+    cp -a backup/lib/libGL.* /usr/lib
+    cp -a backup/lib64/libGL.* /usr/lib64
+    cp -f backup/lib64/xorg/modules/extensions/libglx.so /usr/lib64/xorg/modules/extensions
+  fi
 fi
