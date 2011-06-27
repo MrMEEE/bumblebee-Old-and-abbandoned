@@ -1,9 +1,7 @@
 ROOT_UID=0
-if [ $UID != $ROOT_UID ] || [ "$SUDO_USER" == "root" ] || [ "$SUDO_USER" == "" ] ; then
+if [ $UID != $ROOT_UID ] ; then
   echo "You don't have sufficient privileges to run this script."
   echo
-  echo "Do not run this script as the root user."
-  echo
-  echo "Please run the script with: sudo install.sh"
+  echo "Please run the script as root or with: sudo install.sh"
   exit 1
 fi
