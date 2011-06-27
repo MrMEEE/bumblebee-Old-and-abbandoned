@@ -60,18 +60,32 @@ if [ "$DISTRO" != OPENSUSE ] ; then
     exit 1
 fi
 
+#Determine Arch x86_64 or i686
+ARCH=`uname -m`
+
 #
 #	Check for repository
 #
 FOUND=`rpm -qa|grep x11-video-nvidia`
 if [ "$FOUND" == "" ] ; then
-  echo "You are not using the NVidia repository for openSUSE."
-  echo "Sorry, cannot help you."
+  if [ -d /usr/X11R6/lib-nvidia ] ; then
+    echo "Somebody uninstalled the packages from the NVidia repository."
+    echo "Trying to cleanup the system."
+
+    if [ "$ARCH" == "i686" ] ; then
+      rm -rf /usr/X11R6/lib-nvidia
+      rm -rf /usr/lib/xorg-nvidia
+    else
+      rm -rf /usr/X11R6/lib-nvidia
+      rm -rf /usr/X11R6/lib64-nvidia
+      rm -rf /usr/lib64/xorg-nvidia
+    fi
+  else
+    echo "You are not using the NVidia repository for openSUSE."
+    echo "Sorry, cannot help you."
+  fi
   exit 1
 fi
-
-#Determine Arch x86_64 or i686
-ARCH=`uname -m`
 
 if [ "$1" == "-restore" ] ; then
   #

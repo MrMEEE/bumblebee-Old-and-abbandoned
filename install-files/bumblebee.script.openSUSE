@@ -22,10 +22,11 @@ RETVAL=0
 ENABLECARD=/usr/local/bin/bumblebee-enablecard
 DISABLECARD=/usr/local/bin/bumblebee-disablecard
 
-#64 LD_LIBRARY_PATH=/usr/X11R6/lib64-nvidia:/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
-#32 LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+#64	LD_LIBRARY_PATH=/usr/X11R6/lib64-nvidia:/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+#64	export LD_LIBRARY_PATH
+#32	LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+#32	export LD_LIBRARY_PATH
 
-export LD_LIBRARY_PATH
 
 start() {
 	if [ ! -f $LOCKFILE ] ; then
@@ -37,7 +38,9 @@ start() {
 	  echo "Bumblebee server already running"
 	  exit 1
 	fi
-	/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -nolisten tcp -noreset :1 vt9 > /dev/null 2>&1 &
+#64		/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath  /usr/lib64/xorg-nvidia/modules/updates,/usr/lib64/xorg-nvidia/modules -nolisten tcp -noreset :1 vt9 > /dev/null 2>&1 &
+#32		/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/xorg-nvidia/modules/updates,/usr/lib/xorg-nvidia/modules -nolisten tcp -noreset :1 vt9 > /dev/null 2>&1 &
+#0		/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -nolisten tcp -noreset :1 vt9 > /dev/null 2>&1 &
 	PID_X=$!
 	i=1
 	while [ `ps p $PID_X | wc -l` -eq 1 ] ; do
@@ -53,7 +56,6 @@ start() {
 	echo $PID_X > $LOCKFILE && echo "success" > /dev/null || echo "failure"
 	RETVAL=$?
 	echo
-	vglclient -gl > /dev/null 2>&1 &
 }
 
 stop() {
@@ -65,7 +67,6 @@ stop() {
 	fi
 	PID_X=`cat $LOCKFILE`
 	kill $PID_X
-	killall vglclient > /dev/null 2>&1
 	/bin/rm $LOCKFILE 2> /dev/null && echo "success" > /dev/null || echo "failure"
 	RETVAL=$?
 	i=0
