@@ -1,6 +1,6 @@
 KERNEL_TYPE=`uname -r | cut -f3 -d"-"`
 
-INSTALLED=`zypper info kernel-$KERNEL_TYPE-devel | grep Installed: | cut -f2 -d' '`
+INSTALLED=`zypper --no-refresh info kernel-$KERNEL_TYPE-devel | grep Installed: | cut -f2 -d' '`
 if [ "$INSTALLED" != "Yes" ] ; then
   echo "Do you want me to install the kernel-devel and kernel-$KERNEL_TYPE-devel packages"
   echo "needed for the acpi_call build (y/n) ?"
@@ -26,7 +26,7 @@ if [ "$INSTALLED" != "Yes" ] ; then
   esac
 fi
 
-INSTALLED=`zypper info gcc | grep Installed: | cut -f2 -d' '`
+INSTALLED=`zypper --no-refresh info gcc | grep Installed: | cut -f2 -d' '`
 if [ "$INSTALLED" != "Yes" ] ; then
   echo "Do you want me to install the git, make and gcc packages"
   echo "needed for the acpi_call build (y/n) ?"
@@ -52,7 +52,7 @@ if [ "$INSTALLED" != "Yes" ] ; then
   esac
 fi
 
-INSTALLED=`zypper info dkms | grep Installed: | cut -f2 -d' '`
+INSTALLED=`zypper --no-refresh info dkms | grep Installed: | cut -f2 -d' '`
 if [ "$INSTALLED" != "Yes" ] ; then
   echo "Do you want me to install the dkms package needed for the acpi_call build (y/n) ?"
   read answer
