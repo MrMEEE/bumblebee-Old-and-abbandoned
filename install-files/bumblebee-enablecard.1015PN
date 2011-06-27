@@ -1,12 +1,15 @@
 #!/bin/bash
 # This script should contain the command(s) nessesary to switch on the
-# nVidia card.
-# This example originally comes from bumblebee project for the Asus 1215n, provided by BarzantMD..
-# It works on Asus1015PN.
+# nVidia card. It works on Asus 1015PN.
 # Please note that the acpi_call module is need for these operations:
 #
 # http://linux-hybrid-graphics.blogspot.com/2010/07/using-acpicall-module-to-switch-onoff.html
 # https://github.com/MrMEEE/bumblebee/issues/171
+
+if [ "$(id -u)" != "0" ] ; then
+	echo "This script must be run as root or via sudo"
+	exit
+fi
 
 if lsmod | grep -q nvidia; then
     echo "Skipping: nVidia Card already enabled"
