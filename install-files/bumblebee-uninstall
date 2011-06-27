@@ -113,6 +113,14 @@ elif [ $DISTRO = OPENSUSE ]; then
     echo "Removing VirtualGL package"
     echo
     zypper remove VirtualGL
+
+    FOUND=`rpm -qa|grep x11-video-nvidia`
+    if [ "$FOUND" != "" ] || [ -d /usr/X11R6/lib-nvidia ]  ; then
+	if [ -f /usr/local/bin/bumblebee-check ] ; then
+	  /usr/local/bin/bumblebee-check -restore
+	fi
+    fi
+
     rm /etc/pm/power.d/bumblebee-disablecard-on-powerup
 
 elif [ $DISTRO = FEDORA ]; then
@@ -235,7 +243,9 @@ grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
 mv -f /etc/sudoers.optiorig /etc/sudoers
 chmod 0440 /etc/sudoers
 
-killall -9 vglclient
+if [ "$DISTRO" != "UBUNTU" ] && [ "$DISTRO" != "OPENSUSE" ] ; then
+  killall -9 vglclient
+fi
 
 rm -rf /etc/bash_completion.d/optirun*
 

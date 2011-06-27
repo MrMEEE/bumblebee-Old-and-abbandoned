@@ -40,6 +40,11 @@ trap "terminate" INT
 #
 source /etc/default/bumblebee
 
+#64	LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:/usr/X11R6/lib64-nvidia:$LD_LIBRARY_PATH
+#64	export LD_LIBRARY_PATH
+#32	LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+#32	export LD_LIBRARY_PATH
+
 #
 #	Run the command
 #

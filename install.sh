@@ -124,8 +124,9 @@ source stages/enviromentvariables
 
 source stages/setvariables.$DISTRO
 
-source stages/setupvglclient
-
+if [ "$DISTRO" != UBUNTU ] && [ "$DISTRO" != OPENSUSE ] ; then
+  source stages/setupvglclient
+fi
 
 echo
 echo "Setting up bumblebee user rights and/or stating services."

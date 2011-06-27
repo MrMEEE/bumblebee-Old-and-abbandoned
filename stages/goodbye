@@ -1,33 +1,42 @@
 # Should be removed when changes from v.1.4.19+20 has been implemented on Fedora, OpenSuSE and Debian.
 
 if [ "$DISTRO" != UBUNTU ] && [ "$DISTRO" != OPENSUSE ] ; then
- echo "Now you need to make sure that the command \"vglclient -gl\" is run after your Desktop Environment is started"
+ echo "Now you need to make sure that the command \"vglclient -gl\" is run after"
+ echo "your Desktop Environment is started"
  echo
  echo "In KDE this is done by this script.. Thanks to Peter Liedler."
  echo
  echo "In GNOME this is done by this script.. Thanks to Peter Liedler."
  echo
 else
- echo "Please logout and back in to activate new groups."
+ echo "Please logout and back in to activate new groups and library setups."
  echo
- echo "If you want power saving by shutting the nVidia down when not in use. Please adjust the scripts:"
- echo "/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard for your machine."
+ echo "If you want power saving by shutting the nVidia down when not in use."
+ echo "Please adjust the scripts:"
+ echo "/usr/local/bin/bumblebee-enablecard and"
+ echo "/usr/local/bin/bumblebee-disablecard for your machine."
  echo
  echo "Examples and documentation is available in /usr/share/doc/bumblebee/"
  echo
 fi
 if [ "$ARCH" = "x86_64" ]; then
-echo "After that you should be able to start applications with \"optirun32 <application>\" or \"optirun64 <application>\""
-echo "optirun32 can be used for legacy 32-bit applications and Wine Games.. Everything else should work on optirun64"
+echo "After that you should be able to start applications with"
+echo "\"optirun32 <application>\" or \"optirun64 <application>\""
+echo "optirun32 can be used for legacy 32-bit applications and Wine Games."
+echo "Everything else should work on optirun64"
 echo "But... if one doesn't work... try the other."
 elif [ "$ARCH" = "i686" ]; then
-echo "After that you should be able to start applications with \"optirun <application>\"."
+echo "After that you should be able to start applications with"
+echo "\"optirun <application>\"."
 fi  
 echo
-echo "If you have any problems in or after the installation, please try to run the bumblebee-uninstall script and then"
-echo "rerun this script... if that doesn't work: please run the bumblebee-bugreport tool and send me a bugreport."
+echo "If you have any problems in or after the installation, please try"
+echo "to run the bumblebee-uninstall script and then rerun this script..."
+echo "If that doesn't work: please run the bumblebee-bugreport tool and"
+echo "send me a bugreport."
 echo 
-echo "Or even better.. create an issue on github... this really makes bugfixing much easier for me and faster for you."
+echo "Or even better.. create an issue on github..."
+echo "This really makes bugfixing much easier for me and faster for you."
 echo
 echo "If you need to reconfigure bumblebee the script bumblebee-config as available."
 echo
@@ -36,4 +45,3 @@ echo
 echo "Good luck... MrMEEE / Martin Juhl"
 echo
 echo "http://www.martin-juhl.dk, http://twitter.com/martinjuhl, https://github.com/MrMEEE/bumblebee"
-
