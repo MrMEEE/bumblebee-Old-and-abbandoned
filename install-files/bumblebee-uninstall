@@ -68,8 +68,7 @@ echo
 echo "This script will remove bumblebee completely"
 echo "and also clean up after earlier versions"
 echo
-if [ "$DISTRO" == OPENSUSE ] ; then
-
+if [ "$DISTRO" == OPENSUSE ] && [ -f /usr/bin/nvidia-uninstall ] ; then
     if [ `ps -ea | grep X | wc -l` -gt 0 ] ; then
       echo "X server is still active. Please go to runlevel 3 and try again."
       echo "( Login as root and run \"init 3\". Use \"init 5\" to activate the X server again )"
