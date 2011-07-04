@@ -36,6 +36,14 @@
 #
 BUMBLEBEEVERSION=1.6.53
 
+source stages/determinedistro
+
+echo
+echo $DISTRO"-based distribution found."
+echo
+
+source stages/checkrights.$DISTRO
+
 #Determine Arch x86_64 or i686
 ARCH=`uname -m`
 
@@ -51,14 +59,6 @@ POWERON="UNDEFINED"
 POWEROFF="UNDEFINED"
 INTELBUSID="UNDEFINED"
 NVIDIABUSID="UNDEFINED"
-
-source stages/determinedistro
-
-echo
-echo $DISTRO"-based distribution found."
-echo
-
-source stages/checkrights.$DISTRO
 
 source stages/welcome 
 

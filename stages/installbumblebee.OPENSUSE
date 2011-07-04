@@ -9,6 +9,9 @@ else
  echo
 fi
 
+#
+#	Install the bumblebee defaults file
+#
 if [ -f /etc/default/bumblebee ]; then
   # Already Exists
   echo
@@ -20,21 +23,27 @@ fi
 
 cp install-files/bumblebee.default /etc/default/bumblebee
 
+#
+#	Install the documents and examples
+#
 mkdir -p /usr/share/doc/bumblebee
 cp install-files/documentation /usr/share/doc/bumblebee
 cp install-files/bumblebee-disablecard.* /usr/share/doc/bumblebee
 cp install-files/bumblebee-enablecard.* /usr/share/doc/bumblebee
 
+#
+#	Install the VirtualGL package
+#
 if [ "$ARCH" = "x86_64" ]; then   
  echo
  echo "64-bit system detected"
  echo
- zypper --no-gpg-check install -l install-files/VirtualGL.x86_64.rpm
+ zypper --no-gpg-check --no-refresh --non-interactive install -l install-files/VirtualGL.x86_64.rpm
 elif [ "$ARCH" = "i686" ]; then
  echo
  echo "32-bit system detected"
  echo
- zypper --no-gpg-check install -l install-files/VirtualGL.i386.rpm
+ zypper --no-gpg-check --no-refresh --non-interactive install -l install-files/VirtualGL.i386.rpm
 fi
 if [ $? -ne 0 ]; then
  echo
@@ -42,128 +51,51 @@ if [ $? -ne 0 ]; then
  echo
  exit 20
 fi
+
+#
+#	Install the bumblebee nVidia X server script
+#
 cp install-files/bumblebee.script.openSUSE /etc/init.d/bumblebee
 ln -sf /etc/init.d/bumblebee /usr/sbin/rcbumblebee
 
 #
-#	Are we using the NVidia repository for openSuSE ?
+#	Install the nVidia repository check script when repo is used
 #
-FOUNDREPO=`rpm -qa|grep x11-video-nvidia`
-
-#
-#	Ask the user about Intel and NVidia 3D
-#
-if [ "FOUNDREPO" != "" ] ; then
-
-  if [ -f /usr/local/bin/bumblebee-check ] ; then
-    #
-    #	Somebody tries to run the script twice without uninstall...
-    #	Rescue the system
-    #
-    /usr/local/bin/bumblebee-check -restore
-    rm -f /usr/local/bin/bumblebee-check
-  fi
-
-  CHOICE="UNDEFINED"
-
-  while [ "$CHOICE" == "UNDEFINED" ] ; do
-
-    echo "Do you want to enable 3D for Intel and NVidia ?"
-    echo
-    echo "1) Enable 3D for Intel and NVidia"
-    echo "2) Enable 3D for NVidia only"
-
-    echo
-    read option
-    echo
-
-    case "$option" in
-    1)
-      CHOICE="1"
-      ;;
-    2)
-      CHOICE="2"
-      ;;
-    *)
-      echo
-      echo "Please choose a valid option, Press any key to try again."
-      read
-      clear
-      ;;
-    esac
-  done
+if [ "`rpm -qa|grep x11-video-nvidia`" != "" ] ; then 
+  cp install-files/bumblebee-check.opensuse /usr/local/bin/bumblebee-check
 fi
 
-if [ "FOUNDREPO" != "" ] && [ "$CHOICE" == "1" ] ; then
-  #
-  #	Yes, we can do Intel and NVidia 3D
-  #
-  cp install-files/bumblebee-check.opensuse /usr/local/bin/bumblebee-check
-  if [ "$ARCH" = "x86_64" ]; then
+#
+#	Patch the nVidia X server script.
+#	Install and patch the optirun scripts.
+#
+if [ "$ARCH" = "x86_64" ]; then
 
-    sed -i "s/^#64\t\(.*\)/\1/g" /etc/init.d/bumblebee
-    sed -i "s/\(^#32.*\)//g" /etc/init.d/bumblebee
-    sed -i "s/\(^#0.*\)//g" /etc/init.d/bumblebee
+  sed -i "s/^#64\t\(.*\)/\1/g" /etc/init.d/bumblebee
+  sed -i "s/\(^#32.*\)//g" /etc/init.d/bumblebee
+  sed -i "s/\(^#0.*\)//g" /etc/init.d/bumblebee
 
-    cp install-files/optirun32.opensuse /usr/local/bin/optirun32
-    cp install-files/optirun64.opensuse /usr/local/bin/optirun64
+  cp install-files/optirun32.opensuse /usr/local/bin/optirun32
+  cp install-files/optirun64.opensuse /usr/local/bin/optirun64
 
-    sed -i "s/^#64\t\(.*\)/\1/g" /usr/local/bin/optirun32
-    sed -i "s/\(^#32.*\)//g" /usr/local/bin/optirun32
+  sed -i "s/^#64\t\(.*\)/\1/g" /usr/local/bin/optirun32
+  sed -i "s/\(^#32.*\)//g" /usr/local/bin/optirun32
 
-    sed -i "s/^#64\t\(.*\)/\1/g" /usr/local/bin/optirun64
+  sed -i "s/^#64\t\(.*\)/\1/g" /usr/local/bin/optirun64
 
-    cp install-files/optirun64.bash_completion /etc/bash_completion.d/optirun64
-    cp install-files/optirun32.bash_completion /etc/bash_completion.d/optirun32
-    ln -s /usr/local/bin/optirun64 /usr/local/bin/optirun
-  else
-
-    sed -i "s/\(^#64.*\)//g" /etc/init.d/bumblebee
-    sed -i "s/^#32\t\(.*\)/\1/g" /etc/init.d/bumblebee
-    sed -i "s/\(^#0.*\)//g" /etc/init.d/bumblebee
-
-    cp install-files/optirun32.opensuse /usr/local/bin/optirun
-
-    sed -i "s/\(^#64.*\)//g" /usr/local/bin/optirun
-    sed -i "s/^#32\t\(.*\)/\1/g" /usr/local/bin/optirun
-
-    cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
-  fi
-
-  #
-  #	Move the NVidia files to a less annoying place.
-  #	( PLEASE make your rpm's relocatable.... )
-  #
-  bumblebee-check
+  cp install-files/optirun64.bash_completion /etc/bash_completion.d/optirun64
+  cp install-files/optirun32.bash_completion /etc/bash_completion.d/optirun32
+  ln -s /usr/local/bin/optirun64 /usr/local/bin/optirun
 else
-  if [ "$ARCH" = "x86_64" ]; then
 
-    sed -i "s/\(^#64.*\)//g" /etc/init.d/bumblebee
-    sed -i "s/\(^#32.*\)//g" /etc/init.d/bumblebee
-    sed -i "s/^#0\t\(.*\)/\1/g" /etc/init.d/bumblebee
+  sed -i "s/\(^#64.*\)//g" /etc/init.d/bumblebee
+  sed -i "s/^#32\t\(.*\)/\1/g" /etc/init.d/bumblebee
+  sed -i "s/\(^#0.*\)//g" /etc/init.d/bumblebee
 
-    cp install-files/optirun32.opensuse /usr/local/bin/optirun32
-    cp install-files/optirun64.opensuse /usr/local/bin/optirun64
+  cp install-files/optirun32.opensuse /usr/local/bin/optirun
 
-    sed -i "s/\(^#64.*\)//g" /usr/local/bin/optirun32
-    sed -i "s/\(^#32.*\)//g" /usr/local/bin/optirun32
+  sed -i "s/\(^#64.*\)//g" /usr/local/bin/optirun
+  sed -i "s/^#32\t\(.*\)/\1/g" /usr/local/bin/optirun
 
-    sed -i "s/\(^#64.*\)//g" /usr/local/bin/optirun64
-
-    cp install-files/optirun64.bash_completion /etc/bash_completion.d/optirun64
-    cp install-files/optirun32.bash_completion /etc/bash_completion.d/optirun32
-    ln -s /usr/local/bin/optirun64 /usr/local/bin/optirun
-  else
-
-    sed -i "s/\(^#64.*\)//g" /etc/init.d/bumblebee
-    sed -i "s/\(^#32.*\)//g" /etc/init.d/bumblebee
-    sed -i "s/^#0\t\(.*\)/\1/g" /etc/init.d/bumblebee
-
-    cp install-files/optirun32.opensuse /usr/local/bin/optirun
-
-    sed -i "s/\(^#64.*\)//g" /usr/local/bin/optirun
-    sed -i "s/\(^#32.*\)//g" /usr/local/bin/optirun
-
-    cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
-  fi
+  cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
 fi
