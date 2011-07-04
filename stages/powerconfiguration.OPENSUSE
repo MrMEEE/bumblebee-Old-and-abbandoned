@@ -4,9 +4,9 @@ if [ "$POWERON" != "UNDEFINED" ]; then
     VERSION=`cat /etc/SuSE-release | grep VERSION | cut -f3 -d" "`
 
     if [ "$VERSION" == "11.4" ] ; then
-      zypper install vim-base
+      zypper --no-refresh install vim-base
     else
-      zypper install vim-common
+      zypper --no-refresh install vim-common
     fi
 
     echo
