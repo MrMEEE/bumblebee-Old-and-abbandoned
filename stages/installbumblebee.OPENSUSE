@@ -28,8 +28,7 @@ cp install-files/bumblebee.default /etc/default/bumblebee
 #
 mkdir -p /usr/share/doc/bumblebee
 cp install-files/documentation /usr/share/doc/bumblebee
-cp install-files/bumblebee-disablecard.* /usr/share/doc/bumblebee
-cp install-files/bumblebee-enablecard.* /usr/share/doc/bumblebee
+cp install-files/opensuse/* /usr/share/doc/bumblebee
 
 #
 #	Install the VirtualGL package
