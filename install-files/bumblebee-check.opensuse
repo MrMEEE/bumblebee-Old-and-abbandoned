@@ -69,7 +69,7 @@ ARCH=`uname -m`
 FOUND=`rpm -qa|grep x11-video-nvidia`
 if [ "$FOUND" == "" ] ; then
   if [ -d /usr/X11R6/lib-nvidia ] ; then
-    echo "Somebody uninstalled the packages from the NVidia repository."
+    echo "Somebody uninstalled the packages from the nVidia repository."
     echo "Trying to cleanup the system."
 
     if [ "$ARCH" == "i686" ] ; then
@@ -81,7 +81,7 @@ if [ "$FOUND" == "" ] ; then
       rm -rf /usr/lib64/xorg-nvidia
     fi
   else
-    echo "You are not using the NVidia repository for openSUSE."
+    echo "You are not using the nVidia repository for openSUSE."
     echo "Sorry, cannot help you."
   fi
   exit 1

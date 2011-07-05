@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script should contain the command(s) nessesary to switch off the
+# This script should contain the command(s) necessary to switch off the
 # nVidia card.
 # Examples are available in /usr/share/doc/bumblebee
 
