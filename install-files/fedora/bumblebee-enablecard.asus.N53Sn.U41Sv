@@ -1,0 +1,29 @@
+#!/bin/bash
+# This script should contain the command(s) necessary to switch on the
+# nVidia card on Asus U41Sv and N53Sn.
+#
+# Please note that the acpi_call module is need for these operations:
+# http://linux-hybrid-graphics.blogspot.com/2010/07/using-acpicall-module-to-switch-onoff.html
+
+modprobe acpi_call
+if ! lsmod | grep -q acpi_call; then
+    echo "Error: acpi_call module not loaded"
+    exit
+fi
+
+acpi_call () {
+    echo "$*" > /proc/acpi/call
+    result=$(cat /proc/acpi/call)
+    case "$result" in
+     Error*)
+      echo "Enabling nVidia card failed ($result)."
+      ;;
+     *)
+      echo "Enabling nVidia card succeeded."
+     ;;
+    esac
+}
+
+echo DON $(acpi_call "\_SB.PCI0.PEG0.GFX0.DON")
+
+modprobe nvidia

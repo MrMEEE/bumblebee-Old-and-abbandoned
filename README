@@ -110,59 +110,61 @@ I left the old releases up there in the old/ folder.. if someone needs it..
 Machines Confirmed Working:
 
 Machine					User			Distro
+Alienware M11X R1			Joseph Livecchi
 Alienware M11X R2			Martin Juhl		Ubuntu 11.04
-Asus N82Jv				André Ventura
-Asus EeePC 1215N			Ellington Santos
-Asus N61Jv (X64Jv)			Ted
+Acer Aspire 5742G			Dardan
 Acer Aspire 5745PG			Miguel Belmonte
-Dell Vostro 3300			Peter Liedler
+Acer Aspire 8951G			Paul Hinds
+Asus EeePC 1015PN			Aurelgadjo		Ubuntu 11.04 (i686/x86_64)
+Asus EeePC 1215N			Ellington Santos
 Asus EeePC 1215N			Fedor Indutny
+Asus K52Jc				beta992
+Asus K53Sv (X53Sv)			rom251
+Asus N53Sv				theshadow124
+Asus N53Sv/N53Sn			Ximi1970		openSuSE 11.4 (i686/x86_64)
+Asus N61Jv (X64Jv)			Ted
+Asus N73Jn				Sasin91
+Asus N82Jv				André Ventura
+Asus P31Jg				ouafnico
+Asus P52Jc				Paszcza
+Asus U30J				Gianni Borghesan
+Asus U30Jc				paralocatucalva
+Asus U30Jc				Julien-Charles		Ubuntu 10.10
+Asus U31Jg				kedazo
+Asus U35J				EselSaft
+Asus U35Jc				Martin Yrjölä
+Asus U36Jc				DeeKey
+Asus U43Jc				csdaniels1221
+Asus U43Jc				ArchangeGabriel		Ubuntu 11.04
+Asus U53Jc				Sven Bettscheider
+Asus UL30Vt				Akta
+Asus UL80Vt                             Maegras			Ubuntu 11.04
+Asus X52Jc				Fiox
+CLEVO W150HNQ				Nix Vitae
+Dell Latitude E6420			Scotchy49
+Dell Vostro 3300			Peter Liedler
+Dell Vostro 3400			Sunil Mujumdar
+Dell Vostro 3500			Carlos
+Dell Vostro 3700			andresrommier
 Dell XPS 15 (L501x)			matthew85		Ubuntu 11.04
 Dell XPS 15 (L502x)			Sunil Mujumdar
-Dell Vostro 3400			Sunil Mujumdar
-Toshiba Satellite M645-SP4132L		Leonard Camacho
-Asus U43JC				csdaniels1221
-Samsung RF511				Chuong
-CLEVO W150HNQ				Nix Vitae
 Dell XPS 17 L701x			Samuel Leal
-Asus U53JC				Sven Bettscheider
-Asus K52JC				beta992
-Asus U35JC				Martin Yrjölä
-Asus X52JC				Fiox
-Asus N53SV				theshadow124
-Asus U35J				EselSaft
-Asus P52JC				Paszcza
-Dell Vostro 3500			Carlos
-Acer Aspire 5742G			Dardan
-Samsung RF711				Tomasz Karczmarski
-Asus U30J				Gianni Borghesan
-Asus U36JC				DeeKey
-Dell Vostro 3700			andresrommier
-Asus U31JG				kedazo
-Asus X53SV/K53SV			rom251
-Asus P31JG				ouafnico
-Asus N73JN				Sasin91
-Asus UL30VT				Akta
-Samsung QX310				BenjaminEvenson
-Dell Latitude E6420			Scotchy49
 Dell XPS 17 L702x			Stephen Brooks
-Asus U30JC				paralocatucalva
-Alienware M11X R1			Joseph Livecchi
-Acer Aspire 8951G			Paul Hinds
-Asus UL80VT                             Maegras			Ubuntu 11.04
-MSI-FX700                               Mrssheep
-Samsung QX410 J01			Ben Sanders
-Asus U30JC				Julien-Charles		Ubuntu 10.10
 Lenovo T410				innoscopio		Linux Mint 11
-Asus N53SV/N53SN			Ximi1970		openSuSE 11.4 (i686/x86_64)
-Asus 1015PN				Aurelgadjo		Ubuntu 11.04 (i686/x86_64)
+MSI-FX700                               Mrssheep
+Samsung QX310				BenjaminEvenson
+Samsung QX410 J01			Ben Sanders
+Samsung RF511				Chuong
+Samsung RF711				Tomasz Karczmarski
+Toshiba Satellite M645-SP4132L		Leonard Camacho
 
 Machines working with automatic power management of the nVidia card:
 
 Machine					User
 Alienware M11X R2                       Martin Juhl
+Asus EeePC 1215n			BarzantMD
 Asus P31JG                              ouafnico
-Asus 1215n				BarzantMD
+Asus U43Jc				ArchangeGabriel
 Dell Vostro 3500			pauloxnet
 Dell XPS 15 (L501x)			matthew85
 Dell XPS 15 (L502x)			rockorequin

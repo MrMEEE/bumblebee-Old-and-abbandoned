@@ -22,8 +22,7 @@ cp install-files/bumblebee.default /etc/default/bumblebee
 
 mkdir -p /usr/share/doc/bumblebee
 cp install-files/documentation /usr/share/doc/bumblebee
-cp install-files/bumblebee-disablecard.* /usr/share/doc/bumblebee
-cp install-files/bumblebee-enablecard.* /usr/share/doc/bumblebee
+cp install-files/ubuntu/* /usr/share/doc/bumblebee
 
 if [ "$ARCH" = "x86_64" ]; then
  echo
