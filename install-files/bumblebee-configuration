@@ -1,0 +1,368 @@
+#!/bin/bash
+
+#
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# <mj@casalogic.dk> wrote this file. As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a beer in return Martin Juhl
+# ----------------------------------------------------------------------------
+#
+
+#    This file is part of bumblebee.
+#
+#    bumblebee is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    bumblebee is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+
+ROOT_UID=0
+
+if [ `cat /etc/issue | grep -nir fedora | wc -l` -gt 0 ] ; then
+ DISTRO=FEDORA
+elif [ `cat /etc/issue | grep -nir ubuntu | wc -l` -gt 0 ] || \
+     [ `cat /etc/issue | grep -nir "Linux Mint" | wc -l` -gt 0 ] || \
+     [ `cat /etc/issue | grep -nir "Backtrack 5" | wc -l` -gt 0 ] ; then
+ DISTRO=UBUNTU
+elif [ `cat /etc/issue | grep -nir opensuse | wc -l` -gt 0 ] ; then
+ DISTRO=OPENSUSE
+ if [ "$SUDO_USER" != "" ] ; then
+  HOME=`cat /etc/passwd | grep $SUDO_USER | cut -f6 -d':'`
+
+ fi
+else
+ echo "Cannot handle this distribution."
+fi
+
+if [ "$UID" != "$ROOT_UID" ] ; then
+    echo "You don't have sufficient privileges to run this script."
+    echo
+    echo "Please run the script with: sudo bumblebee-config"
+    exit 1
+fi
+  
+if [ "$HOME" = "/root" ] && [ "$DISTRO" != OPENSUSE ] ; then
+    echo "Do not run this script as the root user"
+    echo
+    echo "Please run the script with: sudo bumblebee-config"
+    exit 2
+fi
+
+#Determine Arch x86_64 or i686
+ARCH=`uname -m`
+
+#Get tools location 
+LSPCI=`which lspci` 
+MODPROBE=`which modprobe`
+
+if [ ! -f /etc/default/bumblebee-initial ]; then
+ whiptail --yesno " Bumblebee Configuration.\n\nDo you want to reconfigure bumblebee????" 30 100
+ if [ $? -eq 1 ]; then
+  exit 1
+ fi
+else
+ rm /etc/default/bumblebee-initial
+fi
+
+if [ -f /tmp/machineinfo ]; then   
+ rm /tmp/machineinfo
+fi  
+
+#
+#	Get the monitor
+#
+CURRENTMONITOR=`cat /etc/X11/xorg.conf.nvidia | grep ConnectedMonitor | cut -f4 -d\"`
+CONNECTEDMONITOR="UNDEFINED"
+echo
+echo "Setting up and Downloading Configuration... Please wait"
+echo
+ rm -rf /etc/alternatives/gl_conf
+ ln -s /usr/lib/mesa/ld.so.conf /etc/alternatives/gl_conf
+ rm -rf /etc/alternatives/xorg_extra_modules
+ rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
+ rm -rf /usr/lib/nvidia-current/xorg/xorg
+ ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
+ ldconfig
+ echo 15
+ wget -O /tmp/machineinfo "http://martin-juhl.dk/bumblebee/?searchitem=`dmidecode --string system-product-name`&search=1" 1>/dev/null 2>/dev/null
+ echo 33
+ s=1
+ i=1
+ unset profiles
+ while [ $s -le `cat /tmp/machineinfo |wc -l` ]; do
+  profiles[i+1]=$(echo `cat /tmp/machineinfo |sed -n \`echo $s\`p|cut -f1 -d\|` `cat /tmp/machineinfo |sed -n \`echo $s\`p|cut -f2 -d\|`":"`cat /tmp/machineinfo |sed -n \`echo $s\`p|cut -f9 -d\|`)
+  profiles[i]=$(echo $s)
+  ((s++)) 
+  ((i+=2))
+ done
+ profiles[i+1]="Enter Manual Configuration"
+ profiles[i]=997
+ ((i+=2))
+ profiles[i+1]="Show all profiles."
+ profiles[i]=998
+ ((i+=2))
+ profiles[i+1]="Do not configure now."
+ profiles[i]=999
+ echo 50
+ wget -O /tmp/allmachineinfo "http://martin-juhl.dk/bumblebee/?searchitem=showall&search=1" 1>/dev/null 2>/dev/null
+ echo 75
+ s=1
+ i=1
+ unset allprofiles
+ while [ $s -le `cat /tmp/allmachineinfo |wc -l` ]; do
+  allprofiles[i+1]=$(echo `cat /tmp/allmachineinfo |sed -n \`echo $s\`p|cut -f1 -d\|` `cat /tmp/allmachineinfo |sed -n \`echo $s\`p|cut -f2 -d\|`":"`cat /tmp/allmachineinfo |sed -n \`echo $s\`p|cut -f9 -d\|`)
+  allprofiles[i]=$(echo $s)
+  ((s++)) 
+  ((i+=2))
+ done
+ allprofiles[i+1]="Enter Manual Configuration"
+ allprofiles[i]=997
+ ((i+=2))
+ allprofiles[i+1]="Do not configure now."
+ allprofiles[i]=999
+ echo 100
+ 
+
+CONFIGMODE=NONE
+
+while [ "$CONFIGMODE" != "MANUAL" ] && [ "$CONFIGMODE" != "DONE" ]; do
+
+if [ "$CONFIGMODE" != "AUTO" ]; then
+case `cat /tmp/machineinfo | wc -l` in
+
+0)
+
+ whiptail --yesno --yes-button "Manual" --no-button "Full list" " Your machine is not registered in the database, starting manual configuration.\n\nIf you get bumblebee running, please run bumblebee-submitsystem.\n\nDo you want to run manual configuration or see the complete list of system profiles?" 30 100
+
+ if [ $? -eq 1 ]; then
+  CONFIGMODE=FULLLIST
+ else
+  CONFIGMODE=MANUAL
+ fi
+
+;;   
+     
+1)
+ CONFIGMODE=AUTO   
+ MANUFACTURER=`cat /tmp/machineinfo |cut -f1 -d\|`
+ MODEL=`cat /tmp/machineinfo |cut -f2 -d\|`
+ USER=`cat /tmp/machineinfo |cut -f9 -d\|` 
+ CONNECTEDMONITOR=`cat /tmp/machineinfo |cut -f3 -d\| | sed -e 's/ //g'`
+ INTELBUSID=`cat /tmp/machineinfo |cut -f4 -d\| | sed -e 's/ //g'`
+ NVIDIABUSID=`cat /tmp/machineinfo |cut -f5 -d\| | sed -e 's/ //g'`
+ POWERON=`cat /tmp/machineinfo |cut -f6 -d\|`
+ POWEROFF=`cat /tmp/machineinfo |cut -f7 -d\|`
+ OS=`cat /tmp/machineinfo |cut -f10 -d\|`
+ POWERSTATUS=`cat /tmp/machineinfo |sed -n 1p|cut -f6 -d\| | sed -e 's/ //g'`
+;;
+ 
+*) 
+ choice=$(whiptail --nocancel --menu " Please select a machine profile to install.\n\nThe profiles contains configuration for specific systems.\n\nThese profiles hasn't been individually testest and are submitted by users." 30 100 10 "${profiles[@]}"  3>&1 1>&2 2>&3)
+  
+ if [ $choice -eq 998 ]; then
+  CONFIGMODE=FULLLIST
+ elif [ $choice -eq 999 ]; then
+  whiptail --msgbox " Bumblebee has NOT been configured, and probably won't work." 30 100
+  exit 0
+ elif
+  [ $choice -eq 997 ]; then
+  CONFIGMODE=MANUAL
+ else
+  CONFIGMODE=AUTO
+  MANUFACTURER=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f1 -d\|`
+  MODEL=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f2 -d\|`
+  USER=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f9 -d\|`
+  CONNECTEDMONITOR=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f3 -d\| | sed -e 's/ //g'`
+  INTELBUSID=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f4 -d\| | sed -e 's/ //g'`
+  NVIDIABUSID=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f5 -d\| | sed -e 's/ //g'`
+  POWERON=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f6 -d\|`
+  POWEROFF=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f7 -d\|`
+  OS=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f10 -d\|`
+  POWERSTATUS=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f6 -d\| | sed -e 's/ //g'`
+ fi
+;; 
+   
+esac
+
+fi
+if [ "$CONFIGMODE" = "AUTO"  ]; then
+
+if [ "$POWERSTATUS" = "UNAVAILABLE"  ]; then
+ PWSTATUS="Unavailable"
+else
+ PWSTATUS="Available"
+fi
+
+choice=$(whiptail --nocancel --menu " The following system profile has been found/selected:\n\n\
+Machine: $MANUFACTURER $MODEL\n\
+Connected Monitor: $CONNECTEDMONITOR\n\
+nVidia Card BusID: $NVIDIABUSID\n\
+Power Control Scripts: $PWSTATUS\n\
+Tested on: $OS\n\
+Submitted by: $USER\n\n\
+Do you want to use this configuration?\n" 30 100 5 1 "Use this Configuration" 2 "Return to System-specific Configuration" 3 "Return to Full System List" 4 "Start Manual Configuration" 5 "Cancel Configuration"  3>&1 1>&2 2>&3)
+
+ case $choice in
+ 1)
+ CONFIGMODE=DONE
+ ;;
+ 2)
+ CONFIGMODE=NONE
+ ;;
+ 3)
+ CONFIGMODE=FULLLIST
+ ;;
+ 4)
+ CONFIGMODE=MANUAL
+ ;;
+ 5)
+ exit 1
+ ;;
+ esac
+
+fi
+
+if [ "$CONFIGMODE" = "FULLLIST" ]; then
+ choice=$(whiptail --nocancel --menu " Please select a machine profile to install.\n\nThe profiles contains configuration for specific systems.\n\nThese profiles hasn't been individually testest and are submitted by users." 30 100 10 "${allprofiles[@]}"  3>&1 1>&2 2>&3)
+ 
+ if [ $choice -eq 999 ]; then
+  whiptail --msgbox " Bumblebee has NOT been configured, and probably won't work." 30 100
+  exit 0
+ elif
+  [ $choice -eq 997 ]; then
+  CONFIGMODE=MANUAL
+ else
+  CONFIGMODE=AUTO
+  MANUFACTURER=`cat /tmp/allmachineinfo |sed -n \`echo $choice\`p|cut -f1 -d\|`
+  MODEL=`cat /tmp/allmachineinfo |sed -n \`echo $choice\`p|cut -f2 -d\|`
+  USER=`cat /tmp/allmachineinfo |sed -n \`echo $choice\`p|cut -f9 -d\|`
+  CONNECTEDMONITOR=`cat /tmp/allmachineinfo |sed -n \`echo $choice\`p|cut -f3 -d\| | sed -e 's/ //g'`
+  INTELBUSID=`cat /tmp/allmachineinfo |sed -n \`echo $choice\`p|cut -f4 -d\| | sed -e 's/ //g'`
+  NVIDIABUSID=`cat /tmp/allmachineinfo |sed -n \`echo $choice\`p|cut -f5 -d\| | sed -e 's/ //g'`
+  POWERON=`cat /tmp/allmachineinfo |sed -n \`echo $choice\`p|cut -f6 -d\|`
+  POWEROFF=`cat /tmp/allmachineinfo |sed -n \`echo $choice\`p|cut -f7 -d\|`
+  OS=`cat /tmp/allmachineinfo |sed -n \`echo $choice\`p|cut -f10 -d\|`
+  POWERSTATUS=`cat /tmp/allmachineinfo |sed -n \`echo $choice\`p|cut -f6 -d\| | sed -e 's/ //g'`
+ fi
+
+fi
+
+done
+
+if [ "$CONFIGMODE" = "MANUAL" ]; then
+if [ `${LSPCI} |grep VGA |wc -l` -eq 2 ]; then
+   NVIDIABUSID=`echo "PCI:"\`${LSPCI} |grep VGA |grep nVidia |cut -f1 -d:\`":"\`${LSPCI} |grep VGA |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep VGA |grep nV
+elif [ `${LSPCI} |grep 3D |wc -l` -eq 1 ]; then
+   NVIDIABUSID=`echo "PCI:"\`${LSPCI} |grep 3D |grep nVidia |cut -f1 -d:\`":"\`${LSPCI} |grep 3D |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep 3D |grep nVidi
+else
+ whiptail --msgbox " The BusID of the nVidia card can't be determined.\n\
+You must correct this manually in /etc/X11/xorg.conf.nvidia.\n\
+Please report this problem..\n\n\
+Press Any Key to continue." 30 100
+fi
+fi
+
+sed -i 's/REPLACEWITHBUSID/'$NVIDIABUSID'/g' /etc/X11/xorg.conf.nvidia
+
+if [ "$CONFIGMODE" = "MANUAL" ]; then
+if [ -f /usr/local/bin/bumblebee-enablecard ]; then
+ /usr/local/bin/bumblebee-enablecard
+fi
+${MODPROBE} nvidia-current
+ 
+if [ `LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig  --query-gpu-info |grep "Display Devices" |cut -f2 -d":"` -gt 0 ]; then
+ CONNECTEDMONITOR=`LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig  --query-gpu-info |grep "Display Device 0" | cut -f2 -d\( | cut -f1 -d\)`
+fi
+${MODPROBE} -r nvidia-current
+if [ -f /usr/local/bin/bumblebee-disablecard ]; then
+ /usr/local/bin/bumblebee-disablecard
+fi
+fi
+
+if [ "$CONFIGMODE" != "MANUAL" ]; then
+if [ "$POWERON" != "UNDEFINED" ]; then
+ echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
+ echo $POWEROFF | xxd -r -p > /usr/local/bin/bumblebee-disablecard
+else
+ whiptail --msgbox " No power-on/off configuration has been reported for your machine,\n\
+please manually enter configuration in:\n\n\
+/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard\n\n\
+Some examples are available in /usr/share/doc/bumblebee/.\n\n\
+Press any key to continue..." 30 100
+fi
+fi
+ if [ ! -f /usr/local/bin/bumblebee-enablecard ]; then
+  # Not installed
+  cp /usr/share/doc/bumblebee/bumblebee-enablecard.template.ubuntu /usr/local/bin/
+ else
+  # Already Exists
+  echo
+  echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard, already exists not overwriting."
+  echo
+ fi
+ if [ ! -f /usr/local/bin/bumblebee-disablecard ]; then
+  # Not installed
+  cp /usr/share/doc/bumblebee/bumblebee-disablecard.template.ubuntu /usr/local/bin/
+ else
+  # Already Exists
+  echo
+  echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard, already exists not overwriting."
+  echo
+ fi
+chmod +x /usr/local/bin/bumblebee*
+
+update-rc.d bumblebee defaults
+
+choice=$(whiptail --nocancel --menu " The Image Transport is how the images are transferred from the\n\
+nVidia card to the Intel card, people has different experiences of\n\
+performance, but just select the default if you are in doubt.\n\n\
+I recently discovered that yuv and jpeg both has some lagging\n\
+this is only noticable in fast moving games, such as 1st person\n\
+shooters and for me, its only good enough with xv, even though\n\
+xv brings down performance a little." 30 100 10 1 "YUV" 2 "JPEG" 3 "PROXY" 4 "XV (Default)" 5 "RGB" 3>&1 1>&2 2>&3)
+
+case "$choice" in
+  
+1)
+IMAGETRANSPORT="yuv"
+;;
+  
+2)
+IMAGETRANSPORT="jpeg"
+;;
+    
+3)
+IMAGETRANSPORT="proxy"
+;;
+  
+4)
+IMAGETRANSPORT="xv"
+;;
+
+5)
+IMAGETRANSPORT="rgb"
+;;
+*)
+IMAGETRANSPORT="xv"  
+;;
+  
+esac 
+
+sed -i 's/VGL_COMPRESS.*/VGL_COMPRESS='$IMAGETRANSPORT'/' /etc/default/bumblebee
+
+groupadd bumblebee
+
+whiptail --msgbox " Bumblebee is now configured.\n\n\
+If your system is working, please run the bumblebee-submitsystem script\n\n\
+If you have any problems, please run bumblebee-bugreport\n\n\
+Have fun...." 30 100
