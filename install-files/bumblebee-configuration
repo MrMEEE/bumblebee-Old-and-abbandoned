@@ -51,13 +51,6 @@ if [ "$UID" != "$ROOT_UID" ] ; then
     exit 1
 fi
   
-if [ "$HOME" = "/root" ] && [ "$DISTRO" != OPENSUSE ] ; then
-    echo "Do not run this script as the root user"
-    echo
-    echo "Please run the script with: sudo bumblebee-config"
-    exit 2
-fi
-
 #Determine Arch x86_64 or i686
 ARCH=`uname -m`
 
@@ -261,9 +254,9 @@ done
 
 if [ "$CONFIGMODE" = "MANUAL" ]; then
 if [ `${LSPCI} |grep VGA |wc -l` -eq 2 ]; then
-   NVIDIABUSID=`echo "PCI:"\`${LSPCI} |grep VGA |grep nVidia |cut -f1 -d:\`":"\`${LSPCI} |grep VGA |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep VGA |grep nV
+   NVIDIABUSID=`${LSPCI} | grep VGA | grep nVidia | awk '{ print "PCI:"$1 }' | sed s/\\\./:/g`
 elif [ `${LSPCI} |grep 3D |wc -l` -eq 1 ]; then
-   NVIDIABUSID=`echo "PCI:"\`${LSPCI} |grep 3D |grep nVidia |cut -f1 -d:\`":"\`${LSPCI} |grep 3D |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`${LSPCI} |grep 3D |grep nVidi
+   NVIDIABUSID=`${LSPCI} | grep 3D  | grep nVidia | awk '{ print "PCI:"$1 }' | sed s/\\\./:/g`
 else
  whiptail --msgbox " The BusID of the nVidia card can't be determined.\n\
 You must correct this manually in /etc/X11/xorg.conf.nvidia.\n\
