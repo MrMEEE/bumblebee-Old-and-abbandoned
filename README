@@ -8,6 +8,9 @@ https://launchpad.net/~mj-casalogic/+archive/bumblebee/
 
 This will probably be the most up-to-date version for Ubuntu from now on...
 
+Please run the bumblebee-uninstall script before switching to the PPA
+version..
+
 # ----------------------------------------------------------------------------
 # "Red Bull License" 
 # <mj@casalogic.dk> wrote this file and is providing free support 
