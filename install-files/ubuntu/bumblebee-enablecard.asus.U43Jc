@@ -4,9 +4,6 @@
 #
 # Please note that the acpi_call module is need for these operations:
 # http://linux-hybrid-graphics.blogspot.com/2010/07/using-acpicall-module-to-switch-onoff.html
-#
-# Please note that this script needs this fix to work:
-# http://ubuntuforums.org/showthread.php?t=1615564
 
 modprobe acpi_call
 if ! lsmod | grep -q acpi_call; then
@@ -26,6 +23,7 @@ acpi_call () {
      ;;
     esac
 }
+
 echo _PS0 $(acpi_call "\_SB.PCI0.RP00.VGA._PS0")
 
 modprobe nvidia-current
