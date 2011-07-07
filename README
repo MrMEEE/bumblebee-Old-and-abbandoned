@@ -8,8 +8,14 @@ https://launchpad.net/~mj-casalogic/+archive/bumblebee/
 
 This will probably be the most up-to-date version for Ubuntu from now on...
 
-Please run the bumblebee-uninstall script before switching to the PPA
-version..
+For people currently running the script/git version please do:
+
+sudo bumblebee-uninstall
+sudo apt-get install ppa-purge
+sudo ppa-purge ppa:ubuntu-x-swat/x-updates
+sudo apt-add-repository ppa:mj-casalogic/bumblebee
+sudo apt-get update
+sudo apt-get install bumblebee
 
 # ----------------------------------------------------------------------------
 # "Red Bull License" 
