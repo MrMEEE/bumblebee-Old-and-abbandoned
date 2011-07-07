@@ -25,7 +25,5 @@ acpi_call () {
 }
 
 echo _PS0 $(acpi_call "\_SB.PCI0.P0P4.GFX0._PS0")
-echo P3MO $(acpi_call "\_SB.PCI0.P0P4.GFX0.P3MO")
-echo DGPS $(acpi_call "\_SB.PCI0.P0P4.GFX0.DGPS")
 
 modprobe nvidia
