@@ -3,6 +3,39 @@
 #
 VERSION=`cat /etc/SuSE-release | grep VERSION | cut -f3 -d" "`
 
+if [ "$VERSION" != "11.4" ] ; then
+	while true ; do
+		echo
+		echo "Sorry, your openSuSE version is not tested yet."
+		echo "Bumblebee is only tested on openSuSE 11.4."
+		echo "Your installation could get corrupted !!!"
+		echo
+		echo "Are you sure you want to continue? (y/n)"
+		echo
+		read opt
+		echo
+
+		case "$opt" in
+			y)
+				echo "You have been warned !!! Press <enter> to continue."
+				echo
+				read
+				echo
+				break
+				;;
+			n)
+				exit 1
+				;;
+			*)
+				echo
+				echo "Please select a valid option, Press <enter> to try again."
+				read
+				clear
+				;;
+		esac
+	done
+fi
+
 #
 #	Determine Arch x86_64 or i686
 #
