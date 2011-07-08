@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script should contain the command(s) necessary to switch off the
+# This script should contain the command(s) necessary to switch on the
 # nVidia card on Asus K42Jc, K52Jc, N53Jf, N53Jg, N71Jv, N73Jf, P52Jc,
 # PL80Jt, U30Jc, U33Jc, U35Jc, U36Jc and UL80Jt.
 #
