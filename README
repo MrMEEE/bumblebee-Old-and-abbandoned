@@ -13,6 +13,7 @@ For people currently running the script/git version please do:
 sudo bumblebee-uninstall
 sudo apt-get install ppa-purge
 sudo ppa-purge ppa:ubuntu-x-swat/x-updates
+sudo ppa-purge ppa:xorg-edgers/ppa
 sudo apt-add-repository ppa:mj-casalogic/bumblebee
 sudo apt-get update
 sudo apt-get install bumblebee
