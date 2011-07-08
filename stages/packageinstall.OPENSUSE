@@ -720,3 +720,28 @@ if [ "$NVIDIA_TYPE" == "package" ] ; then
     cp -f backup/lib64/xorg/modules/extensions/libglx.so /usr/lib64/xorg/modules/extensions
   fi
 fi
+
+INSTALLED=`zypper --no-refresh info newt | grep Installed: | cut -f2 -d' '`
+if [ "$INSTALLED" != "Yes" ] ; then
+  echo "Do you want me to install the newt package"
+  echo "needed for the bumblebee-configuration script (y/n) ?"
+  read answer
+  case "$answer" in
+  y|Y)
+    if [ "$INSTALLED" != "Yes" ] ; then
+      zypper install newt
+      if [ $? -ne 0 ]; then
+	echo
+	echo "Package manager failed to install needed package..."
+	echo
+	exit 21
+      fi
+    fi
+  ;;
+  n|N)
+    echo "Packages will NOT be installed."
+  ;;
+  *)
+  ;;
+  esac
+fi
