@@ -282,8 +282,8 @@ if [ -f /usr/local/bin/bumblebee-disablecard ]; then
 fi
 fi
 
-if [ "$CONFIGMODE" != "MANUAL" ]; then
-if [ "$POWERON" != "UNDEFINED" ]; then
+if [ $CONFIGMODE != "MANUAL" ]; then
+if [ $POWERON != "UNAVAILABLE" ]; then
  echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
  echo $POWEROFF | xxd -r -p > /usr/local/bin/bumblebee-disablecard
 else
@@ -296,7 +296,7 @@ fi
 fi
  if [ ! -f /usr/local/bin/bumblebee-enablecard ]; then
   # Not installed
-  cp /usr/share/doc/bumblebee/bumblebee-enablecard.template.ubuntu /usr/local/bin/
+  cp /usr/share/doc/bumblebee/bumblebee-enablecard.template.ubuntu /usr/local/bin/bumblebee-enablecard
  else
   # Already Exists
   echo
@@ -305,7 +305,7 @@ fi
  fi
  if [ ! -f /usr/local/bin/bumblebee-disablecard ]; then
   # Not installed
-  cp /usr/share/doc/bumblebee/bumblebee-disablecard.template.ubuntu /usr/local/bin/
+  cp /usr/share/doc/bumblebee/bumblebee-disablecard.template.ubuntu /usr/local/bin/bumblebee-disablecard
  else
   # Already Exists
   echo
