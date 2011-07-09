@@ -1,15 +1,10 @@
 #!/bin/bash
-# This script should contain the command(s) necessary to switch off the
-# nVidia card on Dell Vostro 3500, provided by pauloxnet.
+# This script should contain the command(s) necessary to switch on the
+# nVidia card on Asus K42Jc, K52Jc, N53Jf, N53Jg, N71Jv, N73Jf, P52Jc,
+# PL80Jt, U30Jc, U33Jc, U35Jc, U36Jc and UL80Jt.
 #
 # Please note that the acpi_call module is need for these operations:
 # http://linux-hybrid-graphics.blogspot.com/2010/07/using-acpicall-module-to-switch-onoff.html
-
-modprobe -r nvidia
-if lsmod | grep -q nvidia; then
- echo "Error: could not unload nvidia module, leaving card turned on"
- exit
-fi
 
 modprobe acpi_call
 if ! lsmod | grep -q acpi_call; then
@@ -22,12 +17,14 @@ acpi_call () {
     result=$(cat /proc/acpi/call)
     case "$result" in
      Error*)
-      echo "Disabling nVidia card failed ($result)."
+      echo "Enabling nVidia card failed ($result)."
       ;;
      *)
-      echo "Disabling nVidia card succeeded."
+      echo "Enabling nVidia card succeeded."
      ;;
     esac
 }
 
-echo _OFF $(acpi_call "\_SB.PCI0.P0P1.PEGP._OFF")
+echo DON $(acpi_call "\_SB.PCI0.PEG1.GFX0.DON")
+
+modprobe nvidia
