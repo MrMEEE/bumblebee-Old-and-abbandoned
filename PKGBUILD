@@ -5,11 +5,14 @@
 
 pkgname=bumblebee
 pkgver=1.6.13
-pkgrel=1
+pkgrel=2
 pkgdesc="Optimus Support for Linux Through VirtualGL. Turning ON/OFF still not supported"
 arch=('i686' 'x86_64')
 depends=('virtualgl-bin' "dkms-nvidia" "nvidia-utils-bumblebee")
 optdepends=('acpi_call: turn on/off discrete card (not supported yet)')
+if [ "$CARCH" = "x86_64" ]; then
+     optdepends[1]='lib32-nvidia-utils-bumblebee: run 32bit applications with optirun32'
+fi
 url="https://github.com/Samsagax/bumblebee"
 license=("GPL3")
 install=('bumblebee.install')

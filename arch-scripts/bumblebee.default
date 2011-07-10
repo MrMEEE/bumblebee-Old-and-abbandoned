@@ -1,6 +1,5 @@
 # Bumblebee Defaults
 
-# This is not implemented on Arch yet
 # STOP_SERVICE_ON_EXIT YES|NO
 # Should bumblebee service be stopped after last vgl program is finished?
 # Defaults to yes.
@@ -14,3 +13,6 @@ VGL_COMPRESS=proxy
 
 # Readback mode
 VGL_READBACK=fbo
+
+# Readback mode
+VGL_LOG=$HOME/.bumblebee/vgl-log

@@ -1,7 +1,0 @@
-#!/bin/bash
-
-source /etc/bumblebee/bumblebee.conf
-
-export $VGL_READBACK
-
-vglrun -ld /usr/lib/nvidia-bumblebee -c $VGL_COMPRESS -d $VGL_DISPLAY $@
