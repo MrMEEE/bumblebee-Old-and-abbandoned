@@ -282,6 +282,8 @@ if [ -f /usr/local/bin/bumblebee-disablecard ]; then
 fi
 fi
 
+sed -i 's/REPLACEWITHCONNECTEDMONITOR/'$CONNECTEDMONITOR'/g' /etc/X11/xorg.conf.nvidia
+
 if [ $CONFIGMODE != "MANUAL" ]; then
 if [ $POWERON != "UNAVAILABLE" ]; then
  echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
