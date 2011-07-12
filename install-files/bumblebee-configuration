@@ -47,7 +47,7 @@ fi
 if [ "$UID" != "$ROOT_UID" ] ; then
     echo "You don't have sufficient privileges to run this script."
     echo
-    echo "Please run the script with: sudo bumblebee-config"
+    echo "Please run the script with: sudo bumblebee-configuration"
     exit 1
 fi
   
@@ -282,8 +282,10 @@ if [ -f /usr/local/bin/bumblebee-disablecard ]; then
 fi
 fi
 
-if [ "$CONFIGMODE" != "MANUAL" ]; then
-if [ "$POWERON" != "UNDEFINED" ]; then
+sed -i 's/REPLACEWITHCONNECTEDMONITOR/'$CONNECTEDMONITOR'/g' /etc/X11/xorg.conf.nvidia
+
+if [ $CONFIGMODE != "MANUAL" ]; then
+if [ $POWERON != "UNAVAILABLE" ]; then
  echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
  echo $POWEROFF | xxd -r -p > /usr/local/bin/bumblebee-disablecard
 else
@@ -292,26 +294,31 @@ please manually enter configuration in:\n\n\
 /usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard\n\n\
 Some examples are available in /usr/share/doc/bumblebee/.\n\n\
 Press any key to continue..." 30 100
-fi
-fi
  if [ ! -f /usr/local/bin/bumblebee-enablecard ]; then
   # Not installed
-  cp /usr/share/doc/bumblebee/bumblebee-enablecard.template.ubuntu /usr/local/bin/
+  cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
  else
   # Already Exists
   echo
-  echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard, already exists not overwriting."
+  echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard exists moving old script to /usr/local/bin/bumblebee-enablecard.old."
   echo
+  mv /usr/local/bin/bumblebee-enablecard /usr/local/bin/bumblebee-enablecard.old
+  cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
  fi
  if [ ! -f /usr/local/bin/bumblebee-disablecard ]; then
   # Not installed
-  cp /usr/share/doc/bumblebee/bumblebee-disablecard.template.ubuntu /usr/local/bin/
+  cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
  else
   # Already Exists
   echo
-  echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard, already exists not overwriting."
+  echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard exists, moving old script to /usr/local/bin/bumblebee-disablecard.old."
   echo
+  mv /usr/local/bin/bumblebee-disablecard /usr/local/bin/bumblebee-disablecard.old
+  cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
  fi
+fi
+fi
+
 chmod +x /usr/local/bin/bumblebee*
 
 update-rc.d bumblebee defaults
