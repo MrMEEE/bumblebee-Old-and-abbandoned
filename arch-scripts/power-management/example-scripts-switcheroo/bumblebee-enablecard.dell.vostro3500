@@ -13,7 +13,7 @@ fi
 if lspci -kv | grep VGA | grep nVidia | grep -q 'prog-if ff'; then
      echo ON > /sys/kernel/debug/vgaswitcheroo/switch
      RET_VAL=$?
-     if $RET_VAL; then
+     if [ $RET_VAL ] ; then
           echo "Switch ON successfull"
      else
           echo "Error: exit $?"
@@ -21,6 +21,7 @@ if lspci -kv | grep VGA | grep nVidia | grep -q 'prog-if ff'; then
      fi
 else
      echo 'Card is already ON'
+     exit 0;
 fi
 
 rmmod nouveau
