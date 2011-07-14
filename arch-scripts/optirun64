@@ -3,5 +3,6 @@
 source /etc/bumblebee/bumblebee.conf
 
 export $VGL_READBACK
+export $VGL_LOG
 
 vglrun -ld /usr/lib/nvidia-bumblebee -c $VGL_COMPRESS -d $VGL_DISPLAY "$@"
