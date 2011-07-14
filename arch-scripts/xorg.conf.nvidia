@@ -24,3 +24,14 @@ Section "Device"
     Option         "IgnoreEDID"
     Option 	    "ConnectedMonitor" "CRT-0"
 EndSection
+
+Section "Screen"
+    Identifier "Screen1"
+    Device "Device1"
+    Monitor "Monitor0"
+    DefaultDepth 24
+    SubSection "Display"
+        Depth 24
+        Modes "1366x768" "1360x768" "1280x800" "1024x768" "800x600" "640x480"
+    EndSubSection
+EndSection
