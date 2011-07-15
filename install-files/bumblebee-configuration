@@ -58,8 +58,12 @@ ARCH=`uname -m`
 LSPCI=`which lspci` 
 MODPROBE=`which modprobe`
 
+#	Get terminal size
+LINES=`stty size | cut -f1 -d' '`
+COLUMNS=`stty size | cut -f2 -d' '`
+
 if [ ! -f /etc/default/bumblebee-initial ]; then
- whiptail --yesno " Bumblebee Configuration.\n\nDo you want to reconfigure bumblebee????" 30 100
+ whiptail --yesno " Bumblebee Configuration.\n\nDo you want to reconfigure bumblebee????" $LINES $COLUMNS
  if [ $? -eq 1 ]; then
   exit 1
  fi
@@ -86,14 +90,17 @@ echo
  rm -rf /usr/lib/nvidia-current/xorg/xorg
  ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
  ldconfig
- echo 15
+ echo -n "(0%...15%..."
  wget -O /tmp/machineinfo "http://martin-juhl.dk/bumblebee/?searchitem=`dmidecode --string system-product-name`&search=1" 1>/dev/null 2>/dev/null
- echo 33
+ echo -n "33%..."
  s=1
  i=1
  unset profiles
  while [ $s -le `cat /tmp/machineinfo |wc -l` ]; do
   profiles[i+1]=$(echo `cat /tmp/machineinfo |sed -n \`echo $s\`p|cut -f1 -d\|` `cat /tmp/machineinfo |sed -n \`echo $s\`p|cut -f2 -d\|`":"`cat /tmp/machineinfo |sed -n \`echo $s\`p|cut -f9 -d\|`)
+  if [ ${#profiles[i+1]} -gt $(($COLUMNS - 20)) ] ; then
+    profiles[i+1]=${profiles[i+1]:0:$(($COLUMNS - 20))}
+  fi
   profiles[i]=$(echo $s)
   ((s++)) 
   ((i+=2))
@@ -106,14 +113,17 @@ echo
  ((i+=2))
  profiles[i+1]="Do not configure now."
  profiles[i]=999
- echo 50
+ echo -n "50%..."
  wget -O /tmp/allmachineinfo "http://martin-juhl.dk/bumblebee/?searchitem=showall&search=1" 1>/dev/null 2>/dev/null
- echo 75
+ echo -n "75%..."
  s=1
  i=1
  unset allprofiles
  while [ $s -le `cat /tmp/allmachineinfo |wc -l` ]; do
   allprofiles[i+1]=$(echo `cat /tmp/allmachineinfo |sed -n \`echo $s\`p|cut -f1 -d\|` `cat /tmp/allmachineinfo |sed -n \`echo $s\`p|cut -f2 -d\|`":"`cat /tmp/allmachineinfo |sed -n \`echo $s\`p|cut -f9 -d\|`)
+  if [ ${#allprofiles[i+1]} -gt $(($COLUMNS - 20)) ] ; then
+    allprofiles[i+1]=${allprofiles[i+1]:0:$(($COLUMNS - 20))}
+  fi
   allprofiles[i]=$(echo $s)
   ((s++)) 
   ((i+=2))
@@ -123,8 +133,8 @@ echo
  ((i+=2))
  allprofiles[i+1]="Do not configure now."
  allprofiles[i]=999
- echo 100
- 
+ echo "100%)"
+
 
 CONFIGMODE=NONE
 
@@ -135,7 +145,7 @@ case `cat /tmp/machineinfo | wc -l` in
 
 0)
 
- whiptail --yesno --yes-button "Manual" --no-button "Full list" " Your machine is not registered in the database, starting manual configuration.\n\nIf you get bumblebee running, please run bumblebee-submitsystem.\n\nDo you want to run manual configuration or see the complete list of system profiles?" 30 100
+ whiptail --yesno --yes-button "Manual" --no-button "Full list" " Your machine is not registered in the database, starting manual configuration.\n\nIf you get bumblebee running, please run bumblebee-submitsystem.\n\nDo you want to run manual configuration or see the complete list of system profiles?" $LINES $COLUMNS
 
  if [ $? -eq 1 ]; then
   CONFIGMODE=FULLLIST
@@ -160,12 +170,13 @@ case `cat /tmp/machineinfo | wc -l` in
 ;;
  
 *) 
- choice=$(whiptail --nocancel --menu " Please select a machine profile to install.\n\nThe profiles contains configuration for specific systems.\n\nThese profiles hasn't been individually testest and are submitted by users." 30 100 10 "${profiles[@]}"  3>&1 1>&2 2>&3)
+ LIST_SIZE=$(($LINES - 10))
+ choice=$(whiptail --nocancel --menu " Please select a machine profile to install.\n\nThe profiles contains configuration for specific systems.\n\nThese profiles hasn't been individually testest and are submitted by users." $LINES $COLUMNS $LIST_SIZE "${profiles[@]}"  3>&1 1>&2 2>&3)
   
  if [ $choice -eq 998 ]; then
   CONFIGMODE=FULLLIST
  elif [ $choice -eq 999 ]; then
-  whiptail --msgbox " Bumblebee has NOT been configured, and probably won't work." 30 100
+  whiptail --msgbox " Bumblebee has NOT been configured, and probably won't work." $LINES $COLUMNS
   exit 0
  elif
   [ $choice -eq 997 ]; then
@@ -203,7 +214,7 @@ nVidia Card BusID: $NVIDIABUSID\n\
 Power Control Scripts: $PWSTATUS\n\
 Tested on: $OS\n\
 Submitted by: $USER\n\n\
-Do you want to use this configuration?\n" 30 100 5 1 "Use this Configuration" 2 "Return to System-specific Configuration" 3 "Return to Full System List" 4 "Start Manual Configuration" 5 "Cancel Configuration"  3>&1 1>&2 2>&3)
+Do you want to use this configuration?\n" $LINES $COLUMNS 5 1 "Use this Configuration" 2 "Return to System-specific Configuration" 3 "Return to Full System List" 4 "Start Manual Configuration" 5 "Cancel Configuration"  3>&1 1>&2 2>&3)
 
  case $choice in
  1)
@@ -226,10 +237,11 @@ Do you want to use this configuration?\n" 30 100 5 1 "Use this Configuration" 2 
 fi
 
 if [ "$CONFIGMODE" = "FULLLIST" ]; then
- choice=$(whiptail --nocancel --menu " Please select a machine profile to install.\n\nThe profiles contains configuration for specific systems.\n\nThese profiles hasn't been individually testest and are submitted by users." 30 100 10 "${allprofiles[@]}"  3>&1 1>&2 2>&3)
+ LIST_SIZE=$(($LINES - 10))
+ choice=$(whiptail --nocancel --menu " Please select a machine profile to install.\n\nThe profiles contains configuration for specific systems.\n\nThese profiles hasn't been individually testest and are submitted by users." $LINES $COLUMNS $LIST_SIZE "${allprofiles[@]}"  3>&1 1>&2 2>&3)
  
  if [ $choice -eq 999 ]; then
-  whiptail --msgbox " Bumblebee has NOT been configured, and probably won't work." 30 100
+  whiptail --msgbox " Bumblebee has NOT been configured, and probably won't work." $LINES $COLUMNS
   exit 0
  elif
   [ $choice -eq 997 ]; then
@@ -261,7 +273,7 @@ else
  whiptail --msgbox " The BusID of the nVidia card can't be determined.\n\
 You must correct this manually in /etc/X11/xorg.conf.nvidia.\n\
 Please report this problem..\n\n\
-Press Any Key to continue." 30 100
+Press Any Key to continue." $LINES $COLUMNS
 fi
 fi
 
@@ -293,7 +305,7 @@ else
 please manually enter configuration in:\n\n\
 /usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard\n\n\
 Some examples are available in /usr/share/doc/bumblebee/.\n\n\
-Press any key to continue..." 30 100
+Press any key to continue..." $LINES $COLUMNS
  if [ ! -f /usr/local/bin/bumblebee-enablecard ]; then
   # Not installed
   cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
@@ -323,13 +335,14 @@ chmod +x /usr/local/bin/bumblebee*
 
 update-rc.d bumblebee defaults
 
+LIST_SIZE=$(($LINES - 10))
 choice=$(whiptail --nocancel --menu " The Image Transport is how the images are transferred from the\n\
 nVidia card to the Intel card, people has different experiences of\n\
 performance, but just select the default if you are in doubt.\n\n\
 I recently discovered that yuv and jpeg both has some lagging\n\
 this is only noticable in fast moving games, such as 1st person\n\
 shooters and for me, its only good enough with xv, even though\n\
-xv brings down performance a little." 30 100 10 1 "YUV" 2 "JPEG" 3 "PROXY" 4 "XV (Default)" 5 "RGB" 3>&1 1>&2 2>&3)
+xv brings down performance a little." $LINES $COLUMNS $LIST_SIZE 1 "YUV" 2 "JPEG" 3 "PROXY" 4 "XV (Default)" 5 "RGB" 3>&1 1>&2 2>&3)
 
 case "$choice" in
   
@@ -365,4 +378,4 @@ groupadd bumblebee
 whiptail --msgbox " Bumblebee is now configured.\n\n\
 If your system is working, please run the bumblebee-submitsystem script\n\n\
 If you have any problems, please run bumblebee-bugreport\n\n\
-Have fun...." 30 100
+Have fun...." $LINES $COLUMNS
