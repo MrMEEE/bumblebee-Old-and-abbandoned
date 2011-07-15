@@ -463,7 +463,7 @@ case "$choice" in
 	;;
 esac 
 
-sed -i 's/VGL_COMPRESS.*/VGL_COMPRESS='$IMAGETRANSPORT'/' /etc/default/bumblebee
+sed -i 's/VGL_COMPRESS.*/VGL_COMPRESS='$IMAGETRANSPORT'/' $DEFAULT_FILE
 
 groupadd bumblebee
 
