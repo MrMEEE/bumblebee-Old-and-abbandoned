@@ -21,6 +21,15 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
+
+NVIDIABUSID=TestID
+CONNECTEDMONITOR=TestMon
+
+sed -i "s/\([ \t]*BusID[ \t]*\)\".*\"/\1\"$NVIDIABUSID\"/g" xorg.conf.nvidia.test
+sed -i "s/\([ \t]*Option[ \t]*\"ConnectedMonitor\"[ \t]*\)".*"/\1\"$CONNECTEDMONITOR\"/g" xorg.conf.nvidia.test
+
+exit
+
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
@@ -278,7 +287,7 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 	fi
 fi
 
-sed -i 's/REPLACEWITHBUSID/'$NVIDIABUSID'/g' /etc/X11/xorg.conf.nvidia
+sed -i "s/\([ \t]*BusID[ \t]*\)\".*\"/\1\"$NVIDIABUSID\"/g" /etc/X11/xorg.conf.nvidia
 
 if [ "$CONFIGMODE" == "MANUAL" ]; then
 	if [ -f /usr/local/bin/bumblebee-enablecard ]; then
@@ -315,7 +324,7 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 	fi
 fi
 
-sed -i 's/REPLACEWITHCONNECTEDMONITOR/'$CONNECTEDMONITOR'/g' /etc/X11/xorg.conf.nvidia
+sed -i "s/\([ \t]*Option[ \t]*\"ConnectedMonitor\"[ \t]*\)".*"/\1\"$CONNECTEDMONITOR\"/g" /etc/X11/xorg.conf.nvidia
 
 if [ $CONFIGMODE != "MANUAL" ] ; then
 
