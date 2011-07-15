@@ -21,15 +21,6 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
-
-NVIDIABUSID=TestID
-CONNECTEDMONITOR=TestMon
-
-sed -i "s/\([ \t]*BusID[ \t]*\)\".*\"/\1\"$NVIDIABUSID\"/g" xorg.conf.nvidia.test
-sed -i "s/\([ \t]*Option[ \t]*\"ConnectedMonitor\"[ \t]*\)".*"/\1\"$CONNECTEDMONITOR\"/g" xorg.conf.nvidia.test
-
-exit
-
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
@@ -148,6 +139,12 @@ allprofiles[i+1]="Do not configure now."
 allprofiles[i]=999
 echo "100%)"
 
+
+#
+#	Get current values
+#
+NVIDIABUSID=`grep BusID /etc/X11/xorg.conf.nvidia | sed -e "s/[ \t]*BusID[ \t]*\"\(.*\)\"/\1/g"`
+CONNECTEDMONITOR=`grep ConnectedMonitor /etc/X11/xorg.conf.nvidia | sed -e "s/[ \t]*Option[ \t]*\"ConnectedMonitor\"[ \t]*\"\(.*\)\"/\1/g"`
 
 CONFIGMODE=NONE
 while [ "$CONFIGMODE" != "MANUAL" ] && [ "$CONFIGMODE" != "DONE" ] ; do
@@ -308,9 +305,11 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 	if [ "$DISTRO" == "OPENSUSE" ] ; then
 		${MODPROBE} nvidia 2>&1 >/dev/null
 
-		if [ "`/usr/bin/nvidia-xconfig --query-gpu-info 2>&1 | grep ERROR`" == "" ] ; then
-			if [ `/usr/bin/nvidia-xconfig --query-gpu-info | grep "Display Devices" | cut -f2 -d":"` -gt 0 ] ; then
-				CONNECTEDMONITOR=`/usr/bin/nvidia-xconfig --query-gpu-info | grep "Display Device 0" | cut -f2 -d\( | cut -f1 -d\)`
+		if [ -x /usr/bin/nvidia-xconfig ] ; then
+			if [ "`/usr/bin/nvidia-xconfig --query-gpu-info 2>&1 | grep ERROR`" == "" ] ; then
+				if [ `/usr/bin/nvidia-xconfig --query-gpu-info | grep "Display Devices" | cut -f2 -d":"` -gt 0 ] ; then
+					CONNECTEDMONITOR=`/usr/bin/nvidia-xconfig --query-gpu-info | grep "Display Device 0" | cut -f2 -d\( | cut -f1 -d\)`
+				fi
 			fi
 		fi
 		${MODPROBE} -r nvidia 2>&1 >/dev/null
@@ -390,6 +389,30 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 "/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard\n\n"\
 "Some examples are available in /usr/share/doc/bumblebee/.\n\n"\
 "Press any key to continue..." $LINES $COLUMNS
+				if [ ! -f /usr/local/bin/bumblebee-enablecard ] ; then
+					# Not installed
+					cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
+				else
+					# Already Exists
+					echo
+					echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard exists moving old script to /usr/local/bin/bumblebee-enablecard.old."
+					echo
+					mv /usr/local/bin/bumblebee-enablecard /usr/local/bin/bumblebee-enablecard.old
+					cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
+				fi
+
+				if [ ! -f /usr/local/bin/bumblebee-disablecard ] ; then
+					# Not installed
+					cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
+				else
+					# Already Exists
+					echo
+					echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard exists, moving old script to /usr/local/bin/bumblebee-disablecard.old."
+					echo
+					mv /usr/local/bin/bumblebee-disablecard /usr/local/bin/bumblebee-disablecard.old
+					cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
+				fi
+				chmod +x /usr/local/bin/bumblebee*
 			elif [ -f /usr/bin/bumblebee-enablecard ] ; then
 				#
 				#	Repository install
@@ -400,37 +423,31 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 "/usr/bin/bumblebee-enablecard and /usr/bin/bumblebee-disablecard\n\n"\
 "Some examples are available in /usr/share/doc/bumblebee/.\n\n"\
 "Press any key to continue..." $LINES $COLUMNS
-			fi
-		fi
+				if [ ! -f /usr/bin/bumblebee-enablecard ] ; then
+					# Not installed
+					cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
+				else
+					# Already Exists
+					echo
+					echo "nVidia card enable-script: /usr/bin/bumblebee-enablecard exists moving old script to /usr/bin/bumblebee-enablecard.old."
+					echo
+					mv /usr/bin/bumblebee-enablecard /usr/bin/bumblebee-enablecard.old
+					cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
+				fi
 
-		if [ -f /usr/local/bin/optirun ] ; then
-			#
-			#	SCript install
-			#
-			if [ ! -f /usr/local/bin/bumblebee-enablecard ]; then
-				# Not installed
-				cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
+				if [ ! -f /usr/bin/bumblebee-disablecard ] ; then
+					# Not installed
+					cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
+				else
+					# Already Exists
+					echo
+					echo "nVidia card disable-script: /usr/bin/bumblebee-disablecard exists, moving old script to /usr/bin/bumblebee-disablecard.old."
+					echo
+					mv /usr/bin/bumblebee-disablecard /usr/bin/bumblebee-disablecard.old
+					cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
+				fi
+				chmod +x /usr/bin/bumblebee*
 			fi
-
-			if [ ! -f /usr/local/bin/bumblebee-disablecard ]; then
-				# Not installed
-				cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
-			fi
-			chmod +x /usr/local/bin/bumblebee*
-		elif  [ -f /usr/bin/optirun ] ; then
-			#
-			#	SCript install
-			#
-			if [ ! -f /usr/bin/bumblebee-enablecard ]; then
-				# Not installed
-				cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
-			fi
-
-			if [ ! -f /usr/bin/bumblebee-disablecard ]; then
-				# Not installed
-				cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
-			fi
-			chmod +x /usr/bin/bumblebee*
 		fi
 	fi
 fi
