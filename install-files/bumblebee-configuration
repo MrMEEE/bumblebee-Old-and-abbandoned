@@ -365,13 +365,13 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 
 	if [ "$DISTRO" == "OPENSUSE" ] ; then
 		if [ $POWERON != "UNAVAILABLE" ] ; then
-			if [ -f /usr/local/bin/bumblebee-enablecard ] ; then
+			if [ -f /usr/local/bin/optirun ] ; then
 				#
 				#	Script install
 				#
 				echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
 				echo $POWEROFF | xxd -r -p > /usr/local/bin/bumblebee-disablecard
-			elif [ -f /usr/bin/bumblebee-enablecard ] ; then
+			elif [ -f /usr/bin/optirun ] ; then
 				#
 				#	Repository install
 				#
@@ -379,7 +379,7 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 				echo $POWEROFF | xxd -r -p > /usr/bin/bumblebee-disablecard
 			fi
 		else
-			if [ -f /usr/local/bin/bumblebee-enablecard ] ; then
+			if [ -f /usr/local/bin/optirun ] ; then
 				#
 				#	Script install
 				#
@@ -413,7 +413,7 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 					cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
 				fi
 				chmod +x /usr/local/bin/bumblebee*
-			elif [ -f /usr/bin/bumblebee-enablecard ] ; then
+			elif [ -f /usr/bin/optirun ] ; then
 				#
 				#	Repository install
 				#
