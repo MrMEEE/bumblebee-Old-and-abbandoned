@@ -412,6 +412,7 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 					mv /usr/local/bin/bumblebee-enablecard /usr/local/bin/bumblebee-enablecard.old
 					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
 				fi
+				sed -i "s?INSERTPOWERON?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/local/bin/bumblebee-enablecard
 
 				if [ ! -f /usr/local/bin/bumblebee-disablecard ] ; then
 					# Not installed
@@ -424,6 +425,8 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 					mv /usr/local/bin/bumblebee-disablecard /usr/local/bin/bumblebee-disablecard.old
 					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
 				fi
+				sed -i "s?INSERTPOWEROFF?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/local/bin/bumblebee-disablecard
+
 				chmod +x /usr/local/bin/bumblebee*
 			elif [ -f /usr/bin/optirun ] ; then
 				#
@@ -446,6 +449,7 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 					mv /usr/bin/bumblebee-enablecard /usr/bin/bumblebee-enablecard.old
 					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
 				fi
+				sed -i "s?INSERTPOWERON?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/bin/bumblebee-enablecard
 
 				if [ ! -f /usr/bin/bumblebee-disablecard ] ; then
 					# Not installed
@@ -458,6 +462,8 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 					mv /usr/bin/bumblebee-disablecard /usr/bin/bumblebee-disablecard.old
 					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
 				fi
+				sed -i "s?INSERTPOWEROFF?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/bin/bumblebee-disablecard
+
 				chmod +x /usr/bin/bumblebee*
 			fi
 		fi
