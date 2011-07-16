@@ -26,7 +26,7 @@ else
     echo
     echo "/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard"
     echo
-    echo "Some examples are available in /usr/share/doc/bumblebee/."
+    echo "Some examples are available in /usr/share/doc/packages/bumblebee/examples/."
     echo
     echo "Press any key to continue..."
     read
