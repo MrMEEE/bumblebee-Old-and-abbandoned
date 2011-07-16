@@ -326,6 +326,15 @@ fi
 sed -i "s/\([ \t]*Option[ \t]*\"ConnectedMonitor\"[ \t]*\)".*"/\1\"$CONNECTEDMONITOR\"/g" /etc/X11/xorg.conf.nvidia
 
 if [ $CONFIGMODE != "MANUAL" ] ; then
+	#
+	#	Always try to enable the card before switching scripts
+	#
+	if [ -f /usr/local/bin/bumblebee-enablecard ]; then
+		/usr/local/bin/bumblebee-enablecard
+	fi
+	if [ -f /usr/bin/bumblebee-enablecard ]; then
+		/usr/bin/bumblebee-enablecard
+	fi
 
 	if [ "$DISTRO" == "UBUNTU" ] ; then
 		if [ $POWERON != "UNAVAILABLE" ] ; then
@@ -364,6 +373,9 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 	fi
 
 	if [ "$DISTRO" == "OPENSUSE" ] ; then
+		#
+		#	Setup new scripts
+		#
 		if [ $POWERON != "UNAVAILABLE" ] ; then
 			if [ -f /usr/local/bin/optirun ] ; then
 				#
