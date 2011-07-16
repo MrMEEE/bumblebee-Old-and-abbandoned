@@ -387,7 +387,7 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 "No power-on/off configuration has been reported for your machine,\n"\
 "please manually enter configuration in:\n\n"\
 "/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard\n\n"\
-"Some examples are available in /usr/share/doc/bumblebee/.\n\n"\
+"Some examples are available in /usr/share/doc/packages/bumblebee/.\n\n"\
 "Press any key to continue..." $LINES $COLUMNS
 				if [ ! -f /usr/local/bin/bumblebee-enablecard ] ; then
 					# Not installed
@@ -421,7 +421,7 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 "No power-on/off configuration has been reported for your machine,\n"\
 "please manually enter configuration in:\n\n"\
 "/usr/bin/bumblebee-enablecard and /usr/bin/bumblebee-disablecard\n\n"\
-"Some examples are available in /usr/share/doc/bumblebee/.\n\n"\
+"Some examples are available in /usr/share/doc/packages/bumblebee/.\n\n"\
 "Press any key to continue..." $LINES $COLUMNS
 				if [ ! -f /usr/bin/bumblebee-enablecard ] ; then
 					# Not installed
