@@ -26,9 +26,9 @@ cp install-files/bumblebee.default /etc/default/bumblebee
 #
 #	Install the documents and examples
 #
-mkdir -p /usr/share/doc/bumblebee
-cp install-files/documentation /usr/share/doc/bumblebee
-cp install-files/opensuse/* /usr/share/doc/bumblebee
+mkdir -p /usr/share/doc/packages/bumblebee
+cp install-files/documentation /usr/share/doc/packages/bumblebee
+cp install-files/opensuse/* /usr/share/doc/packages/bumblebee
 
 #
 #	Install the VirtualGL package
