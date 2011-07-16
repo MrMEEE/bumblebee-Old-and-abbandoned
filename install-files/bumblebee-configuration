@@ -391,26 +391,26 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 "Press any key to continue..." $LINES $COLUMNS
 				if [ ! -f /usr/local/bin/bumblebee-enablecard ] ; then
 					# Not installed
-					cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
+					cp /usr/share/doc/packages/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
 				else
 					# Already Exists
 					echo
 					echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard exists moving old script to /usr/local/bin/bumblebee-enablecard.old."
 					echo
 					mv /usr/local/bin/bumblebee-enablecard /usr/local/bin/bumblebee-enablecard.old
-					cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
+					cp /usr/share/doc/packages/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
 				fi
 
 				if [ ! -f /usr/local/bin/bumblebee-disablecard ] ; then
 					# Not installed
-					cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
+					cp /usr/share/doc/packages/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
 				else
 					# Already Exists
 					echo
 					echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard exists, moving old script to /usr/local/bin/bumblebee-disablecard.old."
 					echo
 					mv /usr/local/bin/bumblebee-disablecard /usr/local/bin/bumblebee-disablecard.old
-					cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
+					cp /usr/share/doc/packages/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
 				fi
 				chmod +x /usr/local/bin/bumblebee*
 			elif [ -f /usr/bin/optirun ] ; then
@@ -425,26 +425,26 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 "Press any key to continue..." $LINES $COLUMNS
 				if [ ! -f /usr/bin/bumblebee-enablecard ] ; then
 					# Not installed
-					cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
+					cp /usr/share/doc/packages/bumblebee/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
 				else
 					# Already Exists
 					echo
 					echo "nVidia card enable-script: /usr/bin/bumblebee-enablecard exists moving old script to /usr/bin/bumblebee-enablecard.old."
 					echo
 					mv /usr/bin/bumblebee-enablecard /usr/bin/bumblebee-enablecard.old
-					cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
+					cp /usr/share/doc/packages/bumblebee/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
 				fi
 
 				if [ ! -f /usr/bin/bumblebee-disablecard ] ; then
 					# Not installed
-					cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
+					cp /usr/share/doc/packages/bumblebee/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
 				else
 					# Already Exists
 					echo
 					echo "nVidia card disable-script: /usr/bin/bumblebee-disablecard exists, moving old script to /usr/bin/bumblebee-disablecard.old."
 					echo
 					mv /usr/bin/bumblebee-disablecard /usr/bin/bumblebee-disablecard.old
-					cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
+					cp /usr/share/doc/packages/bumblebee/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
 				fi
 				chmod +x /usr/bin/bumblebee*
 			fi
