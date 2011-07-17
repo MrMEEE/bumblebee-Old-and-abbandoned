@@ -27,8 +27,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 
 # default display, may be overidden in /etc/default/$NAME
 VGL_DISPLAY=:1
-VGLNAME=vglclient
-VGLDAEMON=/usr/bin/$VGLNAME
+VGLDAEMON=/usr/bin/vglclient
 VGLDAEMON_ARGS="-gl"
 PIDFILE2=/var/run/bumblebeevgl.pid
 
@@ -39,9 +38,10 @@ DISABLECARD=/usr/local/bin/bumblebee-disablecard
 
 DAEMON_ARGS="$DAEMON_ARGS $VGL_DISPLAY"
 # assume that the display always looks like :1, not sure if :1.1 is possible
-display=${VGL_DISPLAY##*:}
-display=${display%%.*}
-PIDFILE=/tmp/.X${display}-lock
+BEE_DISPLAY=${VGL_DISPLAY##*:}
+BEE_DISPLAY=${BEE_DISPLAY%%.*}
+PIDFILE=/tmp/.X${BEE_DISPLAY}-lock
+X_LOG=/var/log/Xorg.${BEE_DISPLAY}.log
 
 # this sets the display in which vglclient should draw images
 # alternatively pass '-display :0' to vglclient (see vglclient -h)
@@ -76,14 +76,25 @@ do_start()
 
 	# wait for at most three seconds before the server has started
 	retries=0
-	while [ ! -s $PIDFILE -a $retries -le 3 ]; do
+	while [ ! -s $PIDFILE -a $retries -lt 3 ]; do
 		log_daemon_msg "."
 		retries=`expr $retries + 1`
 		sleep 1
 	done
 
 	# fail if the X server is not running
-	pidofproc -p $PIDFILE >/dev/null || return 2
+	if ! pidofproc -p $PIDFILE >/dev/null; then
+		if grep -qF '(EE) Failed to load module "nvidia"' "$X_LOG" && ! lsmod | grep -q 'nvidia '; then
+			if lsmod | grep -q 'nouveau '; then
+				log_daemon_msg "The nvidia driver was not loaded and the nouveau module should be deactivated"
+				log_daemon_msg "Try: sudo rmmod nouveau && sudo modprobe nvidia-current"
+			else
+				log_daemon_msg "The nvidia driver was not loaded, try: sudo modprobe nvidia-current"
+			fi
+		fi
+		log_daemon_msg "The Bumblebee Xserver failed to start. Please check $X_LOG"
+		return 2
+	fi
 
 	# 2: the bridge between the Bumblebee X server and the current display
 	start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE2 \
@@ -96,12 +107,20 @@ do_start()
 
 do_stop()
 {
-	start-stop-daemon --stop --quiet --oknodo --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name X
-	RETVAL=$?
-
-	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE2 --name $VGLNAME
-
+	# --exec $DAEMON and --name X proved to be unreliable (--name Xorg works however)
+	# alternative way: if the pidfile is owned by root, trust the pid from it
+	if [ "$(stat -c '%u' $PIDFILE 2>/dev/null)" = "0" ]; then
+		start-stop-daemon --stop --quiet --oknodo \
+			--retry=TERM/30/KILL/5 --pidfile $PIDFILE
+		RETVAL=$?
+	else
+		RETVAL=2
+	fi
+	# RETVAL 2 = still running
 	[ $RETVAL = 2 ] && return 2
+	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 \
+		--pidfile $PIDFILE2 --exec $VGLDAEMON
+
 	rm -f $PIDFILE2
 	$DISABLECARD
 	return $RETVAL
