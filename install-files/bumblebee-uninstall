@@ -138,7 +138,10 @@ elif [ $DISTRO = OPENSUSE ]; then
 	  #
 	  #	Cleanup 3D hack for the repository
 	  #
-	  /usr/local/bin/bumblebee-check -restore
+	  #	Do not cleanup. It will kill the Intel 3D and put the Intel X server image upside down
+	  # if the nVidia driver is not removed.
+	  #
+#	  /usr/local/bin/bumblebee-check -restore
 	fi
     fi
 
