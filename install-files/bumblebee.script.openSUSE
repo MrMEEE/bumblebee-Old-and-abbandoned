@@ -62,7 +62,7 @@ start() {
 }
 
 stop() {
-	check_3D_hack()
+	check_3D_hack
 	echo -n "Stopping bumblebee X server: "
 	if [ ! -f $LOCKFILE ] ; then
 		echo
