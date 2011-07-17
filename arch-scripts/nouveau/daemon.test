@@ -1,0 +1,92 @@
+#!/bin/bash
+
+# Test daemon for bumblebee using nouveau driver
+
+. /etc/bumblebee/bumblebee.conf
+
+DAEMON=bumblebee
+XDAEMON=/usr/bin/X
+XDAEMON_ARGS="-ac -config /etc/bumblebee/xorg.conf.nouveau -sharevts -nolisten tcp -noreset :1 vt9"
+PIDFILE=/tmp/.X1-lock
+DISABLECARD=/usr/share/nouveau-bumblebee/bumblebee-disablecard
+ENABLECARD=/usr/share/nouveau-bumblebee/bumblebee-enablecard
+
+disable_card()
+{
+     $DISABLECARD
+}
+
+enable_card()
+{
+     $ENABLECARD
+}
+
+#TODO Check different exit status for appropriate feedback
+start() {
+     echo "Starting up Bumblebee: "
+     enable_card
+     if [ $? ]; then
+          echo "Graphics card ON"
+     else
+          echo "Failed to switch ON card"
+     fi
+     PID=$(cat $PIDFILE 2>/dev/null)
+     if [ -z "$PID" ]; then
+          $XDAEMON $XDAEMON_ARGS &>/dev/null &
+     fi
+     i=1
+     while  [ `ps aux |grep xorg.conf.nouveau |wc -l` -eq 1 ]; do
+          sleep 1
+          i=`expr $i + 1`
+          if [ $i -gt 10 ]; then
+               echo "Bumblebee server failed to start"
+               exit 1
+          fi 
+     done
+      echo "Bumblebee is ON"
+}
+
+#TODO Check different exit status for appropriate feedback
+stop() {
+     echo "Stopping bumblebee Daemon: "
+     kill `cat $PIDFILE 2>&1` > /dev/null 2>&1
+     while  [ `ps aux |grep xorg.conf.nouveau |wc -l` -ne 1 ]; do
+          sleep 1
+          i=`expr $i + 1`
+          if [ $i -gt 10 ]; then
+               echo "Bumblebee server failed to stop"
+               exit 1
+          fi
+     done
+     rm -f $PIDFILE
+     disable_card
+     if [ $? ]; then
+          echo "Graphics card OFF"
+          echo "Bumblebee says good-bye"
+     else
+          echo "Failed to switch OFF card"
+     fi
+}
+
+restart() {
+  stop
+  sleep 1
+  start
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    restart
+    ;;
+#  status)
+#    ck_status bumblebee
+#  ;;
+  *)
+    echo "usage: $0 {start|stop|restart}"  
+esac

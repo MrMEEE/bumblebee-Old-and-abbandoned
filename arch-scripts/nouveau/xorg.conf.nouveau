@@ -15,5 +15,5 @@ EndSection
 Section "Device"
     Identifier     "Device1"
     Driver         "nouveau"
-#    BusID          "REPLACEWITHBUSID"
+    BusID          "REPLACEWITHBUSID"
 EndSection

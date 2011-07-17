@@ -1,3 +1,6 @@
+From the Martin Juhl's original README:
+https://github.com/MrMEEE/bumblebee/blob/master/README
+
 # ----------------------------------------------------------------------------
 # "Red Bull License" 
 # <mj@casalogic.dk> wrote this file and is providing free support 
@@ -34,41 +37,41 @@
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-This is a modified version of Martin Juhl's README to fit present project.
-Please reffer to the original in this link:
-https://github.com/MrMEEE/bumblebee/blob/master/README
+This is a Nouveau implementation of Bumblebee.
+Currently this is tested on ArchLinux distribution but the install/uninstall
+scripts should work for any distribution. An AUR package should be released 
+shortly.
 
-Bumblebee is Optimus support for Linux, with real offloading, and not
-switchable graphics. More important, it works on Optimus Laptops without a
-graphical multiplexer.
+To test Bumblebee nouveauyou will need:
+- Needed packages and software:
+     * This was tested on kernel 2.6.39 unpatched, 2.6.38 should work as well. 
+       Any newer kernel is expected to work. Make sure it was compiled with the 
+       'CONFIG_VGA_SWITCHEROO=y'
+     * For 3d acceleration you will need the nouveau 'dri' + Gallium3D drivers,
+       'libgl' and 'mesa'. In ArchLinux they are available under the 'extra' 
+       repository (nouveau-dri, libgl and mesa).
+     * VirtualGL software (For Arch users is available in the AUR)
+- You must enable the debugfs filesystem, see:
+     https://wiki.archlinux.org/index.php/Bumblebee#Power_Switching_Using_Vga-switcheroo
+     on information how to do it.
+- You will need Mesa demos and tools to test Bumblebee nouveau working.
 
-This project is containing ArchLinux modification of bumblebee by Martin Juhl (Formerly known as prime-ng)
 
-Documentation can be found in the ArchWiki page about Bumblebee:
-http://wiki.archlinux.org/index.php/Bumblebee
+Install:
+$ git clone -b nouveau git://github.com/Samsagax/bumblebee.git
+$ cd bumblebee
+$ chmod +x install.sh
+$ sudo sh ./install.sh
 
-The Installation can be made from AUR with this package:
-http://aur.archlinux.org/packages.php?ID=49469
+To test it:
+$ sudo optirun glxgears
 
-First of all: If you have any problem, please create a bug report package
-with the bumblebee-bugreport tool
+To uninstall:
+$ chmod +x uninstall.sh
+$ sudo sh ./uninstall.sh
 
-Then create an issue on Martin Jhul's GitHub project site.
 
-This package features:
-     - 3D is enabled on both the Intel and the nVidia at the same time.
-     - The Intel card is running the Desktop and the nVidia card can be used for
-the thougher applications with the command "optirun <application>" or
-"optirun32 <application>"
-     - Support for automatically shutting down and starting up the nVidia card has
-been added in version 1.4.20 for Ubuntu. For ArchLinux this is a work in progress, 
-we won't support it until there is a safe way to turn on/off the dedicated card
-and be able to use it again. Yo will find more information about this in the wiki. 
-The nVidia card WILL be draining battery unless the two scripts:
-/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard
-are configured correctly
+Almost no configuration is needed. If vga-switcheroo is able to find the 
+correct DSM method to handle your nVidia card, then you are capable of using
+power management safely and seamlessly.
 
-But still I think it is a good step forward...
-
-Status updates can be found here: http://www.martin-juhl.dk 
-or on twitter: http://twitter.com/martinjuhl

@@ -1,0 +1,74 @@
+# ----------------------------------------------------------------------------
+# "Red Bull License" 
+# <mj@casalogic.dk> wrote this file and is providing free support 
+# in any spare time. If you need extended support, you can fuel him up by
+# donating a Red Bull here to get him through the nights..:
+#
+# http://tinyurl.com/bumblebee-project
+#
+# ----------------------------------------------------------------------------
+
+#
+# ----------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42):
+# <mj@casalogic.dk> wrote this file. As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you
+# think
+# this stuff is worth it, you can buy me a beer in return Martin Juhl
+# ----------------------------------------------------------------------------
+#
+
+#    This file is part of bumblebee.
+#
+#    bumblebee is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    bumblebee is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#   
+#    You should have received a copy of the GNU General Public License
+#    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+This is a modified version of Martin Juhl's README to fit present project.
+Please reffer to the original in this link:
+https://github.com/MrMEEE/bumblebee/blob/master/README
+
+Bumblebee is Optimus support for Linux, with real offloading, and not
+switchable graphics. More important, it works on Optimus Laptops without a
+graphical multiplexer.
+
+This project is containing ArchLinux modification of bumblebee by Martin Juhl (Formerly known as prime-ng)
+
+Documentation can be found in the ArchWiki page about Bumblebee:
+http://wiki.archlinux.org/index.php/Bumblebee
+
+The Installation can be made from AUR with this package:
+http://aur.archlinux.org/packages.php?ID=49469
+
+First of all: If you have any problem, please create a bug report package
+with the bumblebee-bugreport tool
+
+Then create an issue on Martin Jhul's GitHub project site.
+
+This package features:
+     - 3D is enabled on both the Intel and the nVidia at the same time.
+     - The Intel card is running the Desktop and the nVidia card can be used for
+the thougher applications with the command "optirun <application>" or
+"optirun32 <application>"
+     - Support for automatically shutting down and starting up the nVidia card has
+been added in version 1.4.20 for Ubuntu. For ArchLinux this is a work in progress, 
+we won't support it until there is a safe way to turn on/off the dedicated card
+and be able to use it again. Yo will find more information about this in the wiki. 
+The nVidia card WILL be draining battery unless the two scripts:
+/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard
+are configured correctly
+
+But still I think it is a good step forward...
+
+Status updates can be found here: http://www.martin-juhl.dk 
+or on twitter: http://twitter.com/martinjuhl
