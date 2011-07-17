@@ -19,7 +19,7 @@ if ! dmesg | grep -q 'vga_switcheroo: enabled'; then
     exit
 fi
 
-if lspci -kv | grep VGA | grep nVidia | grep -q 'prog-if 00'; then
+if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Pwr; then
      echo OFF > /sys/kernel/debug/vgaswitcheroo/switch
      RET_VAL=$?
      if [ $RET_VAL ]; then

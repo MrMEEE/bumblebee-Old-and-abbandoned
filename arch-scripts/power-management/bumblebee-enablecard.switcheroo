@@ -11,7 +11,7 @@ if ! lsmod | grep -q nouveau; then
  echo "Warning: nouveau module not present. Switch ON may fail."
 fi
 
-if lspci -kv | grep VGA | grep nVidia | grep -q 'prog-if ff'; then
+if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Off; then
      echo ON > /sys/kernel/debug/vgaswitcheroo/switch
      RET_VAL=$?
      if [ $RET_VAL ] ; then
