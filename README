@@ -47,6 +47,12 @@ zypper install bumblebee
 
 or just use Yast to add the repositories and packages.
 
+There is also an unstable repository that contains the latest cvs, svn and git packages. These packages are
+very experimental and are not tested at all. They just compile :-)
+
+http://download.opensuse.org/repositories/home:/Ximi1970:/bumblebee-unstable/openSUSE_11.4/
+
+
 # ----------------------------------------------------------------------------
 # "Red Bull License" 
 # <mj@casalogic.dk> wrote this file and is providing free support 
