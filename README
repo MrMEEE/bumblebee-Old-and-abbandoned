@@ -57,6 +57,14 @@ To test Bumblebee nouveauyou will need:
 - You will need Mesa demos and tools to test Bumblebee nouveau working.
 
 
+**WARNING**
+*
+*  Uninstall any previous installation of bumblebee as this installation could break it.
+*  Be sure to have a backup of all your configuration files.
+*
+**END WARNING**
+
+
 Install:
 $ git clone -b nouveau git://github.com/Samsagax/bumblebee.git
 $ cd bumblebee
