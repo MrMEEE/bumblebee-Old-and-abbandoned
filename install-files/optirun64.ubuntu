@@ -35,7 +35,7 @@ if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
 	OPTIRUNS="/usr/bin/optirun /usr/bin/optirun32 /usr/bin/optirun64"
 	while :; do
 		# there is a space separating PIDs if multiple optirun instances are running
-		if pidof $OPTIRUNS | grep ' '; then
+		if pidof $OPTIRUNS | grep -q ' '; then
 			show_msg
 			exit 0
 		elif lsof -n -w "$nvidia_path/libnvidia-glcore.so"* >/dev/null; then
