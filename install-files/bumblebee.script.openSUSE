@@ -32,8 +32,8 @@ fi
 #export LD_LIBRARY_PATH
 
 start() {
-	check_3D_hack()
-	valid_lock()
+	check_3D_hack
+	valid_lock
 	if [ ! -f $LOCKFILE ] ; then
 		$ENABLECARD
 	fi
@@ -93,8 +93,7 @@ restart() {
 	start
 }
 
-valid_lock()
-{
+valid_lock() {
 	if [ -f $LOCKFILE ] && [ ! -f /tmp/.X1-lock ] ; then
 		#
 		#	There is a lock file but no X server running
@@ -105,8 +104,7 @@ valid_lock()
 	fi
 }
 
-check_3D_hack()
-{
+check_3D_hack() {
 	if [ -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
 		#
 		#	Somebody installed / upgraded the i586 nVidia repository
