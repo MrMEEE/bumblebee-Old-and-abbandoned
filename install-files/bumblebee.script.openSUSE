@@ -20,8 +20,13 @@
 LOCKFILE=/var/lock/bumblebee
 
 RETVAL=0
-ENABLECARD=/usr/bin/bumblebee-enablecard
-DISABLECARD=/usr/bin/bumblebee-disablecard
+if [ -f /usr/bin/optirun ] ; then
+	ENABLECARD=/usr/bin/bumblebee-enablecard
+	DISABLECARD=/usr/bin/bumblebee-disablecard
+else
+	ENABLECARD=/usr/local/bin/bumblebee-enablecard
+	DISABLECARD=/usr/local/bin/bumblebee-disablecard
+fi
 
 #LD_LIBRARY_PATH=
 #export LD_LIBRARY_PATH
