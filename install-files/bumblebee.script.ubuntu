@@ -78,7 +78,7 @@ do_start()
 	retries=0
 	while [ ! -s $PIDFILE -a $retries -le 3 ]; do
 		log_daemon_msg "."
-		retries=`$retries + 1`
+		retries=`expr $retries + 1`
 		sleep 1
 	done
 
