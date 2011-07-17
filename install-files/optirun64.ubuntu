@@ -1,9 +1,10 @@
 #!/bin/sh
+# XXX: the package should depend on sysvinit-utils because of `pidof`
 # loads various settings
 . /etc/default/bumblebee
 
 # if executed from a symlink named optirun32, use the 32b path
-if [ "$(basename "$0")" = "optirun32"]; then
+if [ "$(basename "$0")" = "optirun32" ]; then
 	libpath=/usr/lib32
 else
 	libpath=/usr/lib
@@ -31,14 +32,17 @@ show_msg()
 	fi
 }
 if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
+	OPTIRUNS="/usr/bin/optirun /usr/bin/optirun32 /usr/bin/optirun64"
 	while :; do
-		# if multiple optirun instances exist
-		if [ `pgrep optirun | wc -l` -gt 1 ]; then
+		# there is a space separating PIDs if multiple optirun instances are running
+		if pidof $OPTIRUNS | grep ' '; then
 			show_msg
 			exit 0
 		elif lsof -n -w "$nvidia_path/libnvidia-glcore.so"* >/dev/null; then
 			show_msg
 			sleep 1
+		else
+			break
 		fi
 	done
 	sudo /etc/init.d/bumblebee disable
