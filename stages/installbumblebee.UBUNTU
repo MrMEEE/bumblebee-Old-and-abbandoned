@@ -46,9 +46,9 @@ cp install-files/bumblebee.script.ubuntu /etc/init.d/bumblebee
 if [ "$VERSION" = "oneiric" ]; then
  rm /etc/alternatives/*gl_conf
  if [ "$ARCH" = "x86_64" ]; then
-  ln -s /usr/lib/mesa/ld.so.conf /etc/alternatives/x86_64-linux-gnu_gl_conf
+  ln -s /usr/lib/x86_64-linux-gnu/mesa/ld.so.conf /etc/alternatives/x86_64-linux-gnu_gl_conf
  elif [ "$ARCH" = "i686" ]; then
-  ln -s /usr/lib/mesa/ld.so.conf /etc/alternatives/i386-linux-gnu_gl_conf
+  ln -s /usr/lib/i386-linux-gnu/mesa/ld.so.conf /etc/alternatives/i386-linux-gnu_gl_conf
  fi
  rm -rf /etc/alternatives/*xorg_extra_modules
  rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
