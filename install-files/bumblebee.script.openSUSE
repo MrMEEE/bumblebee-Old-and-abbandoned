@@ -32,6 +32,8 @@ fi
 #export LD_LIBRARY_PATH
 
 start() {
+	check_3D_hack()
+	valid_lock()
 	if [ ! -f $LOCKFILE ] ; then
 		$ENABLECARD
 	fi
@@ -60,6 +62,7 @@ start() {
 }
 
 stop() {
+	check_3D_hack()
 	echo -n "Stopping bumblebee X server: "
 	if [ ! -f $LOCKFILE ] ; then
 		echo
@@ -88,6 +91,63 @@ stop() {
 restart() {
 	stop
 	start
+}
+
+valid_lock()
+{
+	if [ -f $LOCKFILE ] && [ ! -f /tmp/.X1-lock ] ; then
+		#
+		#	There is a lock file but no X server running
+		#	Something bad happened.
+		#
+		echo "Dummy lock file detected, removing file..."
+		/bin/rm $LOCKFILE
+	fi
+}
+
+check_3D_hack()
+{
+	if [ -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
+		#
+		#	Somebody installed / upgraded the i586 nVidia repository
+		#	Hack it again for full 3D
+		#
+		if [ `ls /usr/X11R6/lib/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
+			rm -rf /usr/X11R6/lib-nvidia
+			mkdir -p /usr/X11R6/lib-nvidia
+			mv -f /usr/X11R6/lib/libGL.* /usr/X11R6/lib-nvidia/
+			mv -f /usr/X11R6/lib/libXvMCNVIDIA* /usr/X11R6/lib-nvidia/
+		fi
+		if [ -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
+			rm -rf /usr/lib/xorg-nvidia
+			cp -a /usr/lib/xorg /usr/lib/xorg-nvidia
+			rm -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so
+			rm -f /usr/lib/xorg/modules/updates/extensions/libglx.*
+		fi
+	fi
+	if [ -f /usr/lib64/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
+		#
+		#	Somebody installed / upgraded the x86_64 nVidia repository
+		#	Hack it again for full 3D
+		#
+		if [ `ls /usr/X11R6/lib/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
+			rm -rf /usr/X11R6/lib-nvidia
+			mkdir -p /usr/X11R6/lib-nvidia
+			mv -f /usr/X11R6/lib/libGL.* /usr/X11R6/lib-nvidia/
+		fi
+		if [ `ls /usr/X11R6/lib64/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
+			rm -rf /usr/X11R6/lib64-nvidia
+			mkdir -p /usr/X11R6/lib64-nvidia
+			mv -f /usr/X11R6/lib64/libGL.* /usr/X11R6/lib64-nvidia/
+			mv -f /usr/X11R6/lib64/libXvMCNVIDIA* /usr/X11R6/lib64-nvidia/
+		fi
+		if [ -f /usr/lib64/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
+			rm -rf /usr/lib64/xorg-nvidia
+			cp -a /usr/lib64/xorg /usr/lib64/xorg-nvidia
+			rm -f /usr/lib64/xorg/modules/updates/drivers/nvidia_drv.so
+			rm -f /usr/lib64/xorg/modules/updates/extensions/libglx.*
+		fi
+	fi
 }
 
 case "$1" in
