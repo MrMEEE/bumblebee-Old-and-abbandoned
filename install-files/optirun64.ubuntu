@@ -1,26 +1,45 @@
-#!/bin/bash
+#!/bin/sh
+# loads various settings
+. /etc/default/bumblebee
 
-if [ ! -f /tmp/.X1-lock ]; then
- sudo /etc/init.d/bumblebee enable
+# if executed from a symlink named optirun32, use the 32b path
+if [ "$(basename "$0")" = "optirun32"]; then
+	libpath=/usr/lib32
+else
+	libpath=/usr/lib
+fi
+nvidia_path=$libpath/nvidia-current
+
+display=${VGL_DISPLAY##*:}
+display=${display%%.*}
+if [ ! -f /tmp/.X${display}-lock ]; then
+	sudo /etc/init.d/bumblebee enable
 fi
 
 trap "echo 'Caught Ctrl+C'" INT
 
-source /etc/default/bumblebee
-
 export VGL_READBACK
 export VGL_LOG
-vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld /usr/lib/nvidia-current "$@"
+vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld "$nvidia_path" "$@"
 
+msg_shown=false
+show_msg()
+{
+	if ! $msg_shown; then
+		echo "Another bumblebee powered application is running, keeping bumblebee alive."
+		msg_shown=true
+	fi
+}
 if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
- if [ `ps aux |grep optirun | wc -l` -gt 3 ]; then
-  echo "Another bumblebee powered application is running, keeping bumblebee alive."
-  exit 0
- elif [ `lsof -n -w |grep libnvidia-glcore | wc -l` -gt 0 ]; then
-  echo "Another bumblebee powered application is running, keeping bumblebee alive."
-  until [ `lsof -n -w |grep libnvidia-glcore |wc -l` -lt 1 ]; do      
-   sleep 1
-  done
- fi
- sudo /etc/init.d/bumblebee disable 
-fi 
+	while :; do
+		# if multiple optirun instances exist
+		if [ `pgrep optirun | wc -l` -gt 1 ]; then
+			show_msg
+			exit 0
+		elif lsof -n -w "$nvidia_path/libnvidia-glcore.so"* >/dev/null; then
+			show_msg
+			sleep 1
+		fi
+	done
+	sudo /etc/init.d/bumblebee disable
+fi
