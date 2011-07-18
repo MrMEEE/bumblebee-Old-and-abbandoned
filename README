@@ -29,7 +29,7 @@ For people currently running the script/git version please do:
 
 sudo bumblebee-uninstall
 
-If you used the nVidia package option:
+If you have used the nVidia package option:
 sudo bash NVIDIA-Linux-xxxxx-xxxx.run --uninstall
 
 If you used the nVidia repository (mirror) option:
