@@ -66,7 +66,7 @@ To test Bumblebee nouveauyou will need:
 
 
 Install:
-$ git clone -b nouveau git://github.com/Samsagax/bumblebee.git
+$ git clone -b nouveau git://github.com/Samsagax/bumblebee.git --depth 1
 $ cd bumblebee
 $ chmod +x install.sh
 $ sudo sh ./install.sh
