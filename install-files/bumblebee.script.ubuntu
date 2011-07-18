@@ -132,9 +132,9 @@ case "$1" in
 	log_daemon_msg "Starting $DESC" "$NAME "
 	do_start
 	case $? in
-		0) log_action_end_msg 0 ;;
-		1) log_action_end_msg 0 "already running" ;;
-		2) log_action_end_msg 1 ;;
+		0) log_end_msg 0 ;;
+		1) log_end_msg 0 ;; # already running
+		2) log_end_msg 1 ;;
 	esac
 	;;
   disable|start)
@@ -142,9 +142,9 @@ case "$1" in
 	log_daemon_msg "Stopping $DESC" "$NAME "
 	do_stop
 	case $? in
-		0) log_action_end_msg 0 ;;
-		1) log_action_end_msg 1 "already stopped" ;;
-		2) log_action_end_msg 1 ;;
+		0) log_end_msg 0 ;;
+		1) log_end_msg 1 ;; # already stopped
+		2) log_end_msg 1 ;;
 	esac
 	;;
   status)
