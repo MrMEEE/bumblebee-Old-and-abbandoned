@@ -13,8 +13,12 @@ nvidia_path=$libpath/nvidia-current
 
 display=${VGL_DISPLAY##*:}
 display=${display%%.*}
+# test if Bumblebee's X server is running
 if [ ! -f /tmp/.X${display}-lock ]; then
-	sudo /etc/init.d/bumblebee enable
+	if ! sudo /etc/init.d/bumblebee enable; then
+		echo "bumblebee could not be started - optirun cannot be executed."
+		exit 1
+	fi
 fi
 
 trap "echo 'Caught Ctrl+C'" INT
