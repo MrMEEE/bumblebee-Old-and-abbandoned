@@ -6,7 +6,7 @@
 . /etc/rc.d/functions
 . /etc/bumblebee/bumblebee.conf
 
-$NAME="switcheroo"
+NAME="switcheroo"
 
 disable_card() {
      $DISABLECARD
