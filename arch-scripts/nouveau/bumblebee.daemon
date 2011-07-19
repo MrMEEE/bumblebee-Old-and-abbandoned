@@ -8,7 +8,7 @@
 
 DAEMON=bumblebee
 XDAEMON=/usr/bin/X
-XDAEMON_ARGS="-ac -config /etc/X11/xorg.conf.nouveau -sharevts -nolisten tcp -noreset :1 vt9"
+XDAEMON_ARGS="-ac -config /etc/bumblebee/xorg.conf.nouveau -sharevts -nolisten tcp -noreset :1 vt9"
 PIDFILE=/tmp/.X1-lock
 
 disable_card()
