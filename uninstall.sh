@@ -10,7 +10,7 @@ rm -v $INS_DIR/bumblebee
 rm -v /usr/bin/optirun
 rm -v $INS_DIR/bumblebee-enablecard
 rm -v $INS_DIR/bumblebee-disablecard
-rm -v /etc/pm/power.d/10-bumblebee-disablecard
+#rm -v /etc/pm/power.d/10-bumblebee-disablecard
 
 # Configuration files
 rm -v /etc/bumblebee/xorg.conf.nouveau
