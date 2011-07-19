@@ -32,6 +32,7 @@ package() {
   install -D -m755 -v arch-scripts/nouveau/optirun ${pkgdir}/usr/bin/optirun
   install -D -m755 -v arch-scripts/nouveau/bumblebee-enablecard.switcheroo ${pkgdir}/usr/bin/bumblebee-enablecard
   install -D -m755 -v arch-scripts/nouveau/bumblebee-disablecard.switcheroo ${pkgdir}/usr/bin/bumblebee-disablecard
+  install -D -m755 -v arch-scripts/bumblebee-disablecard-on-powerup ${pkgdir}/etc/pm/power.d/10-bumblebee-disablecard
   # Configuration files
   install -D -m644 -v arch-scripts/nouveau/xorg.conf.nouveau ${pkgdir}/etc/bumblebee/xorg.conf.nouveau
   install -D -m644 -v arch-scripts/bumblebee.conf ${pkgdir}/etc/bumblebee/bumblebee.conf

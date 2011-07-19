@@ -18,8 +18,6 @@ sed -i 's/REPLACEWITHBUSID/'$NVIDIABUSID'/g' /etc/bumblebee/xorg.conf.nouveau
 
 #==================================================================================================
 
-ln -s /usr/bin/bumblebee-disablecard /etc/pm/power.d/10-bumblebee-disablecard
-
 echo
 echo "Installation complete..."
 echo "Run your programs with: optirun <name of program>"
