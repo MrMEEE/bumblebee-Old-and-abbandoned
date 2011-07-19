@@ -52,15 +52,15 @@ if [ "$UID" != "$ROOT_UID" ] ; then
 	echo "Please run the script with: sudo bumblebee-configuration"
 	exit 1
 fi
-  
-#Determine Arch x86_64 or i686
+
+# Determine Arch x86_64 or i686
 ARCH=`uname -m`
 
-#Get tools location 
-LSPCI=`which lspci` 
+# Get tools location
+LSPCI=`which lspci`
 MODPROBE=`which modprobe`
 
-#	Get terminal size
+# Get terminal size
 LINES=`stty size | cut -f1 -d' '`
 COLUMNS=`stty size | cut -f2 -d' '`
 
@@ -75,17 +75,43 @@ else
 	rm $DEFAULT_FILE
 fi
 
-if [ -f /tmp/machineinfo ]; then   
+if [ -f /tmp/machineinfo ]; then
 	rm /tmp/machineinfo
 fi
 
 if [ "$DISTRO" == "UBUNTU" ] ; then
-	rm -rf /etc/alternatives/gl_conf
-	ln -s /usr/lib/mesa/ld.so.conf /etc/alternatives/gl_conf
-	rm -rf /etc/alternatives/xorg_extra_modules
+	# Before you start with messing with symlinks or removing files, make sure
+	# that you know what you are doing. Examine the installation scripts of
+	# nvidia-current and libgl1-mesa-glx to get an idea how the alternatives
+	# system should be used. If you're using rm or ln in /etc/alternatives, you
+	# are doing it wrong.
+	# A helpful command for showing links being created on configuring an other
+	# alternative:     update-alternatives --display gl_conf
+
+	# Since Bumblebee is a project to get Optimus laptops to work, we can safely
+	# assume that the nvidia driver is not used for the default display (:0)
+	# Therefore default to mesa instead of nvidia. vglrun sets the GL library
+	# path to /usr/lib{,32}/nvidia-current for programs running on the display
+	# accelerated by the nvidia card. Since most graphical applications are not
+	# statically linked nor setuid/setgid binaries, this is fine. There is an
+	# exception on this: programs which overwrite LD_LIBRARY_PATH will fail to
+	# load the nvidia GL driver. However, this method will allow GL on the Intel
+	# display where the previous situation breaks it.
+	# TLDR: this allows the intel display to use GL, the bumblebee display will
+	#       load the nvidia driver through vglrun in almost all cases
+
+	# this takes care of setting correct links which is used on
+	# /usr/lib/nvidia-current/gl.conf
+	update-alternatives --force --set gl_conf /usr/lib/mesa/ld.so.conf
+
+	# remove a legacy link which was not used anyway
 	rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
-	rm -rf /usr/lib/nvidia-current/xorg/xorg
-	ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
+
+	# fix appeared in commit 68a75db4df628a910886, it should remove an excess symlink
+	rm -f /usr/lib/nvidia-current/xorg/xorg
+
+	# Refresh the dynamic loader search path so /etc/ld.so.conf.d/GL.conf ->
+	# /etc/alternatives/gl_conf -> /usr/lib/mesa/ld.so.conf
 	ldconfig
 fi
 
@@ -108,6 +134,7 @@ do
 	((s++)) 
 	((i+=2))
 done < /tmp/machineinfo
+
 profiles[i+1]="Enter Manual Configuration"
 profiles[i]=997
 ((i+=2))
@@ -119,6 +146,7 @@ profiles[i]=999
 echo -n "50%..."
 wget -O /tmp/allmachineinfo "http://martin-juhl.dk/bumblebee/?searchitem=showall&search=1" 1>/dev/null 2>/dev/null
 echo -n "75%..."
+
 s=1
 i=1
 unset allprofiles
@@ -156,12 +184,12 @@ while [ "$CONFIGMODE" != "MANUAL" ] && [ "$CONFIGMODE" != "DONE" ] ; do
 			else
 				CONFIGMODE=MANUAL
 			fi
-			;;   
+			;;
 		1)
-			CONFIGMODE=AUTO   
+			CONFIGMODE=AUTO
 			MANUFACTURER=`cat /tmp/machineinfo |cut -f1 -d\|`
 			MODEL=`cat /tmp/machineinfo |cut -f2 -d\|`
-			USER=`cat /tmp/machineinfo |cut -f9 -d\|` 
+			USER=`cat /tmp/machineinfo |cut -f9 -d\|`
 			CONNECTEDMONITOR=`cat /tmp/machineinfo |cut -f3 -d\| | sed -e 's/ //g'`
 			INTELBUSID=`cat /tmp/machineinfo |cut -f4 -d\| | sed -e 's/ //g'`
 			NVIDIABUSID=`cat /tmp/machineinfo |cut -f5 -d\| | sed -e 's/ //g'`
@@ -170,7 +198,7 @@ while [ "$CONFIGMODE" != "MANUAL" ] && [ "$CONFIGMODE" != "DONE" ] ; do
 			OS=`cat /tmp/machineinfo |cut -f10 -d\|`
 			POWERSTATUS=`cat /tmp/machineinfo |sed -n 1p|cut -f6 -d\| | sed -e 's/ //g'`
 			;;
-		*) 
+		*)
 			LIST_SIZE=$(($LINES - 10))
 			choice=$(whiptail --nocancel --menu \
 " Please select a machine profile to install.\n\n"\
@@ -197,7 +225,7 @@ while [ "$CONFIGMODE" != "MANUAL" ] && [ "$CONFIGMODE" != "DONE" ] ; do
 				OS=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f10 -d\|`
 				POWERSTATUS=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f6 -d\| | sed -e 's/ //g'`
 			fi
-			;; 
+			;;
 		esac
 	fi
 
@@ -242,7 +270,7 @@ while [ "$CONFIGMODE" != "MANUAL" ] && [ "$CONFIGMODE" != "DONE" ] ; do
 " Please select a machine profile to install.\n\n"\
 "The profiles contains configuration for specific systems.\n\n"\
 "These profiles hasn't been individually tested and are submitted by users." $LINES $COLUMNS $LIST_SIZE "${allprofiles[@]}"  3>&1 1>&2 2>&3)
-	
+
 		if [ $choice -eq 999 ] ; then
 			whiptail --msgbox " Bumblebee has NOT been configured, and probably won't work." $LINES $COLUMNS
 			exit 0
@@ -459,9 +487,9 @@ case "$choice" in
 	IMAGETRANSPORT="rgb"
 	;;
 *)
-	IMAGETRANSPORT="xv"  
+	IMAGETRANSPORT="xv"
 	;;
-esac 
+esac
 
 sed -i 's/VGL_COMPRESS.*/VGL_COMPRESS='$IMAGETRANSPORT'/' /etc/default/bumblebee
 
