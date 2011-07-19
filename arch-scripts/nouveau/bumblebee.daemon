@@ -10,8 +10,6 @@ DAEMON=bumblebee
 XDAEMON=/usr/bin/X
 XDAEMON_ARGS="-ac -config /etc/X11/xorg.conf.nouveau -sharevts -nolisten tcp -noreset :1 vt9"
 PIDFILE=/tmp/.X1-lock
-DISABLECARD=/usr/bin/bumblebee-disablecard
-ENABLECARD=/usr/bin/bumblebee-enablecard
 
 disable_card()
 {
@@ -79,10 +77,10 @@ restart() {
 }
 
 case "$1" in
-  start)
+  start|enable)
     start
     ;;
-  stop)
+  stop|disable)
     stop
     ;;
   restart)
@@ -91,6 +89,12 @@ case "$1" in
   status)
     ck_status bumblebee
   ;;
+  cardon)
+    enable_card
+  ;;
+  cardoff)
+    disable_card
+  ;;
   *)
-    echo "usage: $0 {start|stop|restart|status}"  
+    echo "usage: $0 {start|stop|enable|disable|restart|status}"  
 esac
