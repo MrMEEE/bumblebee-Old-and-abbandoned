@@ -10,7 +10,7 @@ mkdir -v -p /etc/bumblebee
 
 # Executable files
 install -m755 -v arch-scripts/nouveau/daemon.test $INS_DIR/bumblebee
-install -m755 -v arch-scripts/nouveau/optirun /usr/bin/optirun
+install -m755 -v arch-scripts/nouveau/optirun.test /usr/bin/optirun
 install -m755 -v arch-scripts/nouveau/bumblebee-enablecard.switcheroo $INS_DIR/bumblebee-enablecard
 install -m755 -v arch-scripts/nouveau/bumblebee-disablecard.switcheroo $INS_DIR/bumblebee-disablecard
 ln -s $INS_DIR/bumblebee-disablecard /etc/pm/power.d/10-bumblebee-disablecard

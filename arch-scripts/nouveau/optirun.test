@@ -2,10 +2,14 @@
 
 source /etc/bumblebee/bumblebee.conf
 
+/usr/share/nouveau-bumblebee/bumblebee start
+
 trap "echo 'Caught Ctrl+C'" INT
 
 export VGL_READBACK
 export VGL_LOG
 
 vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY "$@"
+
+/usr/share/nouveau-bumblebee/bumblebee stop
 
