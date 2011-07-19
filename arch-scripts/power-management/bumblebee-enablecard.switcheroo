@@ -8,7 +8,11 @@
 # See https://wiki.archlinux.org/index.php/Bumblebee for details.
 
 if ! lsmod | grep -q nouveau; then
- echo "Warning: nouveau module not present. Switch ON may fail."
+ echo "Warning: nouveau module not present. Trying to modprobe"
+ modprobe nouveau
+ if ! lsmod | grep -q nouveau; then
+   echo "Warning: nouveau module not present. Switch ON may fail."
+ fi
 fi
 
 if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Off; then
