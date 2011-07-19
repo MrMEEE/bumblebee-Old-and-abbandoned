@@ -1,64 +1,65 @@
 if [ "$POWERON" != "UNDEFINED" ]; then
 
-    # Needed for xxd
-    VERSION=`cat /etc/SuSE-release | grep VERSION | cut -f3 -d" "`
+	# Needed for xxd
+	VERSION=`cat /etc/SuSE-release | grep VERSION | cut -f3 -d" "`
 
-    if [ "$VERSION" == "11.4" ] ; then
-      zypper --no-refresh install vim-base
-    else
-      zypper --no-refresh install vim-common
-    fi
+	if [ "$VERSION" == "11.4" ] ; then
+		zypper --no-refresh install vim-base
+	else
+		zypper --no-refresh install vim-common
+	fi
 
-    echo
-    echo "Configuring Power Management."
-    echo
-    echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
-    echo $POWEROFF | xxd -r -p > /usr/local/bin/bumblebee-disablecard
-    chmod +x /usr/local/bin/bumblebee*
+	echo
+	echo "Configuring Power Management."
+	echo
+	echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
+	echo $POWEROFF | xxd -r -p > /usr/local/bin/bumblebee-disablecard
+	chmod +x /usr/local/bin/bumblebee*
 #    sed -i 's/nvidia-current/nvidia/g' /usr/local/bin/bumblebee-enablecard
 #    sed -i 's/nvidia-current/nvidia/g' /usr/local/bin/bumblebee-disablecard
 
 else
 
-    echo
-    echo "No power-on/off configuration has been reported for your machine"
-    echo "please manually enter your configuration in:"
-    echo
-    echo "/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard"
-    echo
-    echo "Some examples are available in /usr/share/doc/packages/bumblebee/examples/."
-    echo
-    echo "Press any key to continue..."
-    read
-    echo
+	echo
+	echo "No power-on/off configuration has been reported for your machine"
+	echo "please manually enter your configuration in:"
+	echo
+	echo "/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard"
+	echo
+	echo "Some examples are available in /usr/share/doc/packages/bumblebee/examples/."
+	echo
+	echo "Press any key to continue..."
+	read
+	echo
   
-    if [ ! -f /usr/local/bin/bumblebee-enablecard ]; then
+	if [ ! -f /usr/local/bin/bumblebee-enablecard ]; then
 
-        # Not installed
-        cp install-files/bumblebee-enablecard /usr/local/bin/
+		# Not installed
+		cp install-files/opensuse/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
+		sed -i "s?INSERTPOWERON?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/local/bin/bumblebee-enablecard
 
-    else
+	else
 
-        # Already Exists
-        echo
-        echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard, already exists not overwriting."
-        echo
+		# Already Exists
+		echo
+		echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard, already exists not overwriting."
+		echo
+	fi
 
-    fi
+	if [ ! -f /usr/local/bin/bumblebee-disablecard ]; then
 
-    if [ ! -f /usr/local/bin/bumblebee-disablecard ]; then
+		# Not installed
+		cp install-files/opensuse/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
+		sed -i "s?INSERTPOWEROFF?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/local/bin/bumblebee-disablecard
 
-        # Not installed
-        cp install-files/bumblebee-disablecard /usr/local/bin/
+	else
 
-    else
+		# Already Exists
+		echo
+		echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard, already exists not overwriting."
+		echo
 
-        # Already Exists
-        echo
-        echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard, already exists not overwriting."
-        echo
-
-    fi
+	fi
 fi 
 
 chmod +x /usr/local/bin/bumblebee-*
