@@ -1,0 +1,56 @@
+#!/bin/bash
+
+#
+#	Terminate
+#
+terminate()
+{
+	#
+	#	Can we disable bumblebee ?
+	#
+	if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
+		if [ `ps -e |grep optirun | wc -l` -gt 2 ]; then
+			echo "Another bumblebee powered application is running, keeping bumblebee alive."
+			exit 0
+		fi
+
+		#
+		#	Disable bumblebee only when there is a lock file
+		#
+		if [ -f /tmp/.X1-lock ] ; then
+			sudo /etc/init.d/bumblebee disable
+		fi
+	fi 
+}
+
+#
+#	Enable bumblebee ?
+#
+if [ ! -f /tmp/.X1-lock ] ; then
+	sudo /etc/init.d/bumblebee enable
+fi
+
+#
+#	Intercept Ctrl-C, run terminate
+#
+trap "terminate" INT
+
+#
+#	Get the defaults
+#
+source /etc/default/bumblebee
+
+#LD_LIBRARY_PATH=
+#export LD_LIBRARY_PATH
+
+#
+#	Run the command
+#
+export VGL_READBACK
+export VGL_LOG
+vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY "$@"
+
+#
+#	The end...
+#
+terminate
