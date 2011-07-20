@@ -140,6 +140,12 @@ allprofiles[i]=999
 echo "100%)"
 
 
+#
+#	Get current values
+#
+NVIDIABUSID=`grep BusID /etc/X11/xorg.conf.nvidia | sed -e "s/[ \t]*BusID[ \t]*\"\(.*\)\"/\1/g"`
+CONNECTEDMONITOR=`grep ConnectedMonitor /etc/X11/xorg.conf.nvidia | sed -e "s/[ \t]*Option[ \t]*\"ConnectedMonitor\"[ \t]*\"\(.*\)\"/\1/g"`
+
 CONFIGMODE=NONE
 while [ "$CONFIGMODE" != "MANUAL" ] && [ "$CONFIGMODE" != "DONE" ] ; do
 
@@ -278,7 +284,7 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 	fi
 fi
 
-sed -i 's/REPLACEWITHBUSID/'$NVIDIABUSID'/g' /etc/X11/xorg.conf.nvidia
+sed -i "s/\([ \t]*BusID[ \t]*\)\".*\"/\1\"$NVIDIABUSID\"/g" /etc/X11/xorg.conf.nvidia
 
 if [ "$CONFIGMODE" == "MANUAL" ]; then
 	if [ -f /usr/local/bin/bumblebee-enablecard ]; then
@@ -299,9 +305,11 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 	if [ "$DISTRO" == "OPENSUSE" ] ; then
 		${MODPROBE} nvidia 2>&1 >/dev/null
 
-		if [ "`/usr/bin/nvidia-xconfig --query-gpu-info 2>&1 | grep ERROR`" == "" ] ; then
-			if [ `/usr/bin/nvidia-xconfig --query-gpu-info | grep "Display Devices" | cut -f2 -d":"` -gt 0 ] ; then
-				CONNECTEDMONITOR=`/usr/bin/nvidia-xconfig --query-gpu-info | grep "Display Device 0" | cut -f2 -d\( | cut -f1 -d\)`
+		if [ -x /usr/bin/nvidia-xconfig ] ; then
+			if [ "`/usr/bin/nvidia-xconfig --query-gpu-info 2>&1 | grep ERROR`" == "" ] ; then
+				if [ `/usr/bin/nvidia-xconfig --query-gpu-info | grep "Display Devices" | cut -f2 -d":"` -gt 0 ] ; then
+					CONNECTEDMONITOR=`/usr/bin/nvidia-xconfig --query-gpu-info | grep "Display Device 0" | cut -f2 -d\( | cut -f1 -d\)`
+				fi
 			fi
 		fi
 		${MODPROBE} -r nvidia 2>&1 >/dev/null
@@ -315,9 +323,18 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 	fi
 fi
 
-sed -i 's/REPLACEWITHCONNECTEDMONITOR/'$CONNECTEDMONITOR'/g' /etc/X11/xorg.conf.nvidia
+sed -i "s/\([ \t]*Option[ \t]*\"ConnectedMonitor\"[ \t]*\)".*"/\1\"$CONNECTEDMONITOR\"/g" /etc/X11/xorg.conf.nvidia
 
 if [ $CONFIGMODE != "MANUAL" ] ; then
+	#
+	#	Always try to enable the card before switching scripts
+	#
+	if [ -f /usr/local/bin/bumblebee-enablecard ]; then
+		/usr/local/bin/bumblebee-enablecard
+	fi
+	if [ -f /usr/bin/bumblebee-enablecard ]; then
+		/usr/bin/bumblebee-enablecard
+	fi
 
 	if [ "$DISTRO" == "UBUNTU" ] ; then
 		if [ $POWERON != "UNAVAILABLE" ] ; then
@@ -356,14 +373,17 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 	fi
 
 	if [ "$DISTRO" == "OPENSUSE" ] ; then
+		#
+		#	Setup new scripts
+		#
 		if [ $POWERON != "UNAVAILABLE" ] ; then
-			if [ -f /usr/local/bin/bumblebee-enablecard ] ; then
+			if [ -f /usr/local/bin/optirun ] ; then
 				#
 				#	Script install
 				#
 				echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
 				echo $POWEROFF | xxd -r -p > /usr/local/bin/bumblebee-disablecard
-			elif [ -f /usr/bin/bumblebee-enablecard ] ; then
+			elif [ -f /usr/bin/optirun ] ; then
 				#
 				#	Repository install
 				#
@@ -371,7 +391,7 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 				echo $POWEROFF | xxd -r -p > /usr/bin/bumblebee-disablecard
 			fi
 		else
-			if [ -f /usr/local/bin/bumblebee-enablecard ] ; then
+			if [ -f /usr/local/bin/optirun ] ; then
 				#
 				#	Script install
 				#
@@ -379,9 +399,36 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 "No power-on/off configuration has been reported for your machine,\n"\
 "please manually enter configuration in:\n\n"\
 "/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard\n\n"\
-"Some examples are available in /usr/share/doc/bumblebee/.\n\n"\
+"Some examples are available in /usr/share/doc/packages/bumblebee/examples/.\n\n"\
 "Press any key to continue..." $LINES $COLUMNS
-			elif [ -f /usr/bin/bumblebee-enablecard ] ; then
+				if [ ! -f /usr/local/bin/bumblebee-enablecard ] ; then
+					# Not installed
+					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
+				else
+					# Already Exists
+					echo
+					echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard exists moving old script to /usr/local/bin/bumblebee-enablecard.old."
+					echo
+					mv /usr/local/bin/bumblebee-enablecard /usr/local/bin/bumblebee-enablecard.old
+					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
+				fi
+				sed -i "s?INSERTPOWERON?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/local/bin/bumblebee-enablecard
+
+				if [ ! -f /usr/local/bin/bumblebee-disablecard ] ; then
+					# Not installed
+					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
+				else
+					# Already Exists
+					echo
+					echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard exists, moving old script to /usr/local/bin/bumblebee-disablecard.old."
+					echo
+					mv /usr/local/bin/bumblebee-disablecard /usr/local/bin/bumblebee-disablecard.old
+					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
+				fi
+				sed -i "s?INSERTPOWEROFF?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/local/bin/bumblebee-disablecard
+
+				chmod +x /usr/local/bin/bumblebee*
+			elif [ -f /usr/bin/optirun ] ; then
 				#
 				#	Repository install
 				#
@@ -389,39 +436,36 @@ if [ $CONFIGMODE != "MANUAL" ] ; then
 "No power-on/off configuration has been reported for your machine,\n"\
 "please manually enter configuration in:\n\n"\
 "/usr/bin/bumblebee-enablecard and /usr/bin/bumblebee-disablecard\n\n"\
-"Some examples are available in /usr/share/doc/bumblebee/.\n\n"\
+"Some examples are available in /usr/share/doc/packages/bumblebee/examples/.\n\n"\
 "Press any key to continue..." $LINES $COLUMNS
-			fi
-		fi
+				if [ ! -f /usr/bin/bumblebee-enablecard ] ; then
+					# Not installed
+					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
+				else
+					# Already Exists
+					echo
+					echo "nVidia card enable-script: /usr/bin/bumblebee-enablecard exists moving old script to /usr/bin/bumblebee-enablecard.old."
+					echo
+					mv /usr/bin/bumblebee-enablecard /usr/bin/bumblebee-enablecard.old
+					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
+				fi
+				sed -i "s?INSERTPOWERON?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/bin/bumblebee-enablecard
 
-		if [ -f /usr/local/bin/optirun ] ; then
-			#
-			#	SCript install
-			#
-			if [ ! -f /usr/local/bin/bumblebee-enablecard ]; then
-				# Not installed
-				cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
-			fi
+				if [ ! -f /usr/bin/bumblebee-disablecard ] ; then
+					# Not installed
+					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
+				else
+					# Already Exists
+					echo
+					echo "nVidia card disable-script: /usr/bin/bumblebee-disablecard exists, moving old script to /usr/bin/bumblebee-disablecard.old."
+					echo
+					mv /usr/bin/bumblebee-disablecard /usr/bin/bumblebee-disablecard.old
+					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
+				fi
+				sed -i "s?INSERTPOWEROFF?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/bin/bumblebee-disablecard
 
-			if [ ! -f /usr/local/bin/bumblebee-disablecard ]; then
-				# Not installed
-				cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
+				chmod +x /usr/bin/bumblebee*
 			fi
-			chmod +x /usr/local/bin/bumblebee*
-		elif  [ -f /usr/bin/optirun ] ; then
-			#
-			#	SCript install
-			#
-			if [ ! -f /usr/bin/bumblebee-enablecard ]; then
-				# Not installed
-				cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
-			fi
-
-			if [ ! -f /usr/bin/bumblebee-disablecard ]; then
-				# Not installed
-				cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
-			fi
-			chmod +x /usr/bin/bumblebee*
 		fi
 	fi
 fi
@@ -463,7 +507,7 @@ case "$choice" in
 	;;
 esac 
 
-sed -i 's/VGL_COMPRESS.*/VGL_COMPRESS='$IMAGETRANSPORT'/' /etc/default/bumblebee
+sed -i 's/VGL_COMPRESS.*/VGL_COMPRESS='$IMAGETRANSPORT'/' $DEFAULT_FILE
 
 groupadd bumblebee
 
