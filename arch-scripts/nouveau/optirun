@@ -1,8 +1,19 @@
 #!/bin/bash
 
-source /etc/bumblebee/bumblebee.conf
+. /etc/bumblebee/bumblebee.conf
+. /etc/rc.d/function
 
 trap "echo 'Caught Ctrl+C'" INT
+
+i=1
+while  [ ! ck_daemon bumblebee ]; do
+  sleep 1
+  i=`expr $i + 1`
+  if [ $i -gt 10 ]; then
+    stat_fail "Could not start Bumblebee"
+    exit 1
+  fi
+done
 
 export VGL_READBACK
 export VGL_LOG
