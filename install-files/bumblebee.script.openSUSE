@@ -28,9 +28,6 @@ else
 	DISABLECARD=/usr/local/bin/bumblebee-disablecard
 fi
 
-#LD_LIBRARY_PATH=
-#export LD_LIBRARY_PATH
-
 start() {
 	check_3D_hack
 	valid_lock
@@ -43,7 +40,13 @@ start() {
 		echo "Bumblebee server already running"
 		exit 1
 	fi
+	if [ -f /usr/bin/nvidia-xconfig ] ; then
+#LD_LIBRARY_PATH=
+#export LD_LIBRARY_PATH
 #/usr/bin/X
+	else
+		/usr/bin/X -ac -config /etc/X11/xorg.conf.nouveau -sharevts -nolisten tcp -noreset :1 vt9 > /dev/null 2>&1 &
+	fi
 	PID_X=$!
 	i=1
 	while [ `ps p $PID_X | wc -l` -eq 1 ] ; do
@@ -105,45 +108,47 @@ valid_lock() {
 }
 
 check_3D_hack() {
-	if [ -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
-		#
-		#	Somebody installed / upgraded the i586 nVidia repository
-		#	Hack it again for full 3D
-		#
-		if [ `ls /usr/X11R6/lib/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
-			rm -rf /usr/X11R6/lib-nvidia
-			mkdir -p /usr/X11R6/lib-nvidia
-			mv -f /usr/X11R6/lib/libGL.* /usr/X11R6/lib-nvidia/
-			mv -f /usr/X11R6/lib/libXvMCNVIDIA* /usr/X11R6/lib-nvidia/
-		fi
+	if [ -f /usr/bin/nvidia-xconfig ] ; then
 		if [ -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
-			rm -rf /usr/lib/xorg-nvidia
-			cp -a /usr/lib/xorg /usr/lib/xorg-nvidia
-			rm -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so
-			rm -f /usr/lib/xorg/modules/updates/extensions/libglx.*
-		fi
-	fi
-	if [ -f /usr/lib64/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
-		#
-		#	Somebody installed / upgraded the x86_64 nVidia repository
-		#	Hack it again for full 3D
-		#
-		if [ `ls /usr/X11R6/lib/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
-			rm -rf /usr/X11R6/lib-nvidia
-			mkdir -p /usr/X11R6/lib-nvidia
-			mv -f /usr/X11R6/lib/libGL.* /usr/X11R6/lib-nvidia/
-		fi
-		if [ `ls /usr/X11R6/lib64/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
-			rm -rf /usr/X11R6/lib64-nvidia
-			mkdir -p /usr/X11R6/lib64-nvidia
-			mv -f /usr/X11R6/lib64/libGL.* /usr/X11R6/lib64-nvidia/
-			mv -f /usr/X11R6/lib64/libXvMCNVIDIA* /usr/X11R6/lib64-nvidia/
+			#
+			#	Somebody installed / upgraded the i586 nVidia repository
+			#	Hack it again for full Intel and nVidia 3D
+			#
+			if [ `ls /usr/X11R6/lib/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
+				rm -rf /usr/X11R6/lib-nvidia
+				mkdir -p /usr/X11R6/lib-nvidia
+				mv -f /usr/X11R6/lib/libGL.* /usr/X11R6/lib-nvidia/
+				mv -f /usr/X11R6/lib/libXvMCNVIDIA* /usr/X11R6/lib-nvidia/
+			fi
+			if [ -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
+				rm -rf /usr/lib/xorg-nvidia
+				cp -a /usr/lib/xorg /usr/lib/xorg-nvidia
+				rm -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so
+				rm -f /usr/lib/xorg/modules/updates/extensions/libglx.*
+			fi
 		fi
 		if [ -f /usr/lib64/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
-			rm -rf /usr/lib64/xorg-nvidia
-			cp -a /usr/lib64/xorg /usr/lib64/xorg-nvidia
-			rm -f /usr/lib64/xorg/modules/updates/drivers/nvidia_drv.so
-			rm -f /usr/lib64/xorg/modules/updates/extensions/libglx.*
+			#
+			#	Somebody installed / upgraded the x86_64 nVidia repository
+			#	Hack it again for full Intel and nVidia 3D
+			#
+			if [ `ls /usr/X11R6/lib/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
+				rm -rf /usr/X11R6/lib-nvidia
+				mkdir -p /usr/X11R6/lib-nvidia
+				mv -f /usr/X11R6/lib/libGL.* /usr/X11R6/lib-nvidia/
+			fi
+			if [ `ls /usr/X11R6/lib64/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
+				rm -rf /usr/X11R6/lib64-nvidia
+				mkdir -p /usr/X11R6/lib64-nvidia
+				mv -f /usr/X11R6/lib64/libGL.* /usr/X11R6/lib64-nvidia/
+				mv -f /usr/X11R6/lib64/libXvMCNVIDIA* /usr/X11R6/lib64-nvidia/
+			fi
+			if [ -f /usr/lib64/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
+				rm -rf /usr/lib64/xorg-nvidia
+				cp -a /usr/lib64/xorg /usr/lib64/xorg-nvidia
+				rm -f /usr/lib64/xorg/modules/updates/drivers/nvidia_drv.so
+				rm -f /usr/lib64/xorg/modules/updates/extensions/libglx.*
+			fi
 		fi
 	fi
 }
