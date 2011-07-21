@@ -15,8 +15,9 @@ if [ "$POWERON" != "UNDEFINED" ]; then
 	echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
 	echo $POWEROFF | xxd -r -p > /usr/local/bin/bumblebee-disablecard
 	chmod +x /usr/local/bin/bumblebee*
-#    sed -i 's/nvidia-current/nvidia/g' /usr/local/bin/bumblebee-enablecard
-#    sed -i 's/nvidia-current/nvidia/g' /usr/local/bin/bumblebee-disablecard
+
+	sed -i 's?modprobe nvidia?if \[ -f /usr/bin/nvidia-xconfig \] ; then\n\tmodprobe nvidia\nelse\n\tmodprobe nouveau\nfi?g' /usr/local/bin/bumblebee-enablecard
+	sed -i 's?modprobe -r nvidia?modprobe -r nouveau >/dev/null 2>\&1\nif lsmod | grep -q nouveau; then\n\techo \"Error: could not unload nouveau module, leaving card turned on\"\n\texit\nfi\nmodprobe -r nvidia >/dev/null 2>\&1?g' /usr/local/bin/bumblebee-disablecard
 
 else
 
@@ -37,6 +38,7 @@ else
 		# Not installed
 		cp install-files/opensuse/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
 		sed -i "s?INSERTPOWERON?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/local/bin/bumblebee-enablecard
+		sed -i 's?modprobe nvidia?if \[ -f /usr/bin/nvidia-xconfig \] ; then\n\tmodprobe nvidia\nelse\n\tmodprobe nouveau\nfi?g' /usr/local/bin/bumblebee-enablecard
 
 	else
 
@@ -51,6 +53,7 @@ else
 		# Not installed
 		cp install-files/opensuse/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
 		sed -i "s?INSERTPOWEROFF?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/local/bin/bumblebee-disablecard
+		sed -i 's?modprobe -r nvidia?modprobe -r nouveau >/dev/null 2>\&1\nif lsmod | grep -q nouveau; then\n\techo \"Error: could not unload nouveau module, leaving card turned on\"\n\texit\nfi\nmodprobe -r nvidia >/dev/null 2>\&1?g' /usr/local/bin/bumblebee-disablecard
 
 	else
 
