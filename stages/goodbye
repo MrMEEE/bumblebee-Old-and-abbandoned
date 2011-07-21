@@ -9,15 +9,28 @@ if [ "$DISTRO" != UBUNTU ] && [ "$DISTRO" != OPENSUSE ] ; then
  echo "In GNOME this is done by this script.. Thanks to Peter Liedler."
  echo
 else
- echo "Please logout and back in to activate new groups and library setups."
- echo
- echo "If you want power saving by shutting the nVidia down when not in use."
- echo "Please adjust the scripts:"
- echo "/usr/local/bin/bumblebee-enablecard and"
- echo "/usr/local/bin/bumblebee-disablecard for your machine."
- echo
- echo "Examples and documentation is available in /usr/share/doc/bumblebee/"
- echo
+ if [ "$DISTRO" == "OPENSUSE" ] ; then
+	echo "Please logout and back in to activate new groups and library setups."
+	echo "Please reboot if you changed the driver from nvidia to nouveau or"
+	echo "from nouveau to nvidia."
+	echo
+	echo "If you want power saving by shutting the nVidia down when not in use."
+	echo "Please adjust the scripts:"
+	echo "/usr/local/bin/bumblebee-enablecard and"
+	echo "/usr/local/bin/bumblebee-disablecard for your machine."
+	echo
+	echo "Examples and documentation is available in /usr/share/doc/packages/bumblebee/"
+	echo
+ else
+	echo "Please logout and back in to activate new groups and library setups."
+	echo
+	echo "If you want power saving by shutting the nVidia down when not in use."
+	echo "Please adjust the scripts:"
+	echo "/usr/local/bin/bumblebee-enablecard and"
+	echo "/usr/local/bin/bumblebee-disablecard for your machine."
+	echo
+	echo "Examples and documentation is available in /usr/share/doc/bumblebee/"
+	echo
 fi
 if [ "$ARCH" = "x86_64" ]; then
 echo "After that you should be able to start applications with"
