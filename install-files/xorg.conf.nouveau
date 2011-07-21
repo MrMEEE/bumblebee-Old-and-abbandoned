@@ -22,11 +22,9 @@ EndSection
 
 Section "Device"
 	Identifier     "Device0"
-	Driver         "nvidia"
+	Driver         "nouveau"
 	VendorName     "NVIDIA Corporation"
 	BusID          "REPLACEWITHBUSID"
-	Option         "IgnoreEDID"
-	Option         "ConnectedMonitor" "REPLACEWITHCONNECTEDMONITOR"
 EndSection
 
 Section "Screen"
