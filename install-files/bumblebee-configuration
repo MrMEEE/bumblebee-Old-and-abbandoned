@@ -276,15 +276,26 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 	elif [ `${LSPCI} |grep 3D |wc -l` -eq 1 ]; then
 		NVIDIABUSID=`${LSPCI} | grep 3D  | grep nVidia | awk '{ print "PCI:"$1 }' | sed s/\\\./:/g`
 	else
-		whiptail --msgbox \
+		if [ "$DISTRO" == "OPENSUSE" ] ; then
+			whiptail --msgbox \
 " The BusID of the nVidia card can't be determined.\n"\
-"You must correct this manually in /etc/X11/xorg.conf.nvidia.\n"\
+"You must correct this manually in /etc/X11/xorg.conf.nvidia and /etc/X11/xorg.conf.nouveau\n"\
 "Please report this problem..\n\n"\
 "Press Any Key to continue." $LINES $COLUMNS
+		else
+			whiptail --msgbox \
+" The BusID of the nVidia card can't be determined.\n"\
+"You must correct this manually in /etc/X11/xorg.conf.nvidia\n"\
+"Please report this problem..\n\n"\
+"Press Any Key to continue." $LINES $COLUMNS
+		fi
 	fi
 fi
 
 sed -i "s/\([ \t]*BusID[ \t]*\)\".*\"/\1\"$NVIDIABUSID\"/g" /etc/X11/xorg.conf.nvidia
+if [ "$DISTRO" == "OPENSUSE" ] ; then
+	sed -i "s/\([ \t]*BusID[ \t]*\)\".*\"/\1\"$NVIDIABUSID\"/g" /etc/X11/xorg.conf.nouveau
+fi
 
 if [ "$CONFIGMODE" == "MANUAL" ]; then
 	if [ -f /usr/local/bin/bumblebee-enablecard ]; then
