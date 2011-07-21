@@ -40,8 +40,10 @@ trap "terminate" INT
 #
 source /etc/default/bumblebee
 
+if [ -f /usr/bin/nvidia-xconfig ] ; then
 #LD_LIBRARY_PATH=
 #export LD_LIBRARY_PATH
+fi
 
 #
 #	Run the command
