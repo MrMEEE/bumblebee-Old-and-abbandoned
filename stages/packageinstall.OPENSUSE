@@ -766,7 +766,7 @@ if [ "$NVIDIA_TYPE" == "nouveau" ] ; then
 
   echo "Using the nouveau driver."
   echo
-  echo "We need to uninstall all the nvidia packages and repositories.
+  echo "We need to uninstall all the nvidia packages and repositories."
   echo
 
   #
