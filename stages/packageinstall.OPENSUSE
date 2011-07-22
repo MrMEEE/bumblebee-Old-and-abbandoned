@@ -177,7 +177,7 @@ done
 #	nVidia X server still running ?
 #
 LOCKFILE=/var/lock/bumblebee
-if [ -f $LOCKFILE ] || [ -f /tmp/.X1-lock ] || [ `ps -ef |grep X | grep nvidia | wc -l` -gt 0 ] ; then
+if [ -f $LOCKFILE ] || [ `ps -ef |grep X | grep nvidia | wc -l` -gt 0 ] ; then
   while true ; do
     echo
     echo "nVidia X server still running. Kill the server ? (y/n)"
@@ -189,7 +189,6 @@ if [ -f $LOCKFILE ] || [ -f /tmp/.X1-lock ] || [ `ps -ef |grep X | grep nvidia |
       if [ -f $LOCKFILE ] ; then
 	kill -9 `cat $LOCKFILE`
 	rm -f $LOCKFILE
-	rm -f /tmp/.X1-lock
       else
 	#
 	#	Find the pid
@@ -199,7 +198,6 @@ if [ -f $LOCKFILE ] || [ -f /tmp/.X1-lock ] || [ `ps -ef |grep X | grep nvidia |
 	if [ "`ps p $PID_X | grep nvidia`" != "" ] ; then
 	  kill -9 $PID_X
 	fi
-	rm -f /tmp/.X1-lock
       fi
 
       #
@@ -220,7 +218,7 @@ if [ -f $LOCKFILE ] || [ -f /tmp/.X1-lock ] || [ `ps -ef |grep X | grep nvidia |
       #
       #	Is the system clean ?
       #
-      if [ ! -f $LOCKFILE ] && [ ! -f /tmp/.X1-lock ] && [ `ps -ef | grep X | grep nvidia | wc -l` -eq 0  ] ; then
+      if [ ! -f $LOCKFILE ] && [ `ps -ef | grep X | grep nvidia | wc -l` -eq 0  ] ; then
 	#
 	#	Yes, continue
 	#
