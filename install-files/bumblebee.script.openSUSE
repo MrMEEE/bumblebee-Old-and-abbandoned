@@ -17,8 +17,22 @@
 
 . /etc/rc.status
 
+[ -r /etc/default/bumblebee ] && . /etc/default/bumblebee
+
+#
+#	Get the display
+#
+BEE_DISPLAY=${VGL_DISPLAY##*:}
+BEE_DISPLAY=${BEE_DISPLAY%%.*}
+
+#
+#	Lock file path
+#
 LOCKFILE=/var/lock/bumblebee
 
+#
+#	Enable / disable scripts
+#
 RETVAL=0
 if [ -f /usr/bin/optirun ] ; then
 	ENABLECARD=/usr/bin/bumblebee-enablecard
@@ -28,6 +42,9 @@ else
 	DISABLECARD=/usr/local/bin/bumblebee-disablecard
 fi
 
+#
+#	Bumblebee X server start
+#
 start() {
 	check_3D_hack
 	valid_lock
@@ -45,7 +62,7 @@ start() {
 #export LD_LIBRARY_PATH
 #/usr/bin/X
 	else
-		/usr/bin/X -ac -config /etc/X11/xorg.conf.nouveau -sharevts -nolisten tcp -noreset :1 vt9 > /dev/null 2>&1 &
+		/usr/bin/X -ac -config /etc/X11/xorg.conf.nouveau -sharevts -nolisten tcp -noreset $VGL_DISPLAY vt9 > /dev/null 2>&1 &
 	fi
 	PID_X=$!
 	i=1
@@ -64,6 +81,9 @@ start() {
 	echo
 }
 
+#
+#	Bumblebee X server stop
+#
 stop() {
 	check_3D_hack
 	echo -n "Stopping bumblebee X server: "
@@ -91,13 +111,19 @@ stop() {
 	$DISABLECARD
 }
 
+#
+#	Restart bumblebee
+#
 restart() {
 	stop
 	start
 }
 
+#
+#	Valid lock file ?
+#
 valid_lock() {
-	if [ -f $LOCKFILE ] && [ ! -f /tmp/.X1-lock ] ; then
+	if [ -f $LOCKFILE ] && [ ! -f /tmp/.X$BEE_DISPLAY-lock ] ; then
 		#
 		#	There is a lock file but no X server running
 		#	Something bad happened.
@@ -107,6 +133,9 @@ valid_lock() {
 	fi
 }
 
+#
+#	Check the 3D repository setup
+#
 check_3D_hack() {
 	if [ -f /usr/bin/nvidia-xconfig ] ; then
 		if [ -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
@@ -153,6 +182,9 @@ check_3D_hack() {
 	fi
 }
 
+#
+#	Script commands
+#
 case "$1" in
 	start)
 		stop

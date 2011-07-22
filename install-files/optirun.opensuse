@@ -1,6 +1,17 @@
 #!/bin/bash
 
 #
+#	Get the defaults
+#
+source /etc/default/bumblebee
+
+#
+#	Get the display
+#
+BEE_DISPLAY=${VGL_DISPLAY##*:}
+BEE_DISPLAY=${BEE_DISPLAY%%.*}
+
+#
 #	Terminate
 #
 terminate()
@@ -17,7 +28,7 @@ terminate()
 		#
 		#	Disable bumblebee only when there is a lock file
 		#
-		if [ -f /tmp/.X1-lock ] ; then
+		if [ -f /tmp/.X$BEE_DISPLAY-lock ] ; then
 			sudo /etc/init.d/bumblebee disable
 		fi
 	fi 
@@ -26,7 +37,7 @@ terminate()
 #
 #	Enable bumblebee ?
 #
-if [ ! -f /tmp/.X1-lock ] ; then
+if [ ! -f /tmp/.X$BEE_DISPLAY-lock ] ; then
 	sudo /etc/init.d/bumblebee enable
 fi
 
@@ -34,11 +45,6 @@ fi
 #	Intercept Ctrl-C, run terminate
 #
 trap "terminate" INT
-
-#
-#	Get the defaults
-#
-source /etc/default/bumblebee
 
 if [ -f /usr/bin/nvidia-xconfig ] ; then
 #LD_LIBRARY_PATH=

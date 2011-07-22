@@ -66,7 +66,7 @@ if [ "$ARCH" = "x86_64" ]; then
 
 	sed -i "s?^#LD_LIBRARY_PATH=?\t\tLD_LIBRARY_PATH=/usr/X11R6/lib64-nvidia:/usr/X11R6/lib-nvidia:\$LD_LIBRARY_PATH?g" /etc/init.d/bumblebee
 	sed -i "s?^#export LD_LIBRARY_PATH?\t\texport LD_LIBRARY_PATH?g" /etc/init.d/bumblebee
-	sed -i "s?^#/usr/bin/X?\t\t/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib64/xorg-nvidia/modules/updates,/usr/lib64/xorg-nvidia/modules -nolisten tcp -noreset :1 vt9 > /dev/null 2>\&1 \&?g" /etc/init.d/bumblebee
+	sed -i "s?^#/usr/bin/X?\t\t/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib64/xorg-nvidia/modules/updates,/usr/lib64/xorg-nvidia/modules -nolisten tcp -noreset \$VGL_DISPLAY vt9 > /dev/null 2>\&1 \&?g" /etc/init.d/bumblebee
 
 	cp install-files/optirun.opensuse /usr/local/bin/optirun32
 	cp install-files/optirun.opensuse /usr/local/bin/optirun64
@@ -89,7 +89,7 @@ else
 
 	sed -i "s?^#LD_LIBRARY_PATH=?\t\tLD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:\$LD_LIBRARY_PATH?g" /etc/init.d/bumblebee
 	sed -i "s?^#export LD_LIBRARY_PATH?\t\texport LD_LIBRARY_PATH?g" /etc/init.d/bumblebee
-	sed -i "s?^#/usr/bin/X?\t\t/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/xorg-nvidia/modules/updates,/usr/lib/xorg-nvidia/modules -nolisten tcp -noreset :1 vt9 > /dev/null 2>\&1 \&?g" /etc/init.d/bumblebee
+	sed -i "s?^#/usr/bin/X?\t\t/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/xorg-nvidia/modules/updates,/usr/lib/xorg-nvidia/modules -nolisten tcp -noreset \$VGL_DISPLAY vt9 > /dev/null 2>\&1 \&?g" /etc/init.d/bumblebee
 
 	cp install-files/optirun.opensuse /usr/local/bin/optirun
 
