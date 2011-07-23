@@ -13,19 +13,25 @@
 
 # Author: Igor Urazov <z0rc3r@gmail.com>
 
-PATH=/sbin:/usr/local/sbin:/usr/sbin:/bin:/usr/local/bin:/usr/bin
 LD_LIBRARY_PATH=/usr/lib/nvidia-current
 export LD_LIBRARY_PATH
-DISPLAY=:0
-export DISPLAY
+
+PATH=/sbin:/usr/local/sbin:/usr/sbin:/bin:/usr/local/bin:/usr/bin
 DESC="Bumblebee X server"
 NAME=bumblebee
 DAEMON=/usr/bin/X
 DAEMON_ARGS="-ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-current/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9"
-ENABLECARD=/usr/local/bin/bumblebee-enablecard
-DISABLECARD=/usr/local/bin/bumblebee-disablecard
 PIDFILE=/tmp/.X1-lock
 SCRIPTNAME=/etc/init.d/$NAME
+
+ENABLECARD=/usr/local/bin/bumblebee-enablecard
+DISABLECARD=/usr/local/bin/bumblebee-disablecard
+
+# this sets the display in which vglclient should draw images
+# alternatively pass '-display :0' to vglclient (see vglclient -h)
+# XXX: support for multiple sessions which use different ${DISPLAY}s
+DISPLAY=:0
+export DISPLAY
 
 # Define LSB log_* functions.
 . /lib/lsb/init-functions
