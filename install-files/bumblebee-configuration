@@ -102,6 +102,14 @@ if [ "$DISTRO" == "UBUNTU" ] ; then
 
 	# this takes care of setting correct links which is used on
 	# /usr/lib/nvidia-current/gl.conf
+	# multiarch support
+	for arch in x86_64-linux-gnu i386-linux-gnu; do
+		# check if the link exist to prevent error messages
+		if update-alternatives --list ${arch}_gl_conf >/dev/null 2>&1; then
+			update-alternatives --force --set ${arch}_gl_conf /usr/lib/$arch/mesa/ld.so.conf
+		fi
+	done
+	# versions before Oneiric without multiarch
 	update-alternatives --force --set gl_conf /usr/lib/mesa/ld.so.conf
 
 	# remove a legacy link which was not used anyway
