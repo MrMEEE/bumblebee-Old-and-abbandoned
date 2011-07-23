@@ -1,14 +1,14 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides: bumblebee
-# Required-Start: nvidia-kernel
-# Required-Stop: nvidia-kernel
-# Should-Start: kdm gdm
-# Should-Stop: kdm gdm
-# Default-Start: 2 3 4 5
-# Default-Stop: 0 1 6
+# Provides:          bumblebee
+# Required-Start:    nvidia-kernel
+# Required-Stop:     nvidia-kernel
+# Should-Start:      kdm gdm
+# Should-Stop:       kdm gdm
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
 # Short-Description: Bumblebee initscript
-# Description: Bumblebee initscript for Optimus Graphics support
+# Description:       Bumblebee initscript for Optimus Graphics support
 ### END INIT INFO
 
 # Author: Igor Urazov <z0rc3r@gmail.com>
@@ -46,7 +46,7 @@ while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
  fi 
 done
 
-return 0
+	return 0
 }
 
 do_stop()
@@ -64,8 +64,8 @@ while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -ne 1 ]; do
    exit 1
  fi
 done
-$DISABLECARD
-return $RETVAL
+	$DISABLECARD
+	return $RETVAL
 }
 
 case "$1" in
@@ -86,28 +86,28 @@ case $? in
 esac
 ;;
   status)
-status_of_proc -p $PIDFILE "$DAEMON" "$NAME"
-;;
+	status_of_proc -p $PIDFILE "$DAEMON" "$NAME"
+	;;
   restart)
-log_daemon_msg "Restarting $DESC" "$NAME"
-do_stop
-case "$?" in
-0|1)
-do_start
-case "$?" in
-0) log_end_msg 0 ;;
-1) log_end_msg 1 ;; # Old process is still running
-*) log_end_msg 1 ;; # Failed to start
-esac
-;;
-*)
-# Failed to stop
-log_end_msg 1
-;;
-esac
-;;
+	log_daemon_msg "Restarting $DESC" "$NAME"
+	do_stop
+	case "$?" in
+	  0|1)
+	  	do_start
+		case "$?" in
+			0) log_end_msg 0 ;;
+			1) log_end_msg 1 ;; # Old process is still running
+			*) log_end_msg 1 ;; # Failed to start
+		esac
+		;;
+	  *)
+		# Failed to stop
+		log_end_msg 1
+		;;
+	esac
+	;;
   *)
-echo "Usage: $SCRIPTNAME {enable|disable|start|stop|status|restart}" >&2
-exit 3
-;;
+	echo "Usage: $SCRIPTNAME {enable|disable|start|stop|status|restart}" >&2
+	exit 3
+	;;
 esac
