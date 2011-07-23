@@ -6,7 +6,7 @@ DISABLECARD=/usr/local/bin/bumblebee-disablecard
 ####
 ## This script disables nVidia card if no optirun is running.
 ####
-if ! pidof /usr/bin/optirun /usr/bin/optirun32 /usr/bin/optirun64 >/dev/null; then
+if ! pidof -x /usr/bin/optirun /usr/bin/optirun32 /usr/bin/optirun64 >/dev/null; then
 	$ENABLECARD
 	$DISABLECARD
 fi
