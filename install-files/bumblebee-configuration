@@ -84,7 +84,11 @@ if [ "$DISTRO" == "UBUNTU" ] ; then
 	ln -s /usr/lib/mesa/ld.so.conf /etc/alternatives/gl_conf
 	rm -rf /etc/alternatives/xorg_extra_modules
 	rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
+	rm -rf /usr/lib/xorg/x11-extra-modules/xorg
+	rm -rf /usr/lib/xorg/extra-modules
 	rm -rf /usr/lib/nvidia-current/xorg/xorg
+	rm -rf /etc/alternatives/x86_64-linux-gnu_gl_conf
+	ln -s /usr/lib/mesa/ld.so.conf /etc/alternatives/x86_64-linux-gnu_gl_conf
 	ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
 	ldconfig
 fi
