@@ -271,6 +271,7 @@ while [ "$CONFIGMODE" != "MANUAL" ] && [ "$CONFIGMODE" != "DONE" ] ; do
 done
 
 if [ "$CONFIGMODE" == "MANUAL" ]; then
+	POWERON="UNAVAILABLE"
 	if [ `${LSPCI} |grep VGA |wc -l` -eq 2 ]; then
 		NVIDIABUSID=`${LSPCI} | grep VGA | grep nVidia | awk '{ print "PCI:"$1 }' | sed s/\\\./:/g`
 	elif [ `${LSPCI} |grep 3D |wc -l` -eq 1 ]; then
@@ -298,20 +299,21 @@ if [ "$DISTRO" == "OPENSUSE" ] ; then
 fi
 
 if [ "$CONFIGMODE" == "MANUAL" ]; then
+	CONNECTEDMONITOR="UNKNOWN"
 	if [ -f /usr/local/bin/bumblebee-enablecard ]; then
 		/usr/local/bin/bumblebee-enablecard
 	fi
 	if [ -f /usr/bin/bumblebee-enablecard ]; then
 		/usr/bin/bumblebee-enablecard
 	fi
-
 	if [ "$DISTRO" == "UBUNTU" ] ; then
 		${MODPROBE} nvidia-current
-
-		if [ `LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig --query-gpu-info | grep "Display Devices" | cut -f2 -d":"` -gt 0 ] ; then
-			CONNECTEDMONITOR=`LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig --query-gpu-info | grep "Display Device 0" | cut -f2 -d\( | cut -f1 -d\)`
+		if [ "`lspci -v -s 01:00.0 |grep "Unknown header type"`" == "" ]; then
+			if [ `LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig --query-gpu-info | grep "Display Devices" | cut -f2 -d":"` -gt 0 ] ; then
+				CONNECTEDMONITOR=`LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig --query-gpu-info | grep "Display Device 0" | cut -f2 -d\( | cut -f1 -d\)`
+			fi
 		fi
-		${MODPROBE} -r nvidia-current
+		${MODPROBE} -r nvidia
 	fi
 	if [ "$DISTRO" == "OPENSUSE" ] ; then
 		${MODPROBE} nvidia 2>&1 >/dev/null
@@ -332,154 +334,166 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 	if [ -f /usr/bin/bumblebee-disablecard ]; then
 		/usr/bin/bumblebee-disablecard
 	fi
+	if [ "$CONNECTEDMONITOR" != "CRT-0" ] && [ "$CONNECTEDMONITOR" != "DFP-0" ];then
+		LIST_SIZE=$(($LINES - 10))
+choice=$(whiptail --nocancel --menu \
+" The device for the nVidia monitor could not be detected, please\n"\
+"manually choose the device, if your having problems, try another." $LINES $COLUMNS $LIST_SIZE 1 "CRT-0" 2 "DFP-0" 3 "Manually Enter" 3>&1 1>&2 2>&3)
+		case "$choice" in
+		1)
+		      CONNECTEDMONITOR="CRT-0"
+		;;
+		2)
+		      CONNECTEDMONITOR="DFP-0"
+		;;
+		3)
+CONNECTEDMONITOR=$(whiptail --inputbox " Enter the nVidia connected monitor:" $LINES $COLUMNS 3>&1 1>&2 2>&3)
+		;;
+		esac
+fi
 fi
 
 sed -i "s/\([ \t]*Option[ \t]*\"ConnectedMonitor\"[ \t]*\)".*"/\1\"$CONNECTEDMONITOR\"/g" /etc/X11/xorg.conf.nvidia
 
-if [ $CONFIGMODE != "MANUAL" ] ; then
-	#
-	#	Always try to enable the card before switching scripts
-	#
-	if [ -f /usr/local/bin/bumblebee-enablecard ]; then
-		/usr/local/bin/bumblebee-enablecard
-	fi
-	if [ -f /usr/bin/bumblebee-enablecard ]; then
-		/usr/bin/bumblebee-enablecard
-	fi
-
-	if [ "$DISTRO" == "UBUNTU" ] ; then
-		if [ $POWERON != "UNAVAILABLE" ] ; then
-			echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
-			echo $POWEROFF | xxd -r -p > /usr/local/bin/bumblebee-disablecard
-		else
-			whiptail --msgbox \
+#
+#	Always try to enable the card before switching scripts
+#
+if [ -f /usr/local/bin/bumblebee-enablecard ]; then
+	/usr/local/bin/bumblebee-enablecard
+fi
+if [ -f /usr/bin/bumblebee-enablecard ]; then
+	/usr/bin/bumblebee-enablecard
+fi
+if [ "$DISTRO" == "UBUNTU" ] ; then
+	if [ ! "$POWERON" == "UNAVAILABLE" ] ; then
+		echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
+		echo $POWEROFF | xxd -r -p > /usr/local/bin/bumblebee-disablecard
+	else
+		whiptail --msgbox \
 " No power-on/off configuration has been reported for your machine,\n"\
 "please manually enter configuration in:\n\n"\
 "/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard\n\n"\
 "Some examples are available in /usr/share/doc/bumblebee/.\n\n"\
 "Press any key to continue..." $LINES $COLUMNS
+		if [ ! -f /usr/local/bin/bumblebee-enablecard ] ; then
+			# Not installed
+			cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
+		else
+			# Already Exists
+			echo
+			echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard exists moving old script to /usr/local/bin/bumblebee-enablecard.old."
+			echo
+			mv /usr/local/bin/bumblebee-enablecard /usr/local/bin/bumblebee-enablecard.old
+			cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
+		fi
+		if [ ! -f /usr/local/bin/bumblebee-disablecard ]; then
+			# Not installed
+			cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
+		else
+			# Already Exists
+			echo
+			echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard exists, moving old script to /usr/local/bin/bumblebee-disablecard.old."
+			echo
+			mv /usr/local/bin/bumblebee-disablecard /usr/local/bin/bumblebee-disablecard.old
+			cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
+		fi
+	fi
+fi
+if [ "$DISTRO" == "OPENSUSE" ] ; then
+	#
+	#	Setup new scripts
+	#
+	if [ ! "$POWERON" == "UNAVAILABLE" ] ; then
+		if [ -f /usr/local/bin/optirun ] ; then
+			#
+			#	Script install
+			#
+			echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
+			echo $POWEROFF | xxd -r -p > /usr/local/bin/bumblebee-disablecard
+		elif [ -f /usr/bin/optirun ] ; then
+			#
+			#	Repository install
+			#
+			echo $POWERON | xxd -r -p > /usr/bin/bumblebee-enablecard
+			echo $POWEROFF | xxd -r -p > /usr/bin/bumblebee-disablecard
+		fi
+	else
+		if [ -f /usr/local/bin/optirun ] ; then
+			#
+			#	Script install
+			#
+			whiptail --msgbox \
+"No power-on/off configuration has been reported for your machine,\n"\
+"please manually enter configuration in:\n\n"\
+"/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard\n\n"\
+"Some examples are available in /usr/share/doc/packages/bumblebee/examples/.\n\n"\
+"Press any key to continue..." $LINES $COLUMNS
 			if [ ! -f /usr/local/bin/bumblebee-enablecard ] ; then
 				# Not installed
-				cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
+				cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
 			else
 				# Already Exists
 				echo
 				echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard exists moving old script to /usr/local/bin/bumblebee-enablecard.old."
 				echo
 				mv /usr/local/bin/bumblebee-enablecard /usr/local/bin/bumblebee-enablecard.old
-				cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
+				cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
 			fi
-			if [ ! -f /usr/local/bin/bumblebee-disablecard ]; then
+			sed -i "s?INSERTPOWERON?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/local/bin/bumblebee-enablecard
+
+			if [ ! -f /usr/local/bin/bumblebee-disablecard ] ; then
 				# Not installed
-				cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
+				cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
 			else
 				# Already Exists
 				echo
 				echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard exists, moving old script to /usr/local/bin/bumblebee-disablecard.old."
 				echo
 				mv /usr/local/bin/bumblebee-disablecard /usr/local/bin/bumblebee-disablecard.old
-				cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
+				cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
 			fi
-		fi
-	fi
-
-	if [ "$DISTRO" == "OPENSUSE" ] ; then
-		#
-		#	Setup new scripts
-		#
-		if [ $POWERON != "UNAVAILABLE" ] ; then
-			if [ -f /usr/local/bin/optirun ] ; then
-				#
-				#	Script install
-				#
-				echo $POWERON | xxd -r -p > /usr/local/bin/bumblebee-enablecard
-				echo $POWEROFF | xxd -r -p > /usr/local/bin/bumblebee-disablecard
-			elif [ -f /usr/bin/optirun ] ; then
-				#
-				#	Repository install
-				#
-				echo $POWERON | xxd -r -p > /usr/bin/bumblebee-enablecard
-				echo $POWEROFF | xxd -r -p > /usr/bin/bumblebee-disablecard
-			fi
-		else
-			if [ -f /usr/local/bin/optirun ] ; then
-				#
-				#	Script install
-				#
-				whiptail --msgbox \
-"No power-on/off configuration has been reported for your machine,\n"\
-"please manually enter configuration in:\n\n"\
-"/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard\n\n"\
-"Some examples are available in /usr/share/doc/packages/bumblebee/examples/.\n\n"\
-"Press any key to continue..." $LINES $COLUMNS
-				if [ ! -f /usr/local/bin/bumblebee-enablecard ] ; then
-					# Not installed
-					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
-				else
-					# Already Exists
-					echo
-					echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard exists moving old script to /usr/local/bin/bumblebee-enablecard.old."
-					echo
-					mv /usr/local/bin/bumblebee-enablecard /usr/local/bin/bumblebee-enablecard.old
-					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
-				fi
-				sed -i "s?INSERTPOWERON?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/local/bin/bumblebee-enablecard
-
-				if [ ! -f /usr/local/bin/bumblebee-disablecard ] ; then
-					# Not installed
-					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
-				else
-					# Already Exists
-					echo
-					echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard exists, moving old script to /usr/local/bin/bumblebee-disablecard.old."
-					echo
-					mv /usr/local/bin/bumblebee-disablecard /usr/local/bin/bumblebee-disablecard.old
-					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
-				fi
-				sed -i "s?INSERTPOWEROFF?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/local/bin/bumblebee-disablecard
-
-				chmod +x /usr/local/bin/bumblebee*
-			elif [ -f /usr/bin/optirun ] ; then
-				#
-				#	Repository install
-				#
-				whiptail --msgbox \
+			sed -i "s?INSERTPOWEROFF?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/local/bin/bumblebee-disablecard
+			chmod +x /usr/local/bin/bumblebee*
+		elif [ -f /usr/bin/optirun ] ; then
+			#
+			#	Repository install
+			#
+			whiptail --msgbox \
 "No power-on/off configuration has been reported for your machine,\n"\
 "please manually enter configuration in:\n\n"\
 "/usr/bin/bumblebee-enablecard and /usr/bin/bumblebee-disablecard\n\n"\
 "Some examples are available in /usr/share/doc/packages/bumblebee/examples/.\n\n"\
 "Press any key to continue..." $LINES $COLUMNS
-				if [ ! -f /usr/bin/bumblebee-enablecard ] ; then
-					# Not installed
-					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
-				else
-					# Already Exists
-					echo
-					echo "nVidia card enable-script: /usr/bin/bumblebee-enablecard exists moving old script to /usr/bin/bumblebee-enablecard.old."
-					echo
-					mv /usr/bin/bumblebee-enablecard /usr/bin/bumblebee-enablecard.old
-					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
-				fi
-				sed -i "s?INSERTPOWERON?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/bin/bumblebee-enablecard
-
-				if [ ! -f /usr/bin/bumblebee-disablecard ] ; then
-					# Not installed
-					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
-				else
-					# Already Exists
-					echo
-					echo "nVidia card disable-script: /usr/bin/bumblebee-disablecard exists, moving old script to /usr/bin/bumblebee-disablecard.old."
-					echo
-					mv /usr/bin/bumblebee-disablecard /usr/bin/bumblebee-disablecard.old
-					cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
-				fi
-				sed -i "s?INSERTPOWEROFF?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/bin/bumblebee-disablecard
-
-				chmod +x /usr/bin/bumblebee*
+			if [ ! -f /usr/bin/bumblebee-enablecard ] ; then
+				# Not installed
+				cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
+			else
+				# Already Exists
+				echo
+				echo "nVidia card enable-script: /usr/bin/bumblebee-enablecard exists moving old script to /usr/bin/bumblebee-enablecard.old."
+				echo
+				mv /usr/bin/bumblebee-enablecard /usr/bin/bumblebee-enablecard.old
+				cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template /usr/bin/bumblebee-enablecard
 			fi
+			sed -i "s?INSERTPOWERON?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/bin/bumblebee-enablecard
+
+			if [ ! -f /usr/bin/bumblebee-disablecard ] ; then
+				# Not installed
+				cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
+			else
+				# Already Exists
+				echo
+				echo "nVidia card disable-script: /usr/bin/bumblebee-disablecard exists, moving old script to /usr/bin/bumblebee-disablecard.old."
+				echo
+				mv /usr/bin/bumblebee-disablecard /usr/bin/bumblebee-disablecard.old
+				cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template /usr/bin/bumblebee-disablecard
+			fi
+			sed -i "s?INSERTPOWEROFF?echo \"Please run bumblebee-configuration to enable power management.\"?g" /usr/bin/bumblebee-disablecard
+			chmod +x /usr/bin/bumblebee*
 		fi
 	fi
 fi
+
 
 if [ "$DISTRO" == "UBUNTU" ] ; then
 	chmod +x /usr/local/bin/bumblebee*
