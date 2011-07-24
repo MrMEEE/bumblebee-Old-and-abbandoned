@@ -38,6 +38,8 @@ DAEMON_ARGS="$DAEMON_ARGS $VGL_DISPLAY"
 BEE_DISPLAY=${VGL_DISPLAY##*:}
 BEE_DISPLAY=${BEE_DISPLAY%%.*}
 PIDFILE=/tmp/.X${BEE_DISPLAY}-lock
+X_LOG=/var/log/Xorg.${BEE_DISPLAY}.log
+
 # this sets the display in which vglclient should draw images
 # alternatively pass '-display :0' to vglclient (see vglclient -h)
 # XXX: support for multiple sessions which use different ${DISPLAY}s
@@ -47,9 +49,60 @@ export DISPLAY
 # Define LSB log_* functions.
 . /lib/lsb/init-functions
 
+# prevent rogue users from providing a false PID
+validate_xorg_pidfile()
+{
+	# clear previous validations
+	validated_pid=
+	if [ ! -L $PIDFILE -a ! -e $PIDFILE ]; then
+		# the pidfile does not exist
+		return 0
+	fi
+	if [ -L $PIDFILE -o ! -f $PIDFILE ] || ! [ "$(stat -c '%u' $PIDFILE)" = "0" ]; then
+		# the X lock pidfile is a symlink, not a regular file or not owned by root
+		return 1
+	fi
+	# read the first line from the pidfile, ignoring whitespace
+	read validated_pid < $PIDFILE
+	if [ -z "$validated_pid" ] || ! [ "$validated_pid" -gt 0 -o "$validated_pid" -le 0 ]; then
+		# empty pidfile or non-numeric pid (non-numeric values never fulfil
+		# n > 0 && n <= 0)
+		validated_pid=
+		return 2
+	fi
+	# at this point, $validated_pid can be used to retrieve the PID
+	return 0
+}
+
 do_start()
 {
-! ps -p `cat $PIDFILE 2>&1` > /dev/null 2>&1 || return 1
+	# is a X server running?
+	if validate_xorg_pidfile; then
+		if [ -n "$validated_pid" ]; then
+			# a X server is running, check if it is a Bumblebee one
+			cmd="$(ps --format command --no-headers -ww --pid $validated_pid)
+			case "$cmd" in
+			  '[Xorg]')
+				log_daemon_msg "Xorg was previously crashed by the nvidia driver on display $VGL_DISPLAY."
+				log_daemon_msg "Reboot the machine if you want to use Bumblebee"
+				return 2
+				;;
+			  "$DAEMON $DAEMON_ARGS")
+				# Bumblebee was already started
+				return 1
+				;;
+			  *)
+				log_daemon_msg "Display $VGL_DISPLAY is already in use, consider changing \$VGL_DISPLAY in /etc/default/$NAME"
+				return 2
+				;;
+			esac
+		fi
+		# empty $validated_pid: there is no pidfile, assuming that the X server is not running
+	else
+		log_daemon_msg "Unsafe pidfile '$PIDFILE' - cannot check the availability of display $VGL_DISPLAY"
+		return 2
+	fi
+
 	$ENABLECARD
 	# XXX: should there be a check if the card has become ready?
 
@@ -67,6 +120,20 @@ do_start()
 		retries=`expr $retries + 1`
 		sleep 1
 	done
+
+	# fail if the X server is not running
+	if ! pidofproc -p $PIDFILE >/dev/null; then
+		if grep -qF '(EE) Failed to load module "nvidia"' "$X_LOG" && ! lsmod | grep -q 'nvidia '; then
+			if lsmod | grep -q 'nouveau '; then
+				log_daemon_msg "The nvidia driver was not loaded and the nouveau module should be deactivated"
+				log_daemon_msg "Try: sudo rmmod nouveau && sudo modprobe nvidia-current"
+			else
+				log_daemon_msg "The nvidia driver was not loaded, try: sudo modprobe nvidia-current"
+			fi
+		fi
+		log_daemon_msg "The Bumblebee Xserver failed to start. Please check $X_LOG"
+		return 2
+	fi
 
 	return 0
 }
