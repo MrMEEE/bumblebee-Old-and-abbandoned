@@ -53,10 +53,10 @@ if [ "$UID" != "$ROOT_UID" ] ; then
 	exit 1
 fi
   
-#Determine Arch x86_64 or i686
+#	Determine Arch x86_64 or i686
 ARCH=`uname -m`
 
-#Get tools location 
+#	Get tools location 
 LSPCI=`which lspci` 
 MODPROBE=`which modprobe`
 
@@ -75,7 +75,7 @@ else
 	rm $DEFAULT_FILE
 fi
 
-if [ -f /tmp/machineinfo ]; then   
+if [ -f /tmp/machineinfo ]; then
 	rm /tmp/machineinfo
 fi
 
@@ -162,12 +162,12 @@ while [ "$CONFIGMODE" != "MANUAL" ] && [ "$CONFIGMODE" != "DONE" ] ; do
 			else
 				CONFIGMODE=MANUAL
 			fi
-			;;   
+			;;
 		1)
-			CONFIGMODE=AUTO   
+			CONFIGMODE=AUTO
 			MANUFACTURER=`cat /tmp/machineinfo |cut -f1 -d\|`
 			MODEL=`cat /tmp/machineinfo |cut -f2 -d\|`
-			USER=`cat /tmp/machineinfo |cut -f9 -d\|` 
+			USER=`cat /tmp/machineinfo |cut -f9 -d\|`
 			CONNECTEDMONITOR=`cat /tmp/machineinfo |cut -f3 -d\| | sed -e 's/ //g'`
 			INTELBUSID=`cat /tmp/machineinfo |cut -f4 -d\| | sed -e 's/ //g'`
 			NVIDIABUSID=`cat /tmp/machineinfo |cut -f5 -d\| | sed -e 's/ //g'`
@@ -176,7 +176,7 @@ while [ "$CONFIGMODE" != "MANUAL" ] && [ "$CONFIGMODE" != "DONE" ] ; do
 			OS=`cat /tmp/machineinfo |cut -f10 -d\|`
 			POWERSTATUS=`cat /tmp/machineinfo |sed -n 1p|cut -f6 -d\| | sed -e 's/ //g'`
 			;;
-		*) 
+		*)
 			LIST_SIZE=$(($LINES - 10))
 			choice=$(whiptail --nocancel --menu \
 " Please select a machine profile to install.\n\n"\
@@ -203,7 +203,7 @@ while [ "$CONFIGMODE" != "MANUAL" ] && [ "$CONFIGMODE" != "DONE" ] ; do
 				OS=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f10 -d\|`
 				POWERSTATUS=`cat /tmp/machineinfo |sed -n \`echo $choice\`p|cut -f6 -d\| | sed -e 's/ //g'`
 			fi
-			;; 
+			;;
 		esac
 	fi
 
@@ -317,7 +317,6 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 	fi
 	if [ "$DISTRO" == "OPENSUSE" ] ; then
 		${MODPROBE} nvidia 2>&1 >/dev/null
-
 		if [ -x /usr/bin/nvidia-xconfig ] ; then
 			if [ "`/usr/bin/nvidia-xconfig --query-gpu-info 2>&1 | grep ERROR`" == "" ] ; then
 				if [ `/usr/bin/nvidia-xconfig --query-gpu-info | grep "Display Devices" | cut -f2 -d":"` -gt 0 ] ; then
@@ -341,16 +340,16 @@ choice=$(whiptail --nocancel --menu \
 "manually choose the device, if your having problems, try another." $LINES $COLUMNS $LIST_SIZE 1 "CRT-0" 2 "DFP-0" 3 "Manually Enter" 3>&1 1>&2 2>&3)
 		case "$choice" in
 		1)
-		      CONNECTEDMONITOR="CRT-0"
+			CONNECTEDMONITOR="CRT-0"
 		;;
 		2)
-		      CONNECTEDMONITOR="DFP-0"
+			CONNECTEDMONITOR="DFP-0"
 		;;
 		3)
-CONNECTEDMONITOR=$(whiptail --inputbox " Enter the nVidia connected monitor:" $LINES $COLUMNS 3>&1 1>&2 2>&3)
+			CONNECTEDMONITOR=$(whiptail --inputbox " Enter the nVidia connected monitor:" $LINES $COLUMNS 3>&1 1>&2 2>&3)
 		;;
 		esac
-fi
+	fi
 fi
 
 sed -i "s/\([ \t]*Option[ \t]*\"ConnectedMonitor\"[ \t]*\)".*"/\1\"$CONNECTEDMONITOR\"/g" /etc/X11/xorg.conf.nvidia
@@ -528,9 +527,9 @@ case "$choice" in
 	IMAGETRANSPORT="rgb"
 	;;
 *)
-	IMAGETRANSPORT="xv"  
+	IMAGETRANSPORT="xv"
 	;;
-esac 
+esac
 
 sed -i 's/VGL_COMPRESS.*/VGL_COMPRESS='$IMAGETRANSPORT'/' $DEFAULT_FILE
 
