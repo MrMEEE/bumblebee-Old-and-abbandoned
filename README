@@ -105,17 +105,30 @@ Arch Linux Support:
 
 http://aur.archlinux.org/packages.php?ID=49469
 
+
 Debian Linux Support:
 
 https://github.com/z0rc/debumblebee
+
 
 Gentoo Linux Support:
 
 https://github.com/iegor/bumblebee-Gentoo-support
 
+
 openSuSE Linux Support:
 
+Github:
 https://github.com/Ximi1970/bumblebee
+
+Repositories:
+http://download.opensuse.org/repositories/home:/Ximi1970:/bumblebee/openSUSE_11.3
+http://download.opensuse.org/repositories/home:/Ximi1970:/bumblebee/openSUSE_11.4
+
+Unstable repositories:
+http://download.opensuse.org/repositories/home:/Ximi1970:/bumblebee-unstable/openSUSE_11.3
+http://download.opensuse.org/repositories/home:/Ximi1970:/bumblebee-unstable/openSUSE_11.4
+
 
 
 The Installation should now be completely automatic...
