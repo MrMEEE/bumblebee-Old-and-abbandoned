@@ -1,6 +1,13 @@
 #!/bin/sh
 . /etc/default/bumblebee
 
+# if executed from a symlink named optirun32, use the 32b path
+if [ "${0##*/}" = "optirun32" -a -d /usr/lib32 ]; then
+	libpath=/usr/lib32
+else
+	libpath=/usr/lib
+fi
+nvidia_path=$libpath/nvidia-current
 
 # Remove colon and everything before it: :1.0 -> 1.0
 display=${VGL_DISPLAY##*:}
@@ -18,7 +25,7 @@ trap "echo 'Caught Ctrl+C'" INT
 
 export VGL_READBACK
 export VGL_LOG
-vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld /usr/lib/nvidia-current "$@"
+vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld "$nvidia_path" "$@"
 
 if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
  if [ `ps aux |grep optirun | wc -l` -gt 3 ]; then
