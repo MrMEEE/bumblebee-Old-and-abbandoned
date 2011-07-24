@@ -321,6 +321,24 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 	if [ -f /usr/bin/bumblebee-disablecard ]; then
 		/usr/bin/bumblebee-disablecard
 	fi
+
+	if [ "$CONNECTEDMONITOR" != "CRT-0" ] && [ "$CONNECTEDMONITOR" != "DFP-0" ];then
+		LIST_SIZE=$(($LINES - 10))
+choice=$(whiptail --nocancel --menu \
+" The device for the nVidia monitor could not be detected, please\n"\
+"manually choose the device, if your having problems, try another." $LINES $COLUMNS $LIST_SIZE 1 "CRT-0" 2 "DFP-0" 3 "Manually Enter" 3>&1 1>&2 2>&3)
+		case "$choice" in
+		1)
+		      CONNECTEDMONITOR="CRT-0"
+		;;
+		2)
+		      CONNECTEDMONITOR="DFP-0"
+		;;
+		3)
+CONNECTEDMONITOR=$(whiptail --inputbox " Enter the nVidia connected monitor:" $LINES $COLUMNS 3>&1 1>&2 2>&3)
+		;;
+		esac
+fi
 fi
 
 sed -i "s/\([ \t]*Option[ \t]*\"ConnectedMonitor\"[ \t]*\)".*"/\1\"$CONNECTEDMONITOR\"/g" /etc/X11/xorg.conf.nvidia
