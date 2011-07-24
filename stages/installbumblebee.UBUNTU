@@ -50,15 +50,15 @@ rm -rf /usr/lib/nvidia-current/xorg/xorg
 ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
 ldconfig
 
+cp install-files/optirun.ubuntu /usr/local/bin/optirun
 if [ "$ARCH" = "x86_64" ]; then
- cp install-files/optirun32.ubuntu /usr/local/bin/optirun32
- cp install-files/optirun64.ubuntu /usr/local/bin/optirun64
+	# optirun detects whether a 32-bit libpath must be used based on the link name
+	ln -s /usr/local/bin/optirun32 /usr/local/bin/optirun
+	ln -s /usr/local/bin/optirun64 /usr/local/bin/optirun
  cp install-files/optirun64.bash_completion /etc/bash_completion.d/optirun64
  cp install-files/optirun32.bash_completion /etc/bash_completion.d/optirun32
  cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
- ln -s /usr/local/bin/optirun64 /usr/local/bin/optirun
 else
- cp install-files/optirun64.ubuntu /usr/local/bin/optirun
  cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
 fi
 
