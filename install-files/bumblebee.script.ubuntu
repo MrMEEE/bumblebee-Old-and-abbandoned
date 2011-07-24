@@ -12,6 +12,7 @@
 ### END INIT INFO
 
 # Author: Igor Urazov <z0rc3r@gmail.com>
+#         Lekensteyn <lekensteyn@gmail.com>
 
 LD_LIBRARY_PATH=/usr/lib/nvidia-current
 export LD_LIBRARY_PATH
