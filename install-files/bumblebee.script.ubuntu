@@ -81,7 +81,7 @@ do_start()
 	if validate_xorg_pidfile; then
 		if [ -n "$validated_pid" ]; then
 			# a X server is running, check if it is a Bumblebee one
-			cmd="$(ps --format command --no-headers -ww --pid $validated_pid)
+			cmd="$(ps --format command --no-headers -ww --pid $validated_pid)"
 			case "$cmd" in
 			  '[Xorg]')
 				log_daemon_msg "Xorg was previously crashed by the nvidia driver on display $VGL_DISPLAY."
