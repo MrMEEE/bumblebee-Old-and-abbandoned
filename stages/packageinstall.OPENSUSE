@@ -3,11 +3,11 @@
 #
 VERSION=`cat /etc/SuSE-release | grep VERSION | cut -f3 -d" "`
 
-if [ "$VERSION" != "11.4" ] ; then
+if [ "$VERSION" != "11.3" ] && [ "$VERSION" != "11.4" ] ; then
 	while true ; do
 		echo
 		echo "Sorry, your openSuSE version is not tested yet."
-		echo "Bumblebee is only tested on openSuSE 11.4."
+		echo "Bumblebee is only tested on openSuSE 11.3 and 11.4."
 		echo "Your installation could get corrupted !!!"
 		echo
 		echo "Are you sure you want to continue? (y/n)"
@@ -41,7 +41,7 @@ fi
 #
 ARCH=`uname -m`
 
-if [ "$ARCH" == "i686" ] ; then
+if [ "$ARCH" == "i586" ] || [ "$ARCH" == "i686" ] ; then
   ARCH_NVIDIA="x86"
 else
   ARCH_NVIDIA="x86_64"
