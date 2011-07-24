@@ -140,19 +140,23 @@ do_start()
 
 do_stop()
 {
-kill `cat $PIDFILE 2>&1` > /dev/null 2>&1
-RETVAL=$?
-rm -f $PIDFILE
-i=0
-while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -ne 1 ]; do
- sleep 1
- log_daemon_msg "."
- i=`expr $i + 1`
- if [ $i -gt 10 ]; then
-   echo "Bumblebee server failed to stop"
-   exit 1
- fi
-done
+	# --exec $DAEMON and --name X proved to be unreliable (but --name Xorg works)
+	if validate_xorg_pidfile; then
+		if [ -n "$validated_pid" ]; then
+			# --oknodo makes start-stop-daemon return success if no action has
+			# been performed
+			start-stop-daemon --stop --quiet --oknodo --retry=TERM/10/KILL/5 \
+				--pidfile $PIDFILE
+			RETVAL=$?
+		else
+			# bumblebee is not running
+			return 1
+		fi
+	else
+		RETVAL=2
+	fi
+	# RETVAL 2 = still running
+	[ $RETVAL = 2 ] && return 2
 	$DISABLECARD
 	return $RETVAL
 }
