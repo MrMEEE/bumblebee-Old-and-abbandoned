@@ -163,7 +163,7 @@ do_stop()
 
 case "$1" in
   enable|stop)
-  	# weird logic: enable the bumblebee server when the system is shut down?
+	# weird logic: enable the bumblebee server when the system is shut down?
 	log_daemon_msg "Starting $DESC" "$NAME "
 	do_start
 	case $? in
@@ -173,7 +173,7 @@ case "$1" in
 	esac
 	;;
   disable|start)
-  	# weird logic: disable the bumblebee server when the system is started?
+	# weird logic: disable the bumblebee server when the system is started?
 	log_daemon_msg "Stopping $DESC" "$NAME "
 	do_stop
 	case $? in
@@ -190,7 +190,7 @@ case "$1" in
 	do_stop
 	case "$?" in
 	  0|1)
-	  	do_start
+		do_start
 		case "$?" in
 			0) log_end_msg 0 ;;
 			1) log_end_msg 1 ;; # Old process is still running
