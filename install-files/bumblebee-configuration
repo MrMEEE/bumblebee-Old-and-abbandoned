@@ -80,13 +80,19 @@ if [ -f /tmp/machineinfo ]; then
 fi
 
 if [ "$DISTRO" == "UBUNTU" ] ; then
-	update-alternatives --remove gl_conf /usr/lib/nvidia-current/ld.so.conf
+	for arch in x86_64-linux-gnu i386-linux-gnu; do
+		if update-alternatives --list ${arch}_gl_conf >/dev/null 2>&1; then
+			update-alternatives --force --set ${arch}_gl_conf /usr/lib/$arch/mesa/ld.so.conf
+		fi
+	done
+	if update-alternatives --list gl_conf >/dev/null 2>&1; then
+		update-alternatives --force --set gl_conf /usr/lib/mesa/ld.so.conf
+	fi
 	rm -rf /etc/alternatives/xorg_extra_modules
 	rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
 	rm -rf /usr/lib/xorg/x11-extra-modules/xorg
 	rm -rf /usr/lib/xorg/extra-modules
 	rm -rf /usr/lib/nvidia-current/xorg/xorg
-	update-alternatives --remove x86_64-linux-gnu_gl_conf /usr/lib/nvidia-current/ld.so.conf
 	ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
 	ldconfig
 fi
