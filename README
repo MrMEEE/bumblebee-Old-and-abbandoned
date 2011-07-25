@@ -27,12 +27,14 @@ http://download.opensuse.org/repositories/home:/Ximi1970:/bumblebee/openSUSE_11.
 
 For people currently running the script/git version please do:
 
+Cleanup your system:
+
 sudo bumblebee-uninstall
 
 If you have used the nVidia package option:
 sudo bash NVIDIA-Linux-xxxxx-xxxx.run --uninstall
 
-If you used the nVidia repository (mirror) option:
+If you have used the nVidia repository (mirror) option: 
 rpm -e x11-video-nvidiaG02
 rpm -e nvidia-computeG02
 rpm -e nvidia-gfxG02-kmp
@@ -41,17 +43,18 @@ zypper rr "nVidia Graphics Drivers (local mirror)"
 
 Start using the bumblebee repository:
 
+Install the nVidia repository and packages if you do not want to
+use the nouveau driver:
 zypper ar -f ftp://download.nvidia.com/opensuse/11.4 "nVidia Graphics Drivers"
+zypper install nvidia-gfxG02-kmp-`uname -r | cut -f3 -d"-"`
+zypper install x11-video-nvidiaG02
+
+Installing bumblebee:
+
 zypper ar -f http://download.opensuse.org/repositories/home:/Ximi1970:/bumblebee/openSUSE_11.4 "Bumblebee"
 zypper install bumblebee
 
 or just use Yast to add the repositories and packages.
-
-There is also an unstable repository that contains the latest cvs, svn and git packages. These packages are
-very experimental and are not tested at all. They just compile :-)
-
-http://download.opensuse.org/repositories/home:/Ximi1970:/bumblebee-unstable/openSUSE_11.4/
-
 
 # ----------------------------------------------------------------------------
 # "Red Bull License" 
@@ -103,17 +106,30 @@ Arch Linux Support:
 
 http://aur.archlinux.org/packages.php?ID=49469
 
+
 Debian Linux Support:
 
 https://github.com/z0rc/debumblebee
+
 
 Gentoo Linux Support:
 
 https://github.com/iegor/bumblebee-Gentoo-support
 
+
 openSuSE Linux Support:
 
+Github:
 https://github.com/Ximi1970/bumblebee
+
+Repositories:
+http://download.opensuse.org/repositories/home:/Ximi1970:/bumblebee/openSUSE_11.3
+http://download.opensuse.org/repositories/home:/Ximi1970:/bumblebee/openSUSE_11.4
+
+Unstable repositories ( build with the latest cvs, svn and git packages ):
+http://download.opensuse.org/repositories/home:/Ximi1970:/bumblebee-unstable/openSUSE_11.3
+http://download.opensuse.org/repositories/home:/Ximi1970:/bumblebee-unstable/openSUSE_11.4
+
 
 
 The Installation should now be completely automatic...

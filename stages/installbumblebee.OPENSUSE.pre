@@ -2,8 +2,9 @@
 
 mkdir -p /usr/local/bin/
 cp install-files/xorg.conf.nvidia /etc/X11/
+cp install-files/xorg.conf.nouveau /etc/X11/
 cp install-files/bumblebee-bugreport /usr/local/bin/
 cp install-files/bumblebee-uninstall /usr/local/bin/
 cp install-files/bumblebee-submitsystem /usr/local/bin/
-sed -e "/INSERTMONITORLIST/r stages/manualselectmonitor" -e "/INSERTMONITORLIST/d" install-files/bumblebee-config > /usr/local/bin/bumblebee-config
+cp install-files/bumblebee-configuration /usr/local/bin/
 

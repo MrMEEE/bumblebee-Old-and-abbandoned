@@ -3,11 +3,11 @@
 #
 VERSION=`cat /etc/SuSE-release | grep VERSION | cut -f3 -d" "`
 
-if [ "$VERSION" != "11.4" ] ; then
+if [ "$VERSION" != "11.3" ] && [ "$VERSION" != "11.4" ] ; then
 	while true ; do
 		echo
 		echo "Sorry, your openSuSE version is not tested yet."
-		echo "Bumblebee is only tested on openSuSE 11.4."
+		echo "Bumblebee is only tested on openSuSE 11.3 and 11.4."
 		echo "Your installation could get corrupted !!!"
 		echo
 		echo "Are you sure you want to continue? (y/n)"
@@ -41,7 +41,7 @@ fi
 #
 ARCH=`uname -m`
 
-if [ "$ARCH" == "i686" ] ; then
+if [ "$ARCH" == "i586" ] || [ "$ARCH" == "i686" ] ; then
   ARCH_NVIDIA="x86"
 else
   ARCH_NVIDIA="x86_64"
@@ -141,7 +141,8 @@ while [ "$NVIDIA_TYPE" == "UNDEFINED" ] ; do
   echo
   echo "1) Use the nVidia repository for openSuSE ( stable )"
   echo "2) Use the nVidia driver package NVIDIA-Linux-$ARCH_NVIDIA-xxxx.run ( unstable ? )"
-  echo "3) Skip nVidia driver installation.( Warning: nVidia drivers have to be installed )"
+  echo "3) Use the nouveau driver"
+  echo "4) Skip nVidia driver installation.( Warning: nVidia drivers have to be installed )"
   echo
   read opt
   echo
@@ -156,6 +157,10 @@ while [ "$NVIDIA_TYPE" == "UNDEFINED" ] ; do
     break
     ;;
   3)
+    NVIDIA_TYPE="nouveau"
+    break
+    ;;
+  4)
     NVIDIA_TYPE="none"
     break
     ;;
@@ -172,7 +177,7 @@ done
 #	nVidia X server still running ?
 #
 LOCKFILE=/var/lock/bumblebee
-if [ -f $LOCKFILE ] || [ -f /tmp/.X1-lock ] || [ `ps -ef |grep X | grep nvidia | wc -l` -gt 0 ] ; then
+if [ -f $LOCKFILE ] || [ `ps -ef |grep X | grep nvidia | wc -l` -gt 0 ] ; then
   while true ; do
     echo
     echo "nVidia X server still running. Kill the server ? (y/n)"
@@ -184,7 +189,6 @@ if [ -f $LOCKFILE ] || [ -f /tmp/.X1-lock ] || [ `ps -ef |grep X | grep nvidia |
       if [ -f $LOCKFILE ] ; then
 	kill -9 `cat $LOCKFILE`
 	rm -f $LOCKFILE
-	rm -f /tmp/.X1-lock
       else
 	#
 	#	Find the pid
@@ -194,7 +198,6 @@ if [ -f $LOCKFILE ] || [ -f /tmp/.X1-lock ] || [ `ps -ef |grep X | grep nvidia |
 	if [ "`ps p $PID_X | grep nvidia`" != "" ] ; then
 	  kill -9 $PID_X
 	fi
-	rm -f /tmp/.X1-lock
       fi
 
       #
@@ -215,7 +218,7 @@ if [ -f $LOCKFILE ] || [ -f /tmp/.X1-lock ] || [ `ps -ef |grep X | grep nvidia |
       #
       #	Is the system clean ?
       #
-      if [ ! -f $LOCKFILE ] && [ ! -f /tmp/.X1-lock ] && [ `ps -ef | grep X | grep nvidia | wc -l` -eq 0  ] ; then
+      if [ ! -f $LOCKFILE ] && [ `ps -ef | grep X | grep nvidia | wc -l` -eq 0  ] ; then
 	#
 	#	Yes, continue
 	#
@@ -751,6 +754,105 @@ if [ "$NVIDIA_TYPE" == "package" ] ; then
     cp -a backup/lib/libGL.* /usr/lib
     cp -a backup/lib64/libGL.* /usr/lib64
     cp -f backup/lib64/xorg/modules/extensions/libglx.so /usr/lib64/xorg/modules/extensions
+  fi
+fi
+
+#
+#	Nouveau "installation"
+#
+if [ "$NVIDIA_TYPE" == "nouveau" ] ; then
+
+  echo "Using the nouveau driver."
+  echo
+  echo "We need to uninstall all the nvidia packages and repositories."
+  echo
+
+  #
+  #	Check for nVidia package install
+  #
+  if [ -f /usr/bin/nvidia-uninstall ] ; then
+    uninstall_nvidia_package
+  fi
+
+  #
+  #	Check for repository install
+  #
+  FOUND=`rpm -qa|grep x11-video-nvidia`
+  if [ "$FOUND" != "" ] ; then
+    #
+    #	Repository rpm still installed
+    #
+    while true ; do
+      echo
+      echo "nVidia repository detected."
+      echo "The repository is not compatible with the nouveau installation."
+      echo
+      echo "Remove the nVidia repository ? (y/n)"
+      echo
+      read opt
+      echo
+
+      case "$opt" in
+      y)
+	echo "Uninstalling nVidia rpms and repository."
+  
+	#
+	#	Remove rpm
+	#
+	VIDEO=`rpm -qa | grep x11-video-nvidia`
+	COMPUTE=`rpm -qa | grep nvidia-compute`
+	GFX=`rpm -qa | grep nvidia-gfx`
+
+	if [ "$VIDEO" != "" ] ; then
+	  rpm -e $VIDEO >/dev/null 2>&1
+	fi
+	if [ "$COMPUTE" != "" ] ; then
+	  rpm -e $COMPUTE >/dev/null 2>&1
+	fi
+	if [ "$GFX" != "" ] ; then
+	  rpm -e $GFX >/dev/null 2>&1
+	fi
+
+	#
+	#	Restore the X server link
+	#
+	ln -sf /usr/bin/Xorg /var/lib/X11/X
+
+	#
+	#	Remove repository
+	#
+	ONLINE_REPO=`zypper lr ftp://download.nvidia.com/opensuse/${VERSION} 2>/dev/null | grep Cache`
+	OFFLINE_REPO=`zypper lr "nVidia Graphics Drivers (local mirror)" 2>/dev/null | grep Cache`
+	if [ "$ONLINE_REPO" != "" ] ; then
+	  zypper rr ftp://download.nvidia.com/opensuse/${VERSION} >/dev/null 2>&1 
+	fi
+	if [ "$OFFLINE_REPO" != "" ] ; then
+	  zypper rr "nVidia Graphics Drivers (local mirror)" >/dev/null 2>&1 
+	fi
+
+	#
+	#	Cleanup 3D hack
+	#
+	rm -rf /usr/X11R6/lib-nvidia
+	rm -rf /usr/X11R6/lib64-nvidia
+	rm -rf /usr/lib/xorg-nvidia
+	rm -rf /usr/lib64/xorg-nvidia
+
+	break
+	;;
+      n)
+	echo "Cannot install the nouveau driver while the repository is installed."
+	echo "Aborting installation."
+	exit 1
+	;;
+      *)
+	echo
+	echo "Please select a valid option, Press <enter> to try again."
+	read
+	clear
+	;;
+      esac
+    done
   fi
 fi
 
