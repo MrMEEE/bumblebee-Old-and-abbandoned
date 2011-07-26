@@ -131,7 +131,7 @@ valid_lock() {
 		echo "Dummy lock file detected, removing file..."
 		/bin/rm $LOCKFILE
 	fi
-	if [ -f /tmp/.X$BEE_DISPLAY-lock ] && [ "`xdpyinfo -display $VGL_DISPLAY | grep 'unable to open'`" != "" ] ; then
+	if [ -f /tmp/.X$BEE_DISPLAY-lock ] && [ "`xdpyinfo -display $VGL_DISPLAY 2>&1 | grep 'unable to open'`" != "" ] ; then
 		#
 		#	There is a X server lock file but no X server running
 		#	Something bad happened.
