@@ -1,14 +1,3 @@
-if [ ! -f /usr/local/bin/bumblebee-disablecard-on-powerup ]; then
- # Not installed
- cp install-files/bumblebee-disablecard-on-powerup /usr/local/bin/
- ln -s /usr/local/bin/bumblebee-disablecard-on-powerup /etc/pm/power.d/
-else
- # Already Exists
- echo
- echo "nVidia card disable-on-powerup-script: /usr/local/bin/bumblebee-disablecard-on-powerup, already exists not overwriting"
- echo
-fi
-
 #
 #	Install the bumblebee defaults file
 #
