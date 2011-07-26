@@ -187,7 +187,7 @@ check_3D_hack() {
 #
 case "$1" in
 	start)
-		stop
+		$DISABLECARD
 		# Remember status and be verbose
         rc_status -v
 		;;
@@ -195,7 +195,7 @@ case "$1" in
 		start
 		;;
 	stop)
-		start
+		$ENABLECARD
 		# Remember status and be verbose
 		rc_status -v
 		;;
