@@ -509,8 +509,28 @@ esac
 
 sed -i 's/VGL_COMPRESS.*/VGL_COMPRESS='$IMAGETRANSPORT'/' $DEFAULT_FILE
 
-groupadd bumblebee
+#
+#	Set userrights
+#
+if [ "`grep bumblebee /etc/group`" == "" ] ; then
+	groupadd bumblebee
+fi
+if [ "$DISTRO" == "UBUNTU" ] ; then
+	gpasswd -a `env |grep SUDO_USER |cut -f2 -d=` bumblebee
+fi
+if [ "$DISTRO" == "OPENSUSE" ; then
+	if [ "$SUDO_USER" != "" ] ; then
+		groupmod -A `env | grep SUDO_USER | cut -f2 -d=` bumblebee
+	fi
+fi
+grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
+mv /etc/sudoers.optiorig /etc/sudoers
+echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /etc/init.d/bumblebee" >> /etc/sudoers
+chmod 0440 /etc/sudoers
 
+#
+#	That's all folks
+#
 whiptail --msgbox \
 " Bumblebee is now configured.\n\n"\
 "If your system is working, please run the bumblebee-submitsystem script\n\n"\
