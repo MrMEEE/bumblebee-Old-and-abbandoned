@@ -129,7 +129,7 @@ valid_lock() {
 		#	Something bad happened.
 		#
 		echo "Dummy lock file detected, removing file..."
-		/bin/rm $LOCKFILE
+		/bin/rm -f $LOCKFILE 2>/dev/null
 	fi
 	if [ -f /tmp/.X$BEE_DISPLAY-lock ] && [ "`xdpyinfo -display $VGL_DISPLAY 2>&1 | grep 'unable to open'`" != "" ] ; then
 		#
@@ -137,7 +137,8 @@ valid_lock() {
 		#	Something bad happened.
 		#
 		echo "Dummy lock file detected, removing file..."
-		/bin/rm /tmp/.X$BEE_DISPLAY-lock
+		/bin/rm -f /tmp/.X$BEE_DISPLAY-lock 2>/dev/null
+		/bin/rm -f $LOCKFILE 2>/dev/null
 	fi
 }
 
