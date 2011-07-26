@@ -82,8 +82,8 @@ else
 
 	cp install-files/optirun.opensuse /usr/local/bin/optirun
 
-	sed -i "s?^#LD_LIBRARY_PATH=?\tLD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:\$LD_LIBRARY_PATH?g" /usr/bin/optirun
-	sed -i "s?^#export LD_LIBRARY_PATH?\texport LD_LIBRARY_PATH?g" /usr/bin/optirun
+	sed -i "s?^#LD_LIBRARY_PATH=?\tLD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:\$LD_LIBRARY_PATH?g" /usr/local/bin/optirun
+	sed -i "s?^#export LD_LIBRARY_PATH?\texport LD_LIBRARY_PATH?g" /usr/local/bin/optirun
 
 	cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
 fi
