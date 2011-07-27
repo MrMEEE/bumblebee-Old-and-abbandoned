@@ -120,7 +120,7 @@ restart() {
 }
 
 #
-#	Valid lock file ?
+#	Valid lock files ?
 #
 valid_lock() {
 	if [ -f $LOCKFILE ] && [ ! -f /tmp/.X$BEE_DISPLAY-lock ] ; then
@@ -129,7 +129,16 @@ valid_lock() {
 		#	Something bad happened.
 		#
 		echo "Dummy lock file detected, removing file..."
-		/bin/rm $LOCKFILE
+		/bin/rm -f $LOCKFILE 2>/dev/null
+	fi
+	if [ -f /tmp/.X$BEE_DISPLAY-lock ] && [ "`xdpyinfo -display $VGL_DISPLAY 2>&1 | grep 'unable to open'`" != "" ] ; then
+		#
+		#	There is a X server lock file but no X server running
+		#	Something bad happened.
+		#
+		echo "Dummy lock file detected, removing file..."
+		/bin/rm -f /tmp/.X$BEE_DISPLAY-lock 2>/dev/null
+		/bin/rm -f $LOCKFILE 2>/dev/null
 	fi
 }
 
@@ -187,7 +196,7 @@ check_3D_hack() {
 #
 case "$1" in
 	start)
-		stop
+		$DISABLECARD
 		# Remember status and be verbose
         rc_status -v
 		;;
@@ -195,7 +204,7 @@ case "$1" in
 		start
 		;;
 	stop)
-		start
+		$ENABLECARD
 		# Remember status and be verbose
 		rc_status -v
 		;;

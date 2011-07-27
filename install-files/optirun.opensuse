@@ -26,20 +26,16 @@ terminate()
 		fi
 
 		#
-		#	Disable bumblebee only when there is a lock file
+		#	Disable bumblebee
 		#
-		if [ -f /tmp/.X$BEE_DISPLAY-lock ] ; then
-			sudo /etc/init.d/bumblebee disable
-		fi
+		sudo /etc/init.d/bumblebee disable
 	fi 
 }
 
 #
-#	Enable bumblebee ?
+#	Enable bumblebee
 #
-if [ ! -f /tmp/.X$BEE_DISPLAY-lock ] ; then
-	sudo /etc/init.d/bumblebee enable
-fi
+sudo /etc/init.d/bumblebee enable
 
 #
 #	Intercept Ctrl-C, run terminate

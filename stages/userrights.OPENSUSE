@@ -1,1 +1,10 @@
-/etc/init.d/bumblebee start
+if [ "`grep bumblebee /etc/group`" == "" ] ; then
+	groupadd bumblebee
+fi
+if [ "$SUDO_USER" != "" ] ; then
+	groupmod -A `env | grep SUDO_USER | cut -f2 -d=` bumblebee
+fi
+grep -Ev 'bumblebee' /etc/sudoers > /etc/sudoers.optiorig
+mv /etc/sudoers.optiorig /etc/sudoers
+echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /etc/init.d/bumblebee" >> /etc/sudoers
+chmod 0440 /etc/sudoers

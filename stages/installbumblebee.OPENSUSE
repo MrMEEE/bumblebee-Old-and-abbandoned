@@ -1,14 +1,3 @@
-if [ ! -f /usr/local/bin/bumblebee-disablecard-on-powerup ]; then
- # Not installed
- cp install-files/bumblebee-disablecard-on-powerup /usr/local/bin/
- ln -s /usr/local/bin/bumblebee-disablecard-on-powerup /etc/pm/power.d/
-else
- # Already Exists
- echo
- echo "nVidia card disable-on-powerup-script: /usr/local/bin/bumblebee-disablecard-on-powerup, already exists not overwriting"
- echo
-fi
-
 #
 #	Install the bumblebee defaults file
 #
@@ -93,8 +82,8 @@ else
 
 	cp install-files/optirun.opensuse /usr/local/bin/optirun
 
-	sed -i "s?^#LD_LIBRARY_PATH=?\tLD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:\$LD_LIBRARY_PATH?g" /usr/bin/optirun
-	sed -i "s?^#export LD_LIBRARY_PATH?\texport LD_LIBRARY_PATH?g" /usr/bin/optirun
+	sed -i "s?^#LD_LIBRARY_PATH=?\tLD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:\$LD_LIBRARY_PATH?g" /usr/local/bin/optirun
+	sed -i "s?^#export LD_LIBRARY_PATH?\texport LD_LIBRARY_PATH?g" /usr/local/bin/optirun
 
 	cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
 fi
