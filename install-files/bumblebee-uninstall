@@ -183,7 +183,7 @@ elif [ $DISTRO = OPENSUSE ]; then
 	rm -rf /usr/X11R6/nvidia
     fi
 
-    rm /etc/pm/power.d/bumblebee-disablecard-on-powerup
+    rm /etc/pm/power.d/bumblebee-disablecard-on-powerup 2>/dev/null
 
 elif [ $DISTRO = FEDORA ]; then
 
