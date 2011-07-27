@@ -1,3 +1,4 @@
+VERSION=`cat /etc/issue | cut -f2 -d" "`
 if [ ! -f /usr/local/bin/bumblebee-disablecard-on-powerup ]; then
  # Not installed
  cp install-files/bumblebee-disablecard-on-powerup /usr/local/bin/

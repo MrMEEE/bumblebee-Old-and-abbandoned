@@ -1,33 +1,47 @@
 # Should be removed when changes from v.1.4.19+20 has been implemented on Fedora, OpenSuSE and Debian.
 
 if [ "$DISTRO" != UBUNTU ] && [ "$DISTRO" != OPENSUSE ] ; then
- echo "Now you need to make sure that the command \"vglclient -gl\" is run after"
- echo "your Desktop Environment is started"
- echo
- echo "In KDE this is done by this script.. Thanks to Peter Liedler."
- echo
- echo "In GNOME this is done by this script.. Thanks to Peter Liedler."
- echo
+	echo "Now you need to make sure that the command \"vglclient -gl\" is run after"
+	echo "your Desktop Environment is started"
+	echo
+	echo "In KDE this is done by this script.. Thanks to Peter Liedler."
+	echo
+	echo "In GNOME this is done by this script.. Thanks to Peter Liedler."
+	echo
 else
- echo "Please logout and back in to activate new groups and library setups."
- echo
- echo "If you want power saving by shutting the nVidia down when not in use."
- echo "Please adjust the scripts:"
- echo "/usr/local/bin/bumblebee-enablecard and"
- echo "/usr/local/bin/bumblebee-disablecard for your machine."
- echo
- echo "Examples and documentation is available in /usr/share/doc/bumblebee/"
- echo
+	if [ "$DISTRO" == OPENSUSE ] ; then
+		echo "Please logout and back in to activate new groups and library setups."
+		echo "Please reboot if you changed the driver from nvidia to nouveau or"
+		echo "from nouveau to nvidia."
+		echo
+		echo "If you want power saving by shutting the nVidia down when not in use."
+		echo "Please adjust the scripts:"
+		echo "/usr/local/bin/bumblebee-enablecard and"
+		echo "/usr/local/bin/bumblebee-disablecard for your machine."
+		echo
+		echo "Examples and documentation is available in /usr/share/doc/packages/bumblebee/"
+		echo
+	else
+		echo "Please logout and back in to activate new groups and library setups."
+		echo
+		echo "If you want power saving by shutting the nVidia down when not in use."
+		echo "Please adjust the scripts:"
+		echo "/usr/local/bin/bumblebee-enablecard and"
+		echo "/usr/local/bin/bumblebee-disablecard for your machine."
+		echo
+		echo "Examples and documentation is available in /usr/share/doc/bumblebee/"
+		echo
+	fi
 fi
 if [ "$ARCH" = "x86_64" ]; then
-echo "After that you should be able to start applications with"
-echo "\"optirun32 <application>\" or \"optirun64 <application>\""
-echo "optirun32 can be used for legacy 32-bit applications and Wine Games."
-echo "Everything else should work on optirun64"
-echo "But... if one doesn't work... try the other."
+	echo "After that you should be able to start applications with"
+	echo "\"optirun32 <application>\" or \"optirun64 <application>\""
+	echo "optirun32 can be used for legacy 32-bit applications and Wine Games."
+	echo "Everything else should work on optirun64"
+	echo "But... if one doesn't work... try the other."
 elif [ "$ARCH" = "i686" ]; then
-echo "After that you should be able to start applications with"
-echo "\"optirun <application>\"."
+	echo "After that you should be able to start applications with"
+	echo "\"optirun <application>\"."
 fi  
 echo
 echo "If you have any problems in or after the installation, please try"

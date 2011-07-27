@@ -1,2 +1,2 @@
 /etc/init.d/bumblebee start
-/usr/bin/vglclient-service &
+#/usr/bin/vglclient-service &

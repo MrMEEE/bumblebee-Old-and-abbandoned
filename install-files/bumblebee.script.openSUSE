@@ -7,63 +7,90 @@
 #
 ### BEGIN INIT INFO
 # Provides: bumblebee
-# Required-Start: 
-# Required-Stop: 
+# Required-Start: $remote_fs
+# Required-Stop: $remote_fs
 # Default-Start: 3 5
 # Default-Stop: 0 1 2 6
-# Description: Start the bumblebee optimus X server
+# Short-Description: Start the bumblebee Optimus X server
+# Description: Start the bumblebee Optimus X server
 ### END INIT INFO
 
 . /etc/rc.status
 
+[ -r /etc/default/bumblebee ] && . /etc/default/bumblebee
+
+#
+#	Get the display
+#
+BEE_DISPLAY=${VGL_DISPLAY##*:}
+BEE_DISPLAY=${BEE_DISPLAY%%.*}
+
+#
+#	Lock file path
+#
 LOCKFILE=/var/lock/bumblebee
 
+#
+#	Enable / disable scripts
+#
 RETVAL=0
-ENABLECARD=/usr/local/bin/bumblebee-enablecard
-DISABLECARD=/usr/local/bin/bumblebee-disablecard
+if [ -f /usr/bin/optirun ] ; then
+	ENABLECARD=/usr/bin/bumblebee-enablecard
+	DISABLECARD=/usr/bin/bumblebee-disablecard
+else
+	ENABLECARD=/usr/local/bin/bumblebee-enablecard
+	DISABLECARD=/usr/local/bin/bumblebee-disablecard
+fi
 
-#64	LD_LIBRARY_PATH=/usr/X11R6/lib64-nvidia:/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
-#64	export LD_LIBRARY_PATH
-#32	LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
-#32	export LD_LIBRARY_PATH
-
-
+#
+#	Bumblebee X server start
+#
 start() {
+	check_3D_hack
+	valid_lock
 	if [ ! -f $LOCKFILE ] ; then
-	  $ENABLECARD
+		$ENABLECARD
 	fi
 	echo -n "Starting up bumblebee X server: "
 	if [ -f $LOCKFILE ] ; then
-	  echo
-	  echo "Bumblebee server already running"
-	  exit 1
+		echo
+		echo "Bumblebee server already running"
+		exit 1
 	fi
-#64		/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath  /usr/lib64/xorg-nvidia/modules/updates,/usr/lib64/xorg-nvidia/modules -nolisten tcp -noreset :1 vt9 > /dev/null 2>&1 &
-#32		/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/xorg-nvidia/modules/updates,/usr/lib/xorg-nvidia/modules -nolisten tcp -noreset :1 vt9 > /dev/null 2>&1 &
-#0		/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -nolisten tcp -noreset :1 vt9 > /dev/null 2>&1 &
+	if [ -f /usr/bin/nvidia-xconfig ] ; then
+#LD_LIBRARY_PATH=
+#export LD_LIBRARY_PATH
+#/usr/bin/X
+	else
+		/usr/bin/X -ac -config /etc/X11/xorg.conf.nouveau -sharevts -nolisten tcp -noreset $VGL_DISPLAY vt9 > /dev/null 2>&1 &
+	fi
 	PID_X=$!
 	i=1
 	while [ `ps p $PID_X | wc -l` -eq 1 ] ; do
-	 sleep 1
-	 echo -n "."
-	 i=`expr $i + 1`   
-	 if [ $i -gt 10 ]; then
-	  echo
-	  echo "Bumblebee server failed to start"
-	  exit 1
-	 fi 
+	sleep 1
+	echo -n "."
+	i=`expr $i + 1`   
+	if [ $i -gt 10 ] ; then
+		echo
+		echo "Bumblebee server failed to start"
+		exit 1
+	fi 
 	done
 	echo $PID_X > $LOCKFILE && echo "success" > /dev/null || echo "failure"
 	RETVAL=$?
 	echo
 }
 
+#
+#	Bumblebee X server stop
+#
 stop() {
+	check_3D_hack
 	echo -n "Stopping bumblebee X server: "
 	if [ ! -f $LOCKFILE ] ; then
-	  echo
-	  echo "Bumblebee server not running"
-	  exit 1
+		echo
+		echo "Bumblebee server not running"
+		exit 1
 	fi
 	PID_X=`cat $LOCKFILE`
 	kill $PID_X
@@ -71,64 +98,152 @@ stop() {
 	RETVAL=$?
 	i=0
 	while [ `ps p $PID_X | wc -l` -ne 1 ] ; do
-	 sleep 1
-	 echo -n "."
-	 i=`expr $i + 1`   
-	 if [ $i -gt 10 ]; then
-	  echo
-	  echo "Bumblebee server failed to stop"
-	  exit 1
-	 fi
-        done
+		sleep 1
+		echo -n "."
+		i=`expr $i + 1`   
+		if [ $i -gt 10 ] ; then
+			echo
+			echo "Bumblebee server failed to stop"
+			exit 1
+		fi
+	done
 	echo
-        $DISABLECARD
+	$DISABLECARD
 }
 
+#
+#	Restart bumblebee
+#
 restart() {
 	stop
 	start
 }
 
-case "$1" in
-  start)
-	stop
-	# Remember status and be verbose
-        rc_status -v
-	;;
-  enable)
-	start
-	;;
-  stop)
-	start
-	# Remember status and be verbose
-        rc_status -v
-	;;
-  disable)
-	stop
-	;;
-  try-restart)
-        ## Stop the service and if this succeeds (i.e. the 
-        ## service was running before), start it again.
-        $0 status >/dev/null &&  $0 restart
-
-        # Remember status and be quiet
-        rc_status
-        ;;
-  restart)
-	restart
-	;;
-  status)
-	if [ -f $LOCKFILE ]; then
-		echo $"Bumblebee X Server is running."
-		RETVAL=0
-	else
-		echo $"Bumblebee X Server is not running."
-		RETVAL=3
+#
+#	Valid lock files ?
+#
+valid_lock() {
+	if [ -f $LOCKFILE ] && [ ! -f /tmp/.X$BEE_DISPLAY-lock ] ; then
+		#
+		#	There is a lock file but no X server running
+		#	Something bad happened.
+		#
+		echo "Dummy lock file detected, removing file..."
+		/bin/rm -f $LOCKFILE 2>/dev/null
 	fi
-	;;
-  *)
-	echo $"Usage: $0 {start|stop|enable|disable|status|restart}"
-	exit 1
+	if [ -f /tmp/.X$BEE_DISPLAY-lock ] && [ "`xdpyinfo -display $VGL_DISPLAY 2>&1 | grep 'unable to open'`" != "" ] ; then
+		#
+		#	There is a X server lock file but no X server running
+		#	Something bad happened.
+		#
+		echo "Dummy lock file detected, removing file..."
+		/bin/rm -f /tmp/.X$BEE_DISPLAY-lock 2>/dev/null
+		/bin/rm -f $LOCKFILE 2>/dev/null
+	fi
+}
+
+#
+#	Check the 3D repository setup
+#
+check_3D_hack() {
+	if [ -f /usr/bin/nvidia-xconfig ] ; then
+		if [ -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
+			#
+			#	Somebody installed / upgraded the i586 nVidia repository
+			#	Hack it again for full Intel and nVidia 3D
+			#
+			if [ `ls /usr/X11R6/lib/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
+				rm -rf /usr/X11R6/lib-nvidia
+				mkdir -p /usr/X11R6/lib-nvidia
+				mv -f /usr/X11R6/lib/libGL.* /usr/X11R6/lib-nvidia/
+				mv -f /usr/X11R6/lib/libXvMCNVIDIA* /usr/X11R6/lib-nvidia/
+			fi
+			if [ -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
+				rm -rf /usr/lib/xorg-nvidia
+				cp -a /usr/lib/xorg /usr/lib/xorg-nvidia
+				rm -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so
+				rm -f /usr/lib/xorg/modules/updates/extensions/libglx.*
+			fi
+		fi
+		if [ -f /usr/lib64/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
+			#
+			#	Somebody installed / upgraded the x86_64 nVidia repository
+			#	Hack it again for full Intel and nVidia 3D
+			#
+			if [ `ls /usr/X11R6/lib/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
+				rm -rf /usr/X11R6/lib-nvidia
+				mkdir -p /usr/X11R6/lib-nvidia
+				mv -f /usr/X11R6/lib/libGL.* /usr/X11R6/lib-nvidia/
+			fi
+			if [ `ls /usr/X11R6/lib64/libGL.* 2> /dev/null | wc -l` -gt 0 ] ; then
+				rm -rf /usr/X11R6/lib64-nvidia
+				mkdir -p /usr/X11R6/lib64-nvidia
+				mv -f /usr/X11R6/lib64/libGL.* /usr/X11R6/lib64-nvidia/
+				mv -f /usr/X11R6/lib64/libXvMCNVIDIA* /usr/X11R6/lib64-nvidia/
+			fi
+			if [ -f /usr/lib64/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
+				rm -rf /usr/lib64/xorg-nvidia
+				cp -a /usr/lib64/xorg /usr/lib64/xorg-nvidia
+				rm -f /usr/lib64/xorg/modules/updates/drivers/nvidia_drv.so
+				rm -f /usr/lib64/xorg/modules/updates/extensions/libglx.*
+			fi
+		fi
+	fi
+}
+
+#
+#	Script commands
+#
+case "$1" in
+	start)
+		$DISABLECARD
+		# Remember status and be verbose
+        rc_status -v
+		;;
+	enable)
+		start
+		;;
+	stop)
+		$ENABLECARD
+		# Remember status and be verbose
+		rc_status -v
+		;;
+	disable)
+		stop
+		;;
+	try-restart)
+		## Stop the service and if this succeeds (i.e. the 
+		## service was running before), start it again.
+		$0 status >/dev/null &&  $0 restart
+
+		# Remember status and be quiet
+		rc_status
+		;;
+	restart)
+		$0 stop
+                $0 start
+                rc_status
+		;;
+        force-reload)
+                $0 try-restart
+                rc_status
+                ;;
+         reload)
+                $0 try-restart
+                rc_status
+                ;;
+	status)
+		if [ -f $LOCKFILE ] ; then
+			echo $"Bumblebee X Server is running."
+			RETVAL=0
+		else
+			echo $"Bumblebee X Server is not running."
+			RETVAL=3
+		fi
+		;;
+	*)
+		echo $"Usage: $0 {start|stop|enable|disable|status|restart|force-reload|reload}"
+		exit 1
 esac
 
 exit $RETVAL

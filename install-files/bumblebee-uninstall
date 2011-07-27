@@ -132,15 +132,18 @@ elif [ $DISTRO = OPENSUSE ]; then
       /usr/local/bin/bumblebee-enablecard
     fi
 
-    FOUND=`rpm -qa|grep x11-video-nvidia`
-    if [ "$FOUND" != "" ] || ( [ -d /usr/X11R6/lib-nvidia ] && [ ! -d /usr/X11R6/nvidia ] ) ; then
-	if [ -f /usr/local/bin/bumblebee-check ] ; then
+#    FOUND=`rpm -qa|grep x11-video-nvidia`
+#    if [ "$FOUND" != "" ] || ( [ -d /usr/X11R6/lib-nvidia ] && [ ! -d /usr/X11R6/nvidia ] ) ; then
+#	if [ -f /usr/local/bin/bumblebee-check ] ; then
 	  #
 	  #	Cleanup 3D hack for the repository
 	  #
-	  /usr/local/bin/bumblebee-check -restore
-	fi
-    fi
+	  #	Do not cleanup. It will kill the Intel 3D and put the Intel X server image upside down
+	  # if the nVidia driver is not removed.
+	  #
+#	  /usr/local/bin/bumblebee-check -restore
+#	fi
+#    fi
 
     if [ -f /usr/bin/nvidia-uninstall ] ; then
 
@@ -180,7 +183,7 @@ elif [ $DISTRO = OPENSUSE ]; then
 	rm -rf /usr/X11R6/nvidia
     fi
 
-    rm /etc/pm/power.d/bumblebee-disablecard-on-powerup
+    rm /etc/pm/power.d/bumblebee-disablecard-on-powerup 2>/dev/null
 
 elif [ $DISTRO = FEDORA ]; then
 
@@ -253,6 +256,7 @@ rm -f /usr/local/bin/bumblebee-disablecard-on-powerup
 rm -f /usr/bin/vglclient-service
 rm -f /etc/modprobe.d/nouveau-blacklist.conf
 rm -rf /usr/share/doc/bumblebee
+rm -rf /usr/share/doc/packages/bumblebee
 rm -f /usr/local/bin/bumblebee*
 rm -f /etc/default/bumblebee*
 if [ -d /opt/prime-ng ]; then

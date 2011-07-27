@@ -111,7 +111,7 @@ do_start()
 	# wait for at most three seconds before the server has started
 	retries=0
 	while [ ! -s $PIDFILE -a $retries -lt 3 ]; do
-		log_daemon_msg "."
+		echo -n "."
 		retries=`expr $retries + 1`
 		sleep 1
 	done
