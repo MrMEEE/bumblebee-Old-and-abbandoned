@@ -41,12 +41,6 @@ BEE_DISPLAY=${BEE_DISPLAY%%.*}
 PIDFILE=/tmp/.X${BEE_DISPLAY}-lock
 X_LOG=/var/log/Xorg.${BEE_DISPLAY}.log
 
-# this sets the display in which vglclient should draw images
-# alternatively pass '-display :0' to vglclient (see vglclient -h)
-# XXX: support for multiple sessions which use different ${DISPLAY}s
-DISPLAY=:0
-export DISPLAY
-
 # Define LSB log_* functions.
 . /lib/lsb/init-functions
 
