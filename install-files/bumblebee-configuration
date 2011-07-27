@@ -85,16 +85,46 @@ if [ "$DISTRO" == "UBUNTU" ] ; then
 			update-alternatives --force --set ${arch}_gl_conf /usr/lib/$arch/mesa/ld.so.conf
 		fi
 	done
-	if update-alternatives --list gl_conf >/dev/null 2>&1; then
-		update-alternatives --force --set gl_conf /usr/lib/mesa/ld.so.conf
-	fi
-	rm -rf /etc/alternatives/xorg_extra_modules
-	rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
-	rm -rf /usr/lib/xorg/x11-extra-modules/xorg
-	rm -rf /usr/lib/xorg/extra-modules
-	rm -rf /usr/lib/nvidia-current/xorg/xorg
-	ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
-	ldconfig
+	update-alternatives --remove x86_64-linux-gnu_gl_conf /usr/lib/nvidia-current/ld.so.conf
+	update-alternatives --remove i386-linux-gnu_gl_conf /usr/lib/nvidia-current/alt_ld.so.conf
+
+	update-alternatives --force \
+          --install /etc/ld.so.conf.d/GL.conf gl_conf /usr/lib/mesa/ld.so.conf 500 \
+          --slave /usr/lib/xorg/extra-modules xorg_extra_modules /usr/lib/xorg/x11-extra-modules
+          
+        update-alternatives --force \
+          --install /etc/ld.so.conf.d/GL.conf gl_conf /usr/lib/nvidia-current/ld.so.conf 9700 \
+          --slave /usr/share/man/man1/nvidia-xconfig.1.gz man_nvidiaxconfig.gz /usr/share/man/man1/alt-nvidia-current-xconfig.1.gz \
+          --slave /usr/share/man/man1/nvidia-smi.1.gz nvidia-smi.1.gz /usr/share/man/man1/alt-nvidia-current-smi.1.gz \
+          --slave /usr/share/applications/ubuntu-nvidia-settings.desktop nvidia_desktop /usr/share/nvidia-current/ubuntu-nvidia-settings.desktop \
+          --slave /usr/bin/nvidia-smi nvidia_smi /usr/lib/nvidia-current/bin/nvidia-smi \
+          --slave /usr/bin/nvidia-xconfig nvidia_xconfig /usr/lib/nvidia-current/bin/nvidia-xconfig \
+          --slave /usr/bin/nvidia-bug-report.sh nvidia_bug_report /usr/lib/nvidia-current/bin/nvidia-bug-report.sh \
+          --slave /usr/lib/XvMCConfig xvmcconfig /usr/lib/nvidia-current/XvMCConfig \
+          --slave /etc/xdg/autostart/nvidia-autostart.desktop nvidia-autostart.desktop /usr/share/nvidia-current/nvidia-autostart.desktop \
+          --slave /usr/lib/xorg/modules/drivers/nvidia_drv.so nvidia_drv /usr/lib/nvidia-current/xorg/nvidia_drv.so \
+          --slave /etc/modprobe.d/nvidia-graphics-drivers.conf nvidia_modconf /lib/nvidia-current/modprobe.conf \
+          --slave /usr/lib/xorg/extra-modules xorg_extra_modules /usr/lib/nvidia-current/xorg \
+          --slave /usr/lib/vdpau/libvdpau_nvidia.so.1 libvdpau_nvidia.so.1 /usr/lib/nvidia-current/vdpau/libvdpau_nvidia.so.1 \
+          --slave /usr/lib/libvdpau_nvidia.so libvdpau_nvidia.so /usr/lib/nvidia-current/vdpau/libvdpau_nvidia.so \
+          --slave /usr/lib32/vdpau/libvdpau_nvidia.so.1 libvdpau_nvidia.so.1_lib32 /usr/lib32/nvidia-current/vdpau/libvdpau_nvidia.so.1 \
+          --slave /usr/lib32/libvdpau_nvidia.so libvdpau_nvidia.so_lib32 /usr/lib32/nvidia-current/vdpau/libvdpau_nvidia.so \
+          --slave /usr/share/grub-gfxpayload-lists/blacklist/10_$PACKAGE_NAME grub_fb_blacklist /usr/share/nvidia-current/nvidia-current.grub-gfxpayload
+          
+        update-alternatives --force --set gl_conf /usr/lib/mesa/ld.so.conf
+        
+        rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
+        
+        ldconfig
+#	if update-alternatives --list gl_conf >/dev/null 2>&1; then
+#		update-alternatives --force --set gl_conf /usr/lib/mesa/ld.so.conf
+#	fi
+#	rm -rf /etc/alternatives/xorg_extra_modules
+#	rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
+#	rm -rf /usr/lib/xorg/x11-extra-modules/xorg
+#	rm -rf /usr/lib/xorg/extra-modules
+#	rm -rf /usr/lib/nvidia-current/xorg/xorg
+#	ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
 fi
 
 echo
