@@ -67,3 +67,6 @@ else
 fi
 
 sed -i 's/REPLACEWITHBUSID/'$NVIDIABUSID'/g' /etc/X11/xorg.conf.nvidia
+if [ "$DISTRO" == "OPENSUSE" ] ; then
+	sed -i 's/REPLACEWITHBUSID/'$NVIDIABUSID'/g' /etc/X11/xorg.conf.nouveau
+fi
