@@ -44,31 +44,56 @@ if [ $? -ne 0 ]; then
 fi
 cp install-files/bumblebee.script.ubuntu /etc/init.d/bumblebee
 
+# Before you start with messing with symlinks or removing files, make sure
+# that you know what you are doing. Examine the installation scripts of
+# nvidia-current and libgl1-mesa-glx to get an idea how the alternatives
+# system should be used. If you're using rm or ln in /etc/alternatives, you
+# are doing it wrong.
+# A helpful command for showing links being created on configuring an other
+# alternative:     update-alternatives --display gl_conf
+
+# Since Bumblebee is a project to get Optimus laptops to work, we can safely
+# assume that the nvidia driver is not used for the default display (:0)
+# Therefore default to mesa instead of nvidia. vglrun sets the GL library
+# path to /usr/lib{,32}/nvidia-current for programs running on the display
+# accelerated by the nvidia card. Since most graphical applications are not
+# statically linked nor setuid/setgid binaries, this is fine. There is an
+# exception on this: programs which overwrite LD_LIBRARY_PATH will fail to
+# load the nvidia GL driver. However, this method will allow GL on the Intel
+# display where the previous situation breaks it.
+# TLDR: this allows the intel display to use GL, the bumblebee display will
+#       load the nvidia driver through vglrun in almost all cases
+
+# this takes care of setting correct links which is used on
+# /usr/lib/nvidia-current/gl.conf
+# multiarch support
 for arch in x86_64-linux-gnu i386-linux-gnu; do
- if update-alternatives --list ${arch}_gl_conf >/dev/null 2>&1; then
-   update-alternatives --force --set ${arch}_gl_conf /usr/lib/$arch/mesa/ld.so.conf
- fi
+	# check if the link exist to prevent error messages
+	if update-alternatives --list ${arch}_gl_conf >/dev/null 2>&1; then
+		update-alternatives --force --set ${arch}_gl_conf /usr/lib/$arch/mesa/ld.so.conf
+	fi
 done
-
-rm -rf /etc/alternatives/xorg_extra_modules
+# versions before Oneiric without multiarch
+if update-alternatives --list gl_conf >/dev/null 2>&1; then
+	update-alternatives --force --set gl_conf /usr/lib/mesa/ld.so.conf
+fi
+# remove a legacy link which was not used anyway
 rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
-rm -rf /usr/lib/xorg/x11-extra-modules/xorg
-rm -rf /usr/lib/xorg/extra-modules
-rm -rf /usr/lib/nvidia-current/xorg/xorg
-ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
 
+# fix appeared in commit 68a75db4df628a910886, it should remove an excess symlink
+rm -f /usr/lib/nvidia-current/xorg/xorg
+
+# Refresh the dynamic loader search path so /etc/ld.so.conf.d/GL.conf ->
+# /etc/alternatives/gl_conf -> /usr/lib/mesa/ld.so.conf
 ldconfig
 
+cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
 if [ "$ARCH" = "x86_64" ]; then
  cp install-files/optirun32.ubuntu /usr/local/bin/optirun32
  cp install-files/optirun64.ubuntu /usr/local/bin/optirun64
- cp install-files/optirun64.bash_completion /etc/bash_completion.d/optirun64
- cp install-files/optirun32.bash_completion /etc/bash_completion.d/optirun32
- cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
  ln -s /usr/local/bin/optirun64 /usr/local/bin/optirun
 else
  cp install-files/optirun64.ubuntu /usr/local/bin/optirun
- cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
 fi
 
 if [ "`cat /etc/modules |grep "nvidia-current" |wc -l`" -eq "0" ]; then

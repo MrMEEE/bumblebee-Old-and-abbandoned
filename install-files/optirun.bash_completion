@@ -1,1 +1,7 @@
-complete -F _command optirun
+# bash completion for bumblebee
+
+have optirun   && complete -F _command optirun
+
+# for 64-bit arch
+have optirun32 && complete -F _command optirun32
+have optirun64 && complete -F _command optirun64
