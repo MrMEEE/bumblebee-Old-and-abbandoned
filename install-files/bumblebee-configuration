@@ -69,7 +69,7 @@ if [ -f $DEFAULT_FILE ] ; then
 "Bumblebee Configuration.\n\n"\
 "Do you want to reconfigure bumblebee????" $LINES $COLUMNS
 	if [ $? -eq 1 ]; then
-		exit 1
+		exit 0
 	fi
 else
 	rm $DEFAULT_FILE
