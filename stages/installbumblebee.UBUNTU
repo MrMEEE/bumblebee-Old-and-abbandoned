@@ -87,12 +87,13 @@ rm -f /usr/lib/nvidia-current/xorg/xorg
 # /etc/alternatives/gl_conf -> /usr/lib/mesa/ld.so.conf
 ldconfig
 
-cp install-files/optirun.ubuntu /usr/local/bin/optirun
 cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
 if [ "$ARCH" = "x86_64" ]; then
-	# optirun detects whether a 32-bit libpath must be used based on the link name
-	ln -s /usr/local/bin/optirun32 /usr/local/bin/optirun
-	ln -s /usr/local/bin/optirun64 /usr/local/bin/optirun
+ cp install-files/optirun32.ubuntu /usr/local/bin/optirun32
+ cp install-files/optirun64.ubuntu /usr/local/bin/optirun64
+ ln -s /usr/local/bin/optirun64 /usr/local/bin/optirun
+else
+ cp install-files/optirun64.ubuntu /usr/local/bin/optirun
 fi
 
 if [ "`cat /etc/modules |grep "nvidia-current" |wc -l`" -eq "0" ]; then
