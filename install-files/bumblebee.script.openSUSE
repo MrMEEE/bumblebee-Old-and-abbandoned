@@ -26,6 +26,11 @@ BEE_DISPLAY=${VGL_DISPLAY##*:}
 BEE_DISPLAY=${BEE_DISPLAY%%.*}
 
 #
+#	Get the architecture
+#
+ARCH=`uname -m`
+
+#
 #	Lock file path
 #
 LOCKFILE=/var/lock/bumblebee
@@ -58,9 +63,17 @@ start() {
 		exit 1
 	fi
 	if [ -f /usr/bin/nvidia-xconfig ] ; then
-#LD_LIBRARY_PATH=
-#export LD_LIBRARY_PATH
-#/usr/bin/X
+		if [ "$ARCH" == "x86_64" ] ; then
+			LD_LIBRARY_PATH=/usr/X11R6/lib64-nvidia:/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+			export LD_LIBRARY_PATH
+
+			/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib64/xorg-nvidia/modules/updates,/usr/lib64/xorg-nvidia/modules -nolisten tcp -noreset $VGL_DISPLAY vt9 > /dev/null 2>&1 &
+		else
+			LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+			export LD_LIBRARY_PATH
+
+			/usr/bin/X -ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/xorg-nvidia/modules/updates,/usr/lib/xorg-nvidia/modules -nolisten tcp -noreset $VGL_DISPLAY vt9 > /dev/null 2>&1 &
+		fi
 	else
 		/usr/bin/X -ac -config /etc/X11/xorg.conf.nouveau -sharevts -nolisten tcp -noreset $VGL_DISPLAY vt9 > /dev/null 2>&1 &
 	fi
