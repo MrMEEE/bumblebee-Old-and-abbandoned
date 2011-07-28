@@ -1,19 +1,22 @@
 #!/bin/bash
 
 . /etc/bumblebee/bumblebee.conf
-. /etc/rc.d/function
+. /etc/rc.d/functions
 
 trap "echo 'Caught Ctrl+C'" INT
 
+# Wait for the daemon to turn ON the card
+stat_busy "Starting Bumblebee server"
 i=1
-while  [ ! ck_daemon bumblebee ]; do
-  sleep 1
-  i=`expr $i + 1`
-  if [ $i -gt 10 ]; then
-    stat_fail "Could not start Bumblebee"
-    exit 1
-  fi
+while  [ `ps aux |grep xorg.conf.nouveau |wc -l` -eq 1 ]; do
+   sleep 1
+   i=`expr $i + 1`
+   if [ $i -gt 10 ]; then
+      stat_fail "Bumblebee server failed to start"
+      exit 1
+   fi 
 done
+
 
 export VGL_READBACK
 export VGL_LOG

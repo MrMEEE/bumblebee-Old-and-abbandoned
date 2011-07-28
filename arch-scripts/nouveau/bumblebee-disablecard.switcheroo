@@ -8,6 +8,12 @@
 # See https://wiki.archlinux.org/index.php/Bumblebee for details.
 
 
+# Check for first X server to be running or this may freeze system.
+#if [ ! -e /tmp/.X0-lock ]; then
+#    echo "Error: No primary X server running module"
+#    exit 2
+#fi
+
 # Check for display 1 X server lock file. If present something is running, maybe.
 if [ -e /tmp/.X1-lock ]; then
     echo "Error: nouveau module might be in use by display 1"
@@ -20,10 +26,14 @@ if ! lsmod | grep -q nouveau; then
     exit 1
 fi
 
-if ! dmesg | grep -q 'vga_switcheroo: enabled'; then
-    echo "Error: vga_switcheroo module not enabled, can't turn off card"
-    exit 1
+if [ ! -e /sys/kernel/debug/vgaswitcheroo/switch ]; then
+  echo "Error: Debug filesystem is not present. Can't access vga-switcheroo file"
 fi
+
+#if ! dmesg | grep -q 'vga_switcheroo: enabled'; then
+#    echo "Error: vga_switcheroo module not enabled, can't turn off card"
+#    exit 1
+#fi
 
 if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Pwr; then
      echo OFF > /sys/kernel/debug/vgaswitcheroo/switch
