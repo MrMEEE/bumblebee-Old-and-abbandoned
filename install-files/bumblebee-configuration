@@ -52,15 +52,15 @@ if [ "$UID" != "$ROOT_UID" ] ; then
 	echo "Please run the script with: sudo bumblebee-configuration"
 	exit 1
 fi
-  
-#	Determine Arch x86_64 or i686
+
+# Determine Arch x86_64 or i686
 ARCH=`uname -m`
 
-#	Get tools location 
-LSPCI=`which lspci` 
+# Get tools location
+LSPCI=`which lspci`
 MODPROBE=`which modprobe`
 
-#	Get terminal size
+# Get terminal size
 LINES=`stty size | cut -f1 -d' '`
 COLUMNS=`stty size | cut -f2 -d' '`
 
@@ -80,51 +80,48 @@ if [ -f /tmp/machineinfo ]; then
 fi
 
 if [ "$DISTRO" == "UBUNTU" ] ; then
+	# Before you start with messing with symlinks or removing files, make sure
+	# that you know what you are doing. Examine the installation scripts of
+	# nvidia-current and libgl1-mesa-glx to get an idea how the alternatives
+	# system should be used. If you're using rm or ln in /etc/alternatives, you
+	# are doing it wrong.
+	# A helpful command for showing links being created on configuring an other
+	# alternative:     update-alternatives --display gl_conf
+
+	# Since Bumblebee is a project to get Optimus laptops to work, we can safely
+	# assume that the nvidia driver is not used for the default display (:0)
+	# Therefore default to mesa instead of nvidia. vglrun sets the GL library
+	# path to /usr/lib{,32}/nvidia-current for programs running on the display
+	# accelerated by the nvidia card. Since most graphical applications are not
+	# statically linked nor setuid/setgid binaries, this is fine. There is an
+	# exception on this: programs which overwrite LD_LIBRARY_PATH will fail to
+	# load the nvidia GL driver. However, this method will allow GL on the Intel
+	# display where the previous situation breaks it.
+	# TLDR: this allows the intel display to use GL, the bumblebee display will
+	#       load the nvidia driver through vglrun in almost all cases
+
+	# this takes care of setting correct links which is used on
+	# /usr/lib/nvidia-current/gl.conf
+	# multiarch support
 	for arch in x86_64-linux-gnu i386-linux-gnu; do
+		# check if the link exist to prevent error messages
 		if update-alternatives --list ${arch}_gl_conf >/dev/null 2>&1; then
 			update-alternatives --force --set ${arch}_gl_conf /usr/lib/$arch/mesa/ld.so.conf
 		fi
 	done
-	update-alternatives --remove x86_64-linux-gnu_gl_conf /usr/lib/nvidia-current/ld.so.conf
-	update-alternatives --remove i386-linux-gnu_gl_conf /usr/lib/nvidia-current/alt_ld.so.conf
+	# versions before Oneiric without multiarch
+	if update-alternatives --list gl_conf >/dev/null 2>&1; then
+		update-alternatives --force --set gl_conf /usr/lib/mesa/ld.so.conf
+	fi
+	# remove a legacy link which was not used anyway
+	rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
 
-	update-alternatives --force \
-          --install /etc/ld.so.conf.d/GL.conf gl_conf /usr/lib/mesa/ld.so.conf 500 \
-          --slave /usr/lib/xorg/extra-modules xorg_extra_modules /usr/lib/xorg/x11-extra-modules
-          
-        update-alternatives --force \
-          --install /etc/ld.so.conf.d/GL.conf gl_conf /usr/lib/nvidia-current/ld.so.conf 9700 \
-          --slave /usr/share/man/man1/nvidia-xconfig.1.gz man_nvidiaxconfig.gz /usr/share/man/man1/alt-nvidia-current-xconfig.1.gz \
-          --slave /usr/share/man/man1/nvidia-smi.1.gz nvidia-smi.1.gz /usr/share/man/man1/alt-nvidia-current-smi.1.gz \
-          --slave /usr/share/applications/ubuntu-nvidia-settings.desktop nvidia_desktop /usr/share/nvidia-current/ubuntu-nvidia-settings.desktop \
-          --slave /usr/bin/nvidia-smi nvidia_smi /usr/lib/nvidia-current/bin/nvidia-smi \
-          --slave /usr/bin/nvidia-xconfig nvidia_xconfig /usr/lib/nvidia-current/bin/nvidia-xconfig \
-          --slave /usr/bin/nvidia-bug-report.sh nvidia_bug_report /usr/lib/nvidia-current/bin/nvidia-bug-report.sh \
-          --slave /usr/lib/XvMCConfig xvmcconfig /usr/lib/nvidia-current/XvMCConfig \
-          --slave /etc/xdg/autostart/nvidia-autostart.desktop nvidia-autostart.desktop /usr/share/nvidia-current/nvidia-autostart.desktop \
-          --slave /usr/lib/xorg/modules/drivers/nvidia_drv.so nvidia_drv /usr/lib/nvidia-current/xorg/nvidia_drv.so \
-          --slave /etc/modprobe.d/nvidia-graphics-drivers.conf nvidia_modconf /lib/nvidia-current/modprobe.conf \
-          --slave /usr/lib/xorg/extra-modules xorg_extra_modules /usr/lib/nvidia-current/xorg \
-          --slave /usr/lib/vdpau/libvdpau_nvidia.so.1 libvdpau_nvidia.so.1 /usr/lib/nvidia-current/vdpau/libvdpau_nvidia.so.1 \
-          --slave /usr/lib/libvdpau_nvidia.so libvdpau_nvidia.so /usr/lib/nvidia-current/vdpau/libvdpau_nvidia.so \
-          --slave /usr/lib32/vdpau/libvdpau_nvidia.so.1 libvdpau_nvidia.so.1_lib32 /usr/lib32/nvidia-current/vdpau/libvdpau_nvidia.so.1 \
-          --slave /usr/lib32/libvdpau_nvidia.so libvdpau_nvidia.so_lib32 /usr/lib32/nvidia-current/vdpau/libvdpau_nvidia.so \
-          --slave /usr/share/grub-gfxpayload-lists/blacklist/10_$PACKAGE_NAME grub_fb_blacklist /usr/share/nvidia-current/nvidia-current.grub-gfxpayload
-          
-        update-alternatives --force --set gl_conf /usr/lib/mesa/ld.so.conf
-        
-        rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
-        
-        ldconfig
-#	if update-alternatives --list gl_conf >/dev/null 2>&1; then
-#		update-alternatives --force --set gl_conf /usr/lib/mesa/ld.so.conf
-#	fi
-#	rm -rf /etc/alternatives/xorg_extra_modules
-#	rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
-#	rm -rf /usr/lib/xorg/x11-extra-modules/xorg
-#	rm -rf /usr/lib/xorg/extra-modules
-#	rm -rf /usr/lib/nvidia-current/xorg/xorg
-#	ln -s /usr/lib/nvidia-current/xorg /etc/alternatives/xorg_extra_modules-bumblebee
+	# fix appeared in commit 68a75db4df628a910886, it should remove an excess symlink
+	rm -f /usr/lib/nvidia-current/xorg/xorg
+
+	# Refresh the dynamic loader search path so /etc/ld.so.conf.d/GL.conf ->
+	# /etc/alternatives/gl_conf -> /usr/lib/mesa/ld.so.conf
+	ldconfig
 fi
 
 echo
@@ -146,6 +143,7 @@ do
 	((s++)) 
 	((i+=2))
 done < /tmp/machineinfo
+
 profiles[i+1]="Enter Manual Configuration"
 profiles[i]=997
 ((i+=2))
@@ -157,6 +155,7 @@ profiles[i]=999
 echo -n "50%..."
 wget -O /tmp/allmachineinfo "http://martin-juhl.dk/bumblebee/?searchitem=showall&search=1" 1>/dev/null 2>/dev/null
 echo -n "75%..."
+
 s=1
 i=1
 unset allprofiles
@@ -286,7 +285,7 @@ while [ "$CONFIGMODE" != "MANUAL" ] && [ "$CONFIGMODE" != "DONE" ] ; do
 " Please select a machine profile to install.\n\n"\
 "The profiles contains configuration for specific systems.\n\n"\
 "These profiles hasn't been individually tested and are submitted by users." $LINES $COLUMNS $LIST_SIZE "${allprofiles[@]}"  3>&1 1>&2 2>&3)
-	
+
 		if [ $choice -eq 999 ] ; then
 			whiptail --msgbox " Bumblebee has NOT been configured, and probably won't work." $LINES $COLUMNS
 			exit 0
