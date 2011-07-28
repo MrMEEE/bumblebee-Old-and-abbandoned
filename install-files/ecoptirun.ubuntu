@@ -101,6 +101,11 @@ for arg in "$@"
 #echo "Compression mode:" $VGL_COMPRESS
 #echo "Display:" $VGL_DISPLAY 
 
+# if executed from a symlink named optirun32, use the 32b path
+
+if [ "${0##*/}" = "optirun32" -a -d /usr/lib32 ]; then
+ VGL_DRIVER=/usr/lib32/nvidia-current
+fi
 
 #OPTIRUN
 function optirun_launcher 
