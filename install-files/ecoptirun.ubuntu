@@ -110,8 +110,17 @@ fi
 #OPTIRUN
 function optirun_launcher 
 {
-if [ ! -f /tmp/.X1-lock ]; then
- sudo /etc/init.d/bumblebee enable
+# Remove colon and everything before it: :1.0 -> 1.0
+display=${VGL_DISPLAY##*:}
+# Remove dot and everything after it: 1.0 -> 0
+display=${display%%.*}
+
+# test if Bumblebee's X server is running
+if [ ! -f /tmp/.X${display}-lock ]; then
+ if ! sudo /etc/init.d/bumblebee enable; then
+  echo "bumblebee could not be started - optirun cannot be executed."
+  exit 1
+ fi
 fi
 
 trap "echo 'Caught Ctrl+C'" INT
