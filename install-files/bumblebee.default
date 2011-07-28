@@ -17,3 +17,6 @@ VGL_READBACK=fbo
 
 # Readback mode
 VGL_LOG=/dev/null
+
+# ECO Mode
+ECO_MODE='0'
