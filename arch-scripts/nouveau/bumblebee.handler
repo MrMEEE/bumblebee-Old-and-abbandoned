@@ -6,12 +6,11 @@
 . /etc/rc.d/functions
 . /etc/bumblebee/bumblebee.conf
 
-DAEMON=bumblebee
+NAME=bumblebee
 #XDAEMON=/usr/bin/X
 #XDAEMON_ARGS="-ac -config /etc/bumblebee/xorg.conf.nouveau -sharevts -nolisten tcp -noreset :1 vt9"
 #PIDFILE=/tmp/.X1-lock
-BDAEMON=/etc/rc.d/bumblebeed
-BDAEMONPID=
+BDAEMON=/etc/bin/bumblebeed
 
 disable_card()
 {
@@ -25,7 +24,7 @@ enable_card()
 
 #TODO Check different exit status for appropriate feedback
 start() {
-   stat_busy "Starting up Bumblebee: "
+   stat_busy "Starting up Bumblebee:"
    
    disable_card
    if [ $? ]; then
@@ -33,8 +32,10 @@ start() {
    else
       stat_fail "Failed to switch card OFF"
    fi
-   $BDAEMON &>/dev/null &
-   BDAEMONPID=$!
+   if [ ! -e "$LOCKFILE" ]; then
+      $BDAEMON &>/dev/null &
+      echo $! > $LOCKFILE
+   fi
      #enable_card
      #if [ $? ]; then
      #     stat_append "Graphics card ON"
@@ -54,15 +55,16 @@ start() {
      #          exit 1
      #     fi 
      #done
-      add_daemon $DAEMON
+      add_daemon $NAME
       stat_done "Bumblebee is ON"
 }
 
 #TODO Check different exit status for appropriate feedback
 stop() {
-   stat_busy "Stopping bumblebee Daemon: "
+   stat_busy "Stopping bumblebee Daemon:"
    
-   kill $BDAEMONPID
+   kill `cat $LOCKFILE 2>&1`
+   rm -f $LOCKFILE
    enable_card
    if [ $? ]; then
       stat_append "Nvidia card ON"
@@ -82,11 +84,12 @@ stop() {
      #disable_card
      #if [ $? ]; then
      #     stat_append "Graphics card OFF"
-          stat_done "Bumblebee is out"
+     #     stat_done "Bumblebee is out"
      #else
      #     stat_fail "Failed to switch OFF card"
      #fi
-     rm_daemon $DAEMON
+     rm_daemon $NAME
+     stat_done
 }
 
 restart() {
@@ -106,7 +109,7 @@ case "$1" in
     restart
     ;;
   status)
-    ck_status $DAEMON
+    ck_status $NAME
   ;;
   cardon)
     enable_card

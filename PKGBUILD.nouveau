@@ -4,7 +4,7 @@
 # Maintainer: Samsagax <samsagax@gmail.com>
 
 pkgname=bumblebee-nouveau-git
-pkgver=20110719
+pkgver=20110728
 pkgrel=1
 pkgdesc="Optimus Support for Linux Through VirtualGL using Nouveau driver. Power Management supported throug Vga-switcheroo"
 arch=('i686' 'x86_64')
@@ -14,6 +14,7 @@ url="https://github.com/Samsagax/bumblebee"
 license=("GPL3")
 install=('bumblebee.install')
 provides=("bumblebee")
+conflicts=("bumblebee")
 
 _giturl="git://github.com/Samsagax/bumblebee.git"
 _gitbranch="nouveau"
@@ -28,11 +29,11 @@ package() {
   
 # Installing Bumblebee scripts
   # Executable files
-  install -D -m755 -v arch-scripts/nouveau/bumblebee.daemon ${pkgdir}/etc/rc.d/bumblebee
+  install -D -m755 -v arch-scripts/nouveau/bumblebee.daemon ${pkgdir}/etc/bin/bumblebeed
+  install -D -m755 -v arch-scripts/nouveau/bumblebee.handler ${pkgdir}/etc/rc.d/bumblebee
   install -D -m755 -v arch-scripts/nouveau/optirun ${pkgdir}/usr/bin/optirun
   install -D -m755 -v arch-scripts/nouveau/bumblebee-enablecard.switcheroo ${pkgdir}/usr/bin/bumblebee-enablecard
   install -D -m755 -v arch-scripts/nouveau/bumblebee-disablecard.switcheroo ${pkgdir}/usr/bin/bumblebee-disablecard
-  install -D -m755 -v arch-scripts/nouveau/switcheroo.daemon ${pkgdir}/etc/rc.d/switcheroo
   # Configuration files
   install -D -m644 -v arch-scripts/nouveau/xorg.conf.nouveau ${pkgdir}/etc/bumblebee/xorg.conf.nouveau
   install -D -m644 -v arch-scripts/bumblebee.conf ${pkgdir}/etc/bumblebee/bumblebee.conf

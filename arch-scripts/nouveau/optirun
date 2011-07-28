@@ -16,6 +16,7 @@ while  [ `ps aux |grep xorg.conf.nouveau |wc -l` -eq 1 ]; do
       exit 1
    fi 
 done
+stat_done "Server started. Running application"
 
 
 export VGL_READBACK

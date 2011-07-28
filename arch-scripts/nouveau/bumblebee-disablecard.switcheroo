@@ -28,6 +28,7 @@ fi
 
 if [ ! -e /sys/kernel/debug/vgaswitcheroo/switch ]; then
   echo "Error: Debug filesystem is not present. Can't access vga-switcheroo file"
+  exit 2
 fi
 
 #if ! dmesg | grep -q 'vga_switcheroo: enabled'; then
