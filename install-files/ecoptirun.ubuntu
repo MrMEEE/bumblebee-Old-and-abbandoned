@@ -107,6 +107,14 @@ if [ "${0##*/}" = "optirun32" -a -d /usr/lib32 ]; then
  VGL_DRIVER=/usr/lib32/nvidia-current
 fi
 
+show_msg()
+{
+ if ! $msg_shown; then
+  echo "Another bumblebee powered application is running, keeping bumblebee alive."
+  msg_shown=true
+ fi
+}
+
 #OPTIRUN
 function optirun_launcher 
 {
@@ -132,18 +140,28 @@ export VGL_LOG
 ######MODIFICATION######Replace : /usr/lib/nvidia-current with $VGL_DRIVER
 vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld $VGL_DRIVER "$@"
 
+msg_shown=false
+
 if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
- if [ `ps aux |grep optirun | wc -l` -gt 3 ]; then
-  echo "Another bumblebee powered application is running, keeping bumblebee alive."
-  exit 0
- elif [ `lsof -n -w |grep libnvidia-glcore | wc -l` -gt 0 ]; then
-  echo "Another bumblebee powered application is running, keeping bumblebee alive."
-  until [ `lsof -n -w |grep libnvidia-glcore |wc -l` -lt 1 ]; do      
+ OPTIRUNS="/usr/bin/optirun /usr/bin/optirun32 /usr/bin/optirun64"
+ while :; do
+  # there is a space separating PIDs if multiple optirun instances are running
+  if pidof -x $OPTIRUNS | grep -q ' '; then
+   show_msg
+   exit 0
+  elif lsof -n -w "/usr/lib/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
+   show_msg
    sleep 1
-  done
- fi
- sudo /etc/init.d/bumblebee disable 
-fi 
+  elif lsof -n -w "/usr/lib32/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
+   show_msg
+   sleep 1
+  else
+   break
+  fi
+ done
+ sudo /etc/init.d/bumblebee disable
+fi
+
 }
 
 #CHECK IF ON BATTERY OR NOT

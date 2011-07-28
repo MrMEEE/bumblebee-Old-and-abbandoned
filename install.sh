@@ -34,7 +34,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
-BUMBLEBEEVERSION=1.6.71
+BUMBLEBEEVERSION=1.7.0
 
 source stages/determinedistro
 
