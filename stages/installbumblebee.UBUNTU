@@ -88,14 +88,11 @@ rm -f /usr/lib/nvidia-current/xorg/xorg
 ldconfig
 
 cp install-files/optirun.bash_completion /etc/bash_completion.d/optirun
-cp install-files/ecoptirun.ubuntu /usr/local/bin/ecoptirun
+cp install-files/optirun.ubuntu /usr/local/bin/optirun
 
 if [ "$ARCH" = "x86_64" ]; then
- ln -s /usr/local/bin/ecoptirun /usr/local/bin/optirun32
- ln -s /usr/local/bin/ecoptirun /usr/local/bin/optirun64
- ln -s /usr/local/bin/ecoptirun /usr/local/bin/optirun
-else
- ln -s /usr/local/bin/ecoptirun /usr/local/bin/optirun
+ ln -s /usr/local/bin/optirun /usr/local/bin/optirun32
+ ln -s /usr/local/bin/optirun /usr/local/bin/optirun64
 fi
 
 if [ "`cat /etc/modules |grep "nvidia-current" |wc -l`" -eq "0" ]; then
