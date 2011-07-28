@@ -1,0 +1,55 @@
+#!/bin/sh
+# XXX: the package should depend on sysvinit-utils because of `pidof`
+# loads various settings
+. /etc/default/bumblebee
+
+# if executed from a symlink named optirun32, use the 32b path
+if [ "${0##*/}" = "optirun32" -a -d /usr/lib32 ]; then
+	libpath=/usr/lib32
+else
+	libpath=/usr/lib
+fi
+nvidia_path=$libpath/nvidia-current
+
+# Remove colon and everything before it: :1.0 -> 1.0
+display=${VGL_DISPLAY##*:}
+# Remove dot and everything after it: 1.0 -> 0
+display=${display%%.*}
+# test if Bumblebee's X server is running
+if [ ! -f /tmp/.X${display}-lock ]; then
+	if ! sudo /etc/init.d/bumblebee enable; then
+		echo "bumblebee could not be started - optirun cannot be executed."
+		exit 1
+	fi
+fi
+
+trap "echo 'Caught Ctrl+C'" INT
+
+export VGL_READBACK
+export VGL_LOG
+vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld "$nvidia_path" "$@"
+
+msg_shown=false
+show_msg()
+{
+	if ! $msg_shown; then
+		echo "Another bumblebee powered application is running, keeping bumblebee alive."
+		msg_shown=true
+	fi
+}
+if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
+	OPTIRUNS="/usr/bin/optirun /usr/bin/optirun32 /usr/bin/optirun64"
+	while :; do
+		# there is a space separating PIDs if multiple optirun instances are running
+		if pidof -x $OPTIRUNS | grep -q ' '; then
+			show_msg
+			exit 0
+		elif lsof -n -w "$nvidia_path/libnvidia-glcore.so"* >/dev/null; then
+			show_msg
+			sleep 1
+		else
+			break
+		fi
+	done
+	sudo /etc/init.d/bumblebee disable
+fi
