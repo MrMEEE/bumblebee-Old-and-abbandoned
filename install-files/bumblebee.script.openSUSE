@@ -53,6 +53,7 @@ fi
 start() {
 	check_3D_hack
 	valid_lock
+	check_options
 	if [ ! -f $LOCKFILE ] ; then
 		$ENABLECARD
 	fi
@@ -60,7 +61,7 @@ start() {
 	if [ -f $LOCKFILE ] ; then
 		echo
 		echo "Bumblebee server already running"
-		exit 1
+		exit 0
 	fi
 	if [ -f /usr/bin/nvidia-xconfig ] ; then
 		if [ "$ARCH" == "x86_64" ] ; then
@@ -103,7 +104,7 @@ stop() {
 	if [ ! -f $LOCKFILE ] ; then
 		echo
 		echo "Bumblebee server not running"
-		exit 1
+		exit 0
 	fi
 	PID_X=`cat $LOCKFILE`
 	kill $PID_X
@@ -125,9 +126,63 @@ stop() {
 }
 
 #
+#	Check the options
+#
+check_options()
+{
+	FORCE_VGL_DISPLAY="NO"
+
+	shift
+	for arg in "$@" ; do
+		case $arg in
+			-d)
+				#
+				#	Force new VGL display
+				#
+				FORCE_VGL_DISPLAY="YES"
+				shift
+				;;
+			:*)
+				if [ "$FORCE_VGL_DISPLAY" == "YES" ] ; then
+					#
+					#	Get the new display number
+					#
+					VGL_DISPLAY=$arg
+					#
+					#	Is bumblebee already running ?
+					#
+					PIDOF_X=`pidof X`
+					if[ "$PIDOF_X" != "" ] ; then
+						USED_VGL_DISPLAY=`ps -ef | grep $PIDOF_X | grep "/usr/bin/X" | sed -e "s/.*\(:.*\) vt9/\1/"`
+						if [ "$USED_VGL_DISPLAY" != "$VGL_DISPLAY" ] ; then
+							echo "Already using display $USED_VGL_DISPLAY"
+							exit 2
+						fi
+					fi
+					echo "Bumblebee is using display $VGL_DISPLAY"
+					shift
+					FORCE_VGL_DISPLAY="NO"
+				else
+					echo "The value :0, :1, ... ,:n for a display must be preceeded by the -d option"
+					exit 2
+				fi
+				;;
+			*)
+				#
+				#	Unknown option
+				#
+				echo "Unknown option: $arg"
+				shift
+				;;
+		esac
+	done
+}
+
+#
 #	Restart bumblebee
 #
-restart() {
+restart()
+{
 	stop
 	start
 }
@@ -135,7 +190,8 @@ restart() {
 #
 #	Valid lock files ?
 #
-valid_lock() {
+valid_lock()
+{
 	if [ -f $LOCKFILE ] && [ ! -f /tmp/.X$BEE_DISPLAY-lock ] ; then
 		#
 		#	There is a lock file but no X server running
@@ -158,7 +214,8 @@ valid_lock() {
 #
 #	Check the 3D repository setup
 #
-check_3D_hack() {
+check_3D_hack()
+{
 	if [ -f /usr/bin/nvidia-xconfig ] ; then
 		if [ -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
 			#
@@ -247,15 +304,18 @@ case "$1" in
                 ;;
 	status)
 		if [ -f $LOCKFILE ] ; then
-			echo $"Bumblebee X Server is running."
+			echo "Bumblebee X Server is running."
 			RETVAL=0
 		else
-			echo $"Bumblebee X Server is not running."
+			echo "Bumblebee X Server is not running."
 			RETVAL=3
 		fi
 		;;
-	*)
-		echo $"Usage: $0 {start|stop|enable|disable|status|restart|force-reload|reload}"
+	*|-h|--help)
+		echo "Usage: $0 {start|stop|enable|disable|status|restart|force-reload|reload} [OPTION]"
+		echo "  -h, --help  print this help and exit"
+		echo "	-d			display to use for the X server"
+
 		exit 1
 esac
 
