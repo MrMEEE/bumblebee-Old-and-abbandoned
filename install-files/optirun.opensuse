@@ -185,24 +185,6 @@ terminate()
 trap "terminate" INT
 
 #
-#	Set the library path
-#
-if [ -f /usr/bin/nvidia-xconfig ] ; then
-	if [ "$ARCH" == "x86_64" ] ; then
-		if [ "${0##*/}" == "optirun32" ] || [ "$FORCE_32" == "YES" ] ; then
-			LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:/usr/X11R6/lib64-nvidia:$LD_LIBRARY_PATH
-		else
-			LD_LIBRARY_PATH=/usr/X11R6/lib64-nvidia:/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
-		fi
-	else
-		LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
-	fi
-
-	export LD_LIBRARY_PATH
-fi
-
-
-#
 #	Battery power ?
 #
 AC_DEV=`ls /sys/class/power_supply | grep AC`
@@ -216,6 +198,23 @@ if [ "$POWER_STATE" == "1" ] || [ "$ECO_MODE" == "0" ] ; then
 	#	Enable bumblebee
 	#
 	sudo /etc/init.d/bumblebee enable -d $VGL_DISPLAY
+
+	#
+	#	Set the library path
+	#
+	if [ -f /usr/bin/nvidia-xconfig ] ; then
+		if [ "$ARCH" == "x86_64" ] ; then
+			if [ "${0##*/}" == "optirun32" ] || [ "$FORCE_32" == "YES" ] ; then
+				LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:/usr/X11R6/lib64-nvidia:$LD_LIBRARY_PATH
+			else
+				LD_LIBRARY_PATH=/usr/X11R6/lib64-nvidia:/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+			fi
+		else
+			LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+		fi
+
+		export LD_LIBRARY_PATH
+	fi
 
 	#
 	#	Run the command
