@@ -10,13 +10,17 @@ STOP_SERVICE_ON_EXIT=YES
 VGL_DISPLAY=:8
 
 # Image transport
+# proxy, jpeg, rgb, xv or yuv
 VGL_COMPRESS=xv
 
 # Readback mode
-VGL_READBACK=fbo
+# none, pbo, sync
+VGL_READBACK=pbo
 
-# Readback mode
+# VGL log
 VGL_LOG=/dev/null
 
 # ECO Mode
+# 1 :	ECO mode active, do not run bumblebee on battery power
+# 0 :	ECO mode disabled
 ECO_MODE='0'
