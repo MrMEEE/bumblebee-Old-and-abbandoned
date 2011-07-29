@@ -313,7 +313,7 @@ case "$1" in
 		fi
 		;;
 	*|-h|--help)
-		echo "Usage: $0 {start|stop|enable|disable|status|restart|force-reload|reload} [OPTION]"
+		echo "Usage: $0 { start | stop | enable | disable | status | restart | force-reload | reload } [ OPTION ]"
 		echo "  -h, --help  print this help and exit"
 		echo "	-d			display to use for the X server"
 

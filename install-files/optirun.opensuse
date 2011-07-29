@@ -132,14 +132,16 @@ for arg in "$@" $HELP ; do
 			#
 			#	Help
 			#
-			echo "Usage: ${0##*/} [OPTION]... FILE"
+			echo "Usage: ${0##*/} [ OPTION ]... FILE"
 			echo "  -h, --help  print this help and exit"
 			echo "  -l          list default settings"
 			echo "  -f          disable ECO mode, always start the application"
 			if [ "$ARCH" == "x86_64" ] ; then
 			echo "  -32         force 32 bit mode"
 			fi
-
+			echo
+			echo "  -c { proxy | jpeg | rgb | xv | yuv }  VGL compression type"
+			echo "  -d { :0 | :1 | ... | :n }             VGL display"
 
 			exit 1
 			;;
