@@ -184,13 +184,15 @@ terminate()
 #
 #	Battery power ?
 #
-AC_DEV=`ls /sys/class/power_supply | grep AC`
-POWER_STATE=`cat /sys/class/power_supply/$AC_DEV/online`
+#AC_DEV=`ls /sys/class/power_supply | grep AC`
+#POWER_STATE=`cat /sys/class/power_supply/$AC_DEV/online`
+
+POWER_STATE=`acpi -a | grep off-line`
 
 #
 #	Start the application
 #
-if [ "$POWER_STATE" == "1" ] || [ "$ECO_MODE" == "0" ] ; then
+if [ "$POWER_STATE" == "" ] || [ "$ECO_MODE" == "0" ] ; then
 	#
 	#	Intercept Ctrl-C, run terminate
 	#
