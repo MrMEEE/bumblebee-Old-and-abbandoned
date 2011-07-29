@@ -153,7 +153,7 @@ check_options()
 					#	Is bumblebee already running ?
 					#
 					PIDOF_X=`pidof X`
-					if[ "$PIDOF_X" != "" ] ; then
+					if [ "$PIDOF_X" != "" ] ; then
 						USED_VGL_DISPLAY=`ps -ef | grep $PIDOF_X | grep "/usr/bin/X" | sed -e "s/.*\(:.*\) vt9/\1/"`
 						if [ "$USED_VGL_DISPLAY" != "$VGL_DISPLAY" ] ; then
 							echo "Already using display $USED_VGL_DISPLAY"
