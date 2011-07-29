@@ -180,11 +180,6 @@ terminate()
 }
 
 #
-#	Intercept Ctrl-C, run terminate
-#
-trap "terminate" INT
-
-#
 #	Battery power ?
 #
 AC_DEV=`ls /sys/class/power_supply | grep AC`
@@ -194,6 +189,11 @@ POWER_STATE=`cat /sys/class/power_supply/$AC_DEV/online`
 #	Start the application
 #
 if [ "$POWER_STATE" == "1" ] || [ "$ECO_MODE" == "0" ] ; then
+	#
+	#	Intercept Ctrl-C, run terminate
+	#
+	trap "terminate" INT
+
 	#
 	#	Enable bumblebee
 	#
