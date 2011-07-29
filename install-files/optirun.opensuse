@@ -1,20 +1,116 @@
 #!/bin/bash
+#
+#
+
+### BEGIN LICENSE
+#
+#    This file is part of bumblebee.
+#
+#    bumblebee is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    bumblebee is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
+#
+### END LICENSE
+
+#
+#	Initialize vars
+#
+ECO_MODE='1'
+FORCE32='0'
+
+#
+#	Get the architecture
+#
+ARCH=`uname -m`
 
 #
 #	Get the defaults
 #
-source /etc/default/bumblebee
+[ -r /etc/default/bumblebee ] && . /etc/default/bumblebee
+
+#
+#	Handle arguments
+#
+HELP=""
+if [ $# -eq 0 ] ; then
+	HELP="-h"
+fi
+
+for arg in "$@" $HELP ; do
+	case $arg in
+		-f)
+			#
+			#	Force to run if on battery
+			#
+			ECO_MODE='0'
+			shift
+			;;
+		-32)
+			#
+			#	Force 32 bit mode
+			#
+			FORCE32='1'
+			shift
+			;;
+		-l)
+			#
+			#	List all settings
+			#
+			if [ "$ECO_MODE" == "0" ] ; then
+				echo "ECO mode: off"
+			else
+				echo "ECO mode: on"
+			fi
+			if [ "$ARCH" == "x86_64" ] ; then
+				if [ "$FORCE32" == "0" ] ; then
+					echo "Application mode: 64 bit"
+				else
+					echo "Application mode: 32 bit"
+				fi
+			fi
+			echo "Display: $VGL_DISPLAY"
+			echo "Compression: $VGL_COMPRESS"
+
+			exit 0
+			;;
+		-h|--help)
+			#
+			#	Help
+			#
+			echo "Usage: ${0##*/} [OPTION]... FILE"
+			echo "  -h, --help  print this help and exit"
+			echo "  -l          list default settings"
+			echo "  -f          disable ECO mode, always start the application"
+			if [ "$ARCH" == "x86_64" ] ; then
+			echo "  -32         force 32 bit mode"
+			fi
+
+
+			exit 1
+			;;
+		*)
+			#
+			#	Start the application
+			#
+			break
+			;;
+	esac
+done
 
 #
 #	Get the display
 #
 BEE_DISPLAY=${VGL_DISPLAY##*:}
 BEE_DISPLAY=${BEE_DISPLAY%%.*}
-
-#
-#	Get the architecture
-#
-ARCH=`uname -m`
 
 #
 #	Terminate
@@ -24,8 +120,8 @@ terminate()
 	#
 	#	Can we disable bumblebee ?
 	#
-	if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
-		if [ `ps -e |grep optirun | wc -l` -gt 2 ]; then
+	if [ "$STOP_SERVICE_ON_EXIT" != "NO" ] ; then
+		if [ `pidof -x optirun optirun32 optirun64 | wc -w` -gt 2 ] ; then
 			echo "Another bumblebee powered application is running, keeping bumblebee alive."
 			exit 0
 		fi
@@ -38,11 +134,6 @@ terminate()
 }
 
 #
-#	Enable bumblebee
-#
-sudo /etc/init.d/bumblebee enable
-
-#
 #	Intercept Ctrl-C, run terminate
 #
 trap "terminate" INT
@@ -52,7 +143,7 @@ trap "terminate" INT
 #
 if [ -f /usr/bin/nvidia-xconfig ] ; then
 	if [ "$ARCH" == "x86_64" ] ; then
-		if [ "${0##*/}" == "optirun32" ] ;then
+		if [ "${0##*/}" == "optirun32" ] || [ "$FORCE32" == "1" ] ; then
 			LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:/usr/X11R6/lib64-nvidia:$LD_LIBRARY_PATH
 		else
 			LD_LIBRARY_PATH=/usr/X11R6/lib64-nvidia:/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
@@ -64,12 +155,32 @@ if [ -f /usr/bin/nvidia-xconfig ] ; then
 	export LD_LIBRARY_PATH
 fi
 
+
 #
-#	Run the command
+#	Battery power ?
 #
-export VGL_READBACK
-export VGL_LOG
-vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY "$@"
+AC_DEV=`ls /sys/class/power_supply | grep AC`
+POWER_STATE=`cat /sys/class/power_supply/$AC_DEV/online`
+
+#
+#	Start the application
+#
+if [ "$POWER_STATE" == "1" ] || [ "$ECO_MODE" == "0" ] ; then
+	#
+	#	Enable bumblebee
+	#
+	sudo /etc/init.d/bumblebee enable
+
+	#
+	#	Run the command
+	#
+	export VGL_READBACK
+	export VGL_LOG
+	vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY "$@"
+
+else
+	echo "optirun: ECO mode active, bumblebee is not started because you are on battery power."
+fi
 
 #
 #	The end...
