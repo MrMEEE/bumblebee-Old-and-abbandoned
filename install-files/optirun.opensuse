@@ -187,12 +187,10 @@ terminate()
 #
 #	Take the first power supply in the list...
 #
-AC_DEV=`ls -d /sys/class/power_supply/*/online | head -1`
-if [ "$AC_DEV" != "" ] ; then
-	POWER_STATE=`cat $AC_DEV`
-else
-	POWER_STATE="1"
-fi
+POWER_STATE=0
+for state in /sys/class/power_supply/*/online ; do
+	POWER_STATE=$(( POWER_STATE || `cat $state` ))
+done
 
 #
 #	Start the application
