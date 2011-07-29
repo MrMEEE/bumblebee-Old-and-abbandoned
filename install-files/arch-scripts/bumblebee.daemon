@@ -1,0 +1,70 @@
+#!/bin/bash
+
+. /etc/rc.conf
+. /etc/rc.d/functions
+
+DAEMON=bumblebee
+XDAEMON=/usr/bin/X
+XDAEMON_ARGS="-ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-bumblebee/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9"
+PIDFILE=/tmp/.X1-lock
+#PID=$(cat $PIDFILE 2>/dev/null)
+
+#TODO Check different exit status for appropriate feedback
+start() {
+     stat_busy "Starting up bumblebee Daemon"
+     PID=$(cat $PIDFILE 2>/dev/null)
+     if [ -z "$PID" ]; then
+          LD_LIBRARY_PATH=/usr/lib/nvidia-bumblebee $XDAEMON $XDAEMON_ARGS &>/dev/null &
+     fi
+     i=1
+     while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
+          sleep 1
+          i=`expr $i + 1`
+          if [ $i -gt 10 ]; then
+               stat_fail "Bumblebee server failed to start"
+               exit 1
+          fi 
+     done
+      add_daemon $DAEMON
+      stat_done
+}
+
+#TODO Check different exit status for appropriate feedback
+stop() {
+     stat_busy "Stopping bumblebee Daemon"
+     kill `cat $PIDFILE 2>&1` > /dev/null 2>&1
+     while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -ne 1 ]; do
+          sleep 1
+          i=`expr $i + 1`
+          if [ $i -gt 10 ]; then
+               stat_fail "Bumblebee server failed to stop"
+               exit 1
+          fi
+     done
+     rm -f $PIDFILE
+     rm_daemon $DAEMON
+     stat_done
+}
+
+restart() {
+  stop
+  sleep 1
+  start
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    restart
+    ;;
+  status)
+    ck_status bumblebee
+  ;;
+  *)
+    echo "usage: $0 {start|stop|restart|status}"  
+esac

@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# This script should contain the command(s) necessary to switch off the
+# nVidia card on Dell Vostro 3500, provided by Samsagax.
+# 
+# This script uses the vga-switcheroo module. To enable it you must mount
+# debugfs filesystem in /sys/kernel/debug/
+# See https://wiki.archlinux.org/index.php/Bumblebee for details.
+
+rmmod nvidia
+if lsmod | grep -q nvidia; then
+ echo "Error: could not unload nvidia module, leaving card turned on"
+ exit
+fi
+
+modprobe -v nouveau
+if ! dmesg | grep -q 'vga_switcheroo: enabled'; then
+    echo "Error: vga_switcheroo module not enabled, can't turn off card"
+    exit
+fi
+
+if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Pwr; then
+     echo OFF > /sys/kernel/debug/vgaswitcheroo/switch
+     RET_VAL=$?
+     if [ $RET_VAL ]; then
+          echo "Switch OFF successfull"
+     else
+          echo "Error $?"
+          exit $RET_VAL
+     fi
+else
+     echo 'Card is already OFF'
+fi
+
