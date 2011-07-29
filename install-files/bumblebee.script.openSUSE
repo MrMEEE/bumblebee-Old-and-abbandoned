@@ -1,6 +1,7 @@
 #! /bin/sh
 #
-# Author: Arnaud Dupuis <a.dupuis@infinityperl.org>
+# Author: Maxime Rijnders <ximi_github@hotmail.com>
+#         Arnaud Dupuis <a.dupuis@infinityperl.org>
 #
 # /etc/init.d/bumblebee
 #
