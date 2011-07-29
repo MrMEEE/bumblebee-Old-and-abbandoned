@@ -173,12 +173,11 @@ fi
 
 #CHECK IF ON BATTERY OR NOT
 
-AC_DEV=`ls -d /sys/class/power_supply/*/online | head -1`
-if [ "$AC_DEV" != "" ] ; then
-        POWER_STATE=`cat $AC_DEV`
-else
-	POWER_STATE="1"
-fi
+POWER_STATE=0
+for state in /sys/class/power_supply/*/online; do
+	POWER_STATE=$(cat "$state")
+	break
+done
 
 if [ "$POWER_STATE" -eq "1" ] || [ "$ECO_MODE" -eq "0" ]; then
 	optirun_launcher $@
