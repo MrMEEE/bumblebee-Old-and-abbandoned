@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# This daemon will turn on the nvidia card when needed and turn 
+# it back off when not used
+
+. /etc/rc.conf
+. /etc/rc.d/functions
+. /etc/bumblebee/bumblebee.conf
+
+HANDLER=/etc/rc.d/bumblebee
+XDAEMON=/usr/bin/X
+XDAEMON_ARGS="-ac -config /etc/bumblebee/xorg.conf.nouveau -sharevts -nolisten tcp -noreset :1 vt9"
+PIDFILE=/tmp/.X1-lock
+REFRESH=1 # Refresh time in seconds
+
+while :
+do
+   # While 'optirun' is running
+   while pidof -x optirun 
+   do
+      if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Off; then
+         $HANDLER cardon
+         # echo "Card turned ON"
+      fi
+      if [ ! -e $PIDFILE ]; then
+         $XDAEMON $XDAEMON_ARGS &>/dev/null &
+      fi
+      sleep $REFRESH
+   done
+   
+   # While 'optirun' is not running
+   while ! pidof -x optirun 
+   do
+      if [ -e $PIDFILE ]; then
+         kill -TERM `cat $PIDFILE 2>&1`
+         rm -f $PIDFILE
+      fi
+      if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Pwr; then
+         $HANDLER cardoff
+      fi
+      sleep $REFRESH
+   done
+   sleep 1
+done

@@ -1,0 +1,19 @@
+Section "ServerLayout"
+    Identifier     "Layout0"
+    Option         "AutoAddDevices" "false"
+EndSection
+
+Section "Module"
+	Load  "dbe"
+	Load  "extmod"
+	Load  "glx"
+	Load  "record"
+	Load  "freetype"
+	Load  "type1"
+EndSection
+
+Section "Device"
+    Identifier     "Device1"
+    Driver         "nouveau"
+    BusID          "REPLACEWITHBUSID"
+EndSection

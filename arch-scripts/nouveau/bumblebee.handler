@@ -1,0 +1,124 @@
+#!/bin/bash
+
+# Daemon for bumblebee using nouveau driver
+
+. /etc/rc.conf
+. /etc/rc.d/functions
+. /etc/bumblebee/bumblebee.conf
+
+NAME=bumblebee
+#XDAEMON=/usr/bin/X
+#XDAEMON_ARGS="-ac -config /etc/bumblebee/xorg.conf.nouveau -sharevts -nolisten tcp -noreset :1 vt9"
+#PIDFILE=/tmp/.X1-lock
+LOCKFILE=/tmp/.bb-lock
+BDAEMON=/usr/bin/bumblebeed
+
+disable_card()
+{
+     $DISABLECARD
+}
+
+enable_card()
+{
+     $ENABLECARD
+}
+
+#TODO Check different exit status for appropriate feedback
+start() {
+   stat_busy "Starting up Bumblebee:"
+   
+   disable_card
+   if [ $? ]; then
+      stat_append "Nvidia card OFF"
+   else
+      stat_fail "Failed to switch card OFF"
+   fi
+   if [ ! -e "$LOCKFILE" ]; then
+      $BDAEMON &>/dev/null &
+      BDPID=$!
+      echo "$BDPID" > "$LOCKFILE"
+   fi
+     #enable_card
+     #if [ $? ]; then
+     #     stat_append "Graphics card ON"
+     #else
+     #     stat_fail "Failed to switch ON card"
+     #fi
+     #PID=$(cat $PIDFILE 2>/dev/null)
+     #if [ -z "$PID" ]; then
+     #     $XDAEMON $XDAEMON_ARGS &>/dev/null &
+     #fi
+     #i=1
+     #while  [ `ps aux |grep xorg.conf.nouveau |wc -l` -eq 1 ]; do
+     #     sleep 1
+     #     i=`expr $i + 1`
+     #     if [ $i -gt 10 ]; then
+     #          stat_fail "Bumblebee server failed to start"
+     #          exit 1
+     #     fi 
+     #done
+      add_daemon $NAME
+      stat_done "Bumblebee is ON"
+}
+
+#TODO Check different exit status for appropriate feedback
+stop() {
+   stat_busy "Stopping bumblebee Daemon:"
+   
+   kill `cat $LOCKFILE 2>&1`
+   rm -f $LOCKFILE
+   enable_card
+   if [ $? ]; then
+      stat_append "Nvidia card ON"
+   else
+      stat_fail "Failed to switch card ON"
+   fi
+     #kill `cat $PIDFILE 2>&1` > /dev/null 2>&1
+     #while  [ `ps aux |grep xorg.conf.nouveau |wc -l` -ne 1 ]; do
+     #     sleep 1
+     #     i=`expr $i + 1`
+     #     if [ $i -gt 10 ]; then
+     #          stat_fail "Bumblebee server failed to stop"
+     #          exit 1
+     #     fi
+     #done
+     #rm -f $PIDFILE
+     #disable_card
+     #if [ $? ]; then
+     #     stat_append "Graphics card OFF"
+     #     stat_done "Bumblebee is out"
+     #else
+     #     stat_fail "Failed to switch OFF card"
+     #fi
+     rm_daemon $NAME
+     stat_done
+}
+
+restart() {
+  stop
+  sleep 1
+  start
+}
+
+case "$1" in
+  start|enable)
+    start
+    ;;
+  stop|disable)
+    stop
+    ;;
+  restart)
+    restart
+    ;;
+  status)
+    ck_status $NAME
+  ;;
+  cardon)
+    enable_card
+  ;;
+  cardoff)
+    disable_card
+  ;;
+  *)
+    echo "usage: $0 {start|stop|enable|disable|restart|status|cardon|cardoff}"  
+esac
