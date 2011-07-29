@@ -29,7 +29,7 @@ package() {
   
 # Installing Bumblebee scripts
   # Executable files
-  install -D -m755 -v arch-scripts/nouveau/bumblebee.daemon ${pkgdir}/etc/bin/bumblebeed
+  install -D -m755 -v arch-scripts/nouveau/bumblebee.daemon ${pkgdir}/usr/bin/bumblebeed
   install -D -m755 -v arch-scripts/nouveau/bumblebee.handler ${pkgdir}/etc/rc.d/bumblebee
   install -D -m755 -v arch-scripts/nouveau/bumblebee.pm ${pkgdir}/usr/lib/pm-utils/power.d/bumblebee
   install -D -m755 -v arch-scripts/nouveau/optirun ${pkgdir}/usr/bin/optirun
@@ -40,6 +40,6 @@ package() {
   install -D -m644 -v arch-scripts/nouveau/xorg.conf.nouveau ${pkgdir}/etc/bumblebee/xorg.conf.nouveau
   install -D -m644 -v arch-scripts/bumblebee.conf ${pkgdir}/etc/bumblebee/bumblebee.conf
   # Bash completion
-  install -D -m644 -v arch-scripts/nouveau/optirun.bash_completion ${pkgdir}/etc/bash_completion.d/optirun
+  install -D -m644 -v arch-scripts/optirun.bash_completion ${pkgdir}/etc/bash_completion.d/optirun
 }
 
