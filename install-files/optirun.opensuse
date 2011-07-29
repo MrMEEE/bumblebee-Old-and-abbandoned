@@ -82,11 +82,11 @@ for arg in "$@" $HELP ; do
 			#
 			if [ "$FORCE_COMPRESS" == "YES" ] ; then
 				VGL_COMPRESS=$arg
-				echo "Using compressioon: $VGL_COMPRESS"
+				echo "Using compression: $VGL_COMPRESS"
 				shift
 				FORCE_COMPRESS="NO"
 			else
-				echo "The value proxy, jpeg, rgb, xv or yuv for the compression must be preceeded by the -c option"
+				echo "The value proxy, jpeg, rgb, xv or yuv for the compression must be preceded by the -c option"
 				exit 1
 			fi
 			;;
@@ -103,7 +103,7 @@ for arg in "$@" $HELP ; do
 				shift
 				FORCE_VGL_DISPLAY="NO"
 			else
-				echo "The value :0, :1, ... ,:n for a display must be preceeded by the -d option"
+				echo "The value :0, :1, ... ,:n for a display must be preceded by the -d option"
 				exit 2
 			fi
 			;;
@@ -142,6 +142,7 @@ for arg in "$@" $HELP ; do
 			echo
 			echo "  -c { proxy | jpeg | rgb | xv | yuv }  VGL compression type"
 			echo "  -d { :0 | :1 | ... | :n }             VGL display"
+			echo
 
 			exit 1
 			;;
