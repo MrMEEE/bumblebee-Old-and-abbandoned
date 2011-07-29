@@ -21,12 +21,6 @@
 [ -r /etc/default/bumblebee ] && . /etc/default/bumblebee
 
 #
-#	Get the display
-#
-BEE_DISPLAY=${VGL_DISPLAY##*:}
-BEE_DISPLAY=${BEE_DISPLAY%%.*}
-
-#
 #	Get the architecture
 #
 ARCH=`uname -m`
@@ -51,10 +45,10 @@ fi
 #
 #	Bumblebee X server start
 #
-start() {
+start()
+{
 	check_3D_hack
 	valid_lock
-	check_options
 	if [ ! -f $LOCKFILE ] ; then
 		$ENABLECARD
 	fi
@@ -99,7 +93,8 @@ start() {
 #
 #	Bumblebee X server stop
 #
-stop() {
+stop()
+{
 	check_3D_hack
 	echo -n "Stopping bumblebee X server: "
 	if [ ! -f $LOCKFILE ] ; then
@@ -124,59 +119,6 @@ stop() {
 	done
 	echo
 	$DISABLECARD
-}
-
-#
-#	Check the options
-#
-check_options()
-{
-	FORCE_VGL_DISPLAY="NO"
-
-	shift
-	for arg in "$@" ; do
-		case $arg in
-			-d)
-				#
-				#	Force new VGL display
-				#
-				FORCE_VGL_DISPLAY="YES"
-				shift
-				;;
-			:*)
-				if [ "$FORCE_VGL_DISPLAY" == "YES" ] ; then
-					#
-					#	Get the new display number
-					#
-					VGL_DISPLAY=$arg
-					#
-					#	Is bumblebee already running ?
-					#
-					PIDOF_X=`pidof X`
-					if [ "$PIDOF_X" != "" ] ; then
-						USED_VGL_DISPLAY=`ps -ef | grep $PIDOF_X | grep "/usr/bin/X" | sed -e "s/.*\(:.*\) vt9/\1/"`
-						if [ "$USED_VGL_DISPLAY" != "$VGL_DISPLAY" ] ; then
-							echo "Already using display $USED_VGL_DISPLAY"
-							exit 2
-						fi
-					fi
-					echo "Bumblebee is using display $VGL_DISPLAY"
-					shift
-					FORCE_VGL_DISPLAY="NO"
-				else
-					echo "The value :0, :1, ... ,:n for a display must be preceeded by the -d option"
-					exit 2
-				fi
-				;;
-			*)
-				#
-				#	Unknown option
-				#
-				echo "Unknown option: $arg"
-				shift
-				;;
-		esac
-	done
 }
 
 #
@@ -263,9 +205,70 @@ check_3D_hack()
 }
 
 #
+#	Main
+#
+COMMAND=$1
+
+FORCE_VGL_DISPLAY="NO"
+shift
+for arg in "$@" ; do
+	case $arg in
+		-d)
+			#
+			#	Force new VGL display
+			#
+			FORCE_VGL_DISPLAY="YES"
+			shift
+			;;
+		:*)
+			if [ "$FORCE_VGL_DISPLAY" == "YES" ] ; then
+				#
+				#	Get the new display number
+				#
+				NEW_VGL_DISPLAY=$arg
+				#
+				#	Is bumblebee already running ?
+				#
+				FOUND=`ps axwwww | grep /usr/bin/X | grep vt9`
+				if [ "$FOUND" != "" ] ; then
+					USED_VGL_DISPLAY=`echo $FOUND | sed -e "s/.*\(:.*\) vt9/\1/"`
+					if [ "$USED_VGL_DISPLAY" != "$NEW_VGL_DISPLAY" ] ; then
+						echo "Trying to use display $NEW_VGL_DISPLAY,"
+						echo "but already using display $USED_VGL_DISPLAY"
+						exit 2
+					fi
+				fi
+				if [ "$NEW_VGL_DISPLAY" != "$VGL_DISPLAY" ] ; then
+					VGL_DISPLAY=$NEW_VGL_DISPLAY
+					echo "Bumblebee is using display $VGL_DISPLAY"
+				fi
+				shift
+				FORCE_VGL_DISPLAY="NO"
+			else
+				echo "The value :0, :1, ... ,:n for a display must be preceeded by the -d option"
+				exit 2
+			fi
+			;;
+		*)
+			#
+			#	Unknown option
+			#
+			echo "Unknown option: $arg"
+			shift
+			;;
+	esac
+done
+
+#
+#	Get the display
+#
+BEE_DISPLAY=${VGL_DISPLAY##*:}
+BEE_DISPLAY=${BEE_DISPLAY%%.*}
+
+#
 #	Script commands
 #
-case "$1" in
+case "$COMMAND" in
 	start)
 		$DISABLECARD
 		# Remember status and be verbose
@@ -315,7 +318,7 @@ case "$1" in
 	*|-h|--help)
 		echo "Usage: $0 { start | stop | enable | disable | status | restart | force-reload | reload } [ OPTION ]"
 		echo "  -h, --help  print this help and exit"
-		echo "	-d			display to use for the X server"
+		echo "  -d          display to use for the X server"
 
 		exit 1
 esac

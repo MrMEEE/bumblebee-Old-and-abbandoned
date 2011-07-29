@@ -205,6 +205,9 @@ if [ "$POWER_STATE" == "1" ] || [ "$ECO_MODE" == "0" ] ; then
 	#	Enable bumblebee
 	#
 	sudo /etc/init.d/bumblebee enable -d $VGL_DISPLAY
+	if [ $? -ne 0 ] ; then
+		exit 1
+	fi
 
 	#
 	#	Set the library path
