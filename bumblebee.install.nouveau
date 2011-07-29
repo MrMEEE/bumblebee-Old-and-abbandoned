@@ -5,6 +5,7 @@ post_upgrade() {
 post_install() {
 
 #==================================================================================================
+echo "Changing Configuration to match your Machine"
 
 if [ `lspci |grep VGA |wc -l` -eq 2 ]; then 
    NVIDIABUSID=`echo "PCI:"\`lspci |grep VGA |grep nVidia |cut -f1 -d:\`":"\`lspci |grep VGA |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep VGA |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``
@@ -14,8 +15,7 @@ else
 echo "The BusID of the nVidia card can't be determined"
 echo "You must correct this manually in /etc/bumblebee/xorg.conf.nouveau"
 fi
-echo "Changing Configuration to match your Machine"
-echo 
+
 sed -i 's/REPLACEWITHBUSID/'$NVIDIABUSID'/g' /etc/bumblebee/xorg.conf.nouveau
 
 #==================================================================================================
@@ -25,7 +25,7 @@ echo "Installation complete..."
 echo "Run your programs with: optirun <name of program>"
 echo 
 echo "Visit ArchWiki page on Bumblebee for documentation on how to finish setup,"
-echo "configure and run applications with Bumblebee:"
+echo "configure and run applications with Bumblebee-nouveau:"
 echo "http://wiki.archlinux.org/index.php/Bumblebee"
 
 }

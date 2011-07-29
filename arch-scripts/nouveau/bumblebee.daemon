@@ -20,7 +20,7 @@ do
    do
       if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Off; then
          $HANDLER cardon
-         echo "Card turned ON"
+         # echo "Card turned ON"
       fi
       if [ ! -e $PIDFILE ]; then
          $XDAEMON $XDAEMON_ARGS &>/dev/null &

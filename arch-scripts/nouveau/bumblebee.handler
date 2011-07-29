@@ -10,7 +10,8 @@ NAME=bumblebee
 #XDAEMON=/usr/bin/X
 #XDAEMON_ARGS="-ac -config /etc/bumblebee/xorg.conf.nouveau -sharevts -nolisten tcp -noreset :1 vt9"
 #PIDFILE=/tmp/.X1-lock
-BDAEMON=/etc/bin/bumblebeed
+LOCKFILE=/tmp/.bb-lock
+BDAEMON=/usr/bin/bumblebeed
 
 disable_card()
 {
@@ -34,7 +35,8 @@ start() {
    fi
    if [ ! -e "$LOCKFILE" ]; then
       $BDAEMON &>/dev/null &
-      echo $! > $LOCKFILE
+      BDPID=$!
+      echo "$BDPID" > "$LOCKFILE"
    fi
      #enable_card
      #if [ $? ]; then
