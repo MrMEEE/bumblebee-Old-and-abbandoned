@@ -172,11 +172,17 @@ fi
 }
 
 #CHECK IF ON BATTERY OR NOT
-power_state=$(acpi -a |grep on-line |wc -l)
 
-if [ "$power_state" -eq "1" ] || [ "$ECO_MODE" -eq "0" ]; then
+AC_DEV=`ls -d /sys/class/power_supply/*/online | head -1`
+if [ "$AC_DEV" != "" ] ; then
+        POWER_STATE=`cat $AC_DEV`
+else
+	POWER_STATE="1"
+fi
+
+if [ "$POWER_STATE" -eq "1" ] || [ "$ECO_MODE" -eq "0" ]; then
 	optirun_launcher $@
-elif [ "$power_state" -eq "0" ]; then
+elif [ "$POWER_STATE" -eq "0" ]; then
 	$@
 else
 	$@
