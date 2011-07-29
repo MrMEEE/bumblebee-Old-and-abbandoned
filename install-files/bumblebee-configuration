@@ -337,11 +337,13 @@ fi
 
 if [ "$CONFIGMODE" == "MANUAL" ]; then
 	CONNECTEDMONITOR="UNKNOWN"
-	if [ -f /usr/local/bin/bumblebee-enablecard ]; then
-		/usr/local/bin/bumblebee-enablecard
-	fi
-	if [ -f /usr/bin/bumblebee-enablecard ]; then
-		/usr/bin/bumblebee-enablecard
+	if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 1 ]; then
+		if [ -f /usr/local/bin/bumblebee-enablecard ]; then
+			/usr/local/bin/bumblebee-enablecard
+		fi
+		if [ -f /usr/bin/bumblebee-enablecard ]; then
+			/usr/bin/bumblebee-enablecard
+		fi
 	fi
 	if [ "$DISTRO" == "UBUNTU" ] ; then
 		${MODPROBE} nvidia-current
@@ -363,12 +365,13 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 		fi
 		${MODPROBE} -r nvidia 2>&1 >/dev/null
 	fi
-
-	if [ -f /usr/local/bin/bumblebee-disablecard ]; then
-		/usr/local/bin/bumblebee-disablecard
-	fi
-	if [ -f /usr/bin/bumblebee-disablecard ]; then
-		/usr/bin/bumblebee-disablecard
+	if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 1 ]; then
+		if [ -f /usr/local/bin/bumblebee-disablecard ]; then
+			/usr/local/bin/bumblebee-disablecard
+		fi
+		if [ -f /usr/bin/bumblebee-disablecard ]; then
+			/usr/bin/bumblebee-disablecard
+		fi
 	fi
 	if [ "$CONNECTEDMONITOR" != "CRT-0" ] && [ "$CONNECTEDMONITOR" != "DFP-0" ];then
 		LIST_SIZE=$(($LINES - 10))
@@ -394,11 +397,13 @@ sed -i "s/\([ \t]*Option[ \t]*\"ConnectedMonitor\"[ \t]*\)".*"/\1\"$CONNECTEDMON
 #
 #	Always try to enable the card before switching scripts
 #
-if [ -f /usr/local/bin/bumblebee-enablecard ] ; then
-	/usr/local/bin/bumblebee-enablecard
-fi
-if [ -f /usr/bin/bumblebee-enablecard ] ; then
-	/usr/bin/bumblebee-enablecard
+if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 1 ]; then
+	if [ -f /usr/local/bin/bumblebee-enablecard ] ; then
+		/usr/local/bin/bumblebee-enablecard
+	fi
+	if [ -f /usr/bin/bumblebee-enablecard ] ; then
+		/usr/bin/bumblebee-enablecard
+	fi
 fi
 if [ "$DISTRO" == "UBUNTU" ] ; then
 	if [ ! "$POWERON" == "UNAVAILABLE" ] ; then

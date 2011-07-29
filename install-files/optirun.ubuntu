@@ -44,6 +44,7 @@ source /etc/default/bumblebee
 VGL_DRIVER="/usr/lib/nvidia-current"
 get_compression='0'
 get_display='0'
+NVIDIABUSID=`grep BusID /etc/X11/xorg.conf.nvidia | sed -e "s/[ \t]*BusID[ \t]*\"\(.*\)\"/\1/g" |cut -d: -f2,3`
 
 #READ ARGUMENTS
 #echo "$@"
@@ -125,9 +126,11 @@ display=${display%%.*}
 
 # test if Bumblebee's X server is running
 if [ ! -f /tmp/.X${display}-lock ]; then
- if ! sudo /etc/init.d/bumblebee enable; then
-  echo "bumblebee could not be started - optirun cannot be executed."
-  exit 1
+ if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 1 ]; then
+  if ! sudo /etc/init.d/bumblebee enable; then
+   echo "bumblebee could not be started - optirun cannot be executed."
+   exit 1
+  fi
  fi
 fi
 
@@ -152,25 +155,33 @@ if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
   elif lsof -n -w "/usr/lib/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
    show_msg
    sleep 1
-  elif lsof -n -w "/usr/lib32/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
-   show_msg
-   sleep 1
+  elif [ -f /usr/lib32/nvidia-current/libnvidia-glcore.so ]; then 
+   if lsof -n -w "/usr/lib32/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
+    show_msg
+    sleep 1
+   fi
   else
    break
   fi
  done
- sudo /etc/init.d/bumblebee disable
+ if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 0 ]; then
+  sudo /etc/init.d/bumblebee disable
+ fi
 fi
 
 }
 
 #CHECK IF ON BATTERY OR NOT
-ac_device=$(ls /sys/class/power_supply | grep AC)
-power_state=$(cat /sys/class/power_supply/$ac_device/online)
 
-if [ "$power_state" -eq "1" ] || [ "$ECO_MODE" -eq "0" ]; then
+POWER_STATE=0
+for state in /sys/class/power_supply/*/online; do
+	POWER_STATE=$(cat "$state")
+	break
+done
+
+if [ "$POWER_STATE" -eq "1" ] || [ "$ECO_MODE" -eq "0" ]; then
 	optirun_launcher $@
-elif [ "$power_state" -eq "0" ]; then
+elif [ "$POWER_STATE" -eq "0" ]; then
 	$@
 else
 	$@
