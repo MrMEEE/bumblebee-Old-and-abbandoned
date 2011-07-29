@@ -64,6 +64,9 @@ MODPROBE=`which modprobe`
 LINES=`stty size | cut -f1 -d' '`
 COLUMNS=`stty size | cut -f2 -d' '`
 
+# NVIDIABUSID without PCI:
+NVIDIABUSIDCUT=`grep BusID /etc/X11/xorg.conf.nvidia | sed -e "s/[ \t]*BusID[ \t]*\"\(.*\)\"/\1/g" |cut -d: -f2,3`
+
 if [ -f $DEFAULT_FILE ] ; then
 	whiptail --yesno \
 "Bumblebee Configuration.\n\n"\
@@ -348,7 +351,7 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 	fi
 	if [ "$DISTRO" == "UBUNTU" ] ; then
 		${MODPROBE} nvidia-current
-		if [ `$LSPCI -v -s $NVIDIABUSIDCUT |grep ! |wc -l` -eq 1 ] ; then
+		if [ `$LSPCI -v -s $NVIDIABUSIDCUT |grep ! |wc -l` = 0 ] ; then
 			if [ `LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig --query-gpu-info | grep "Display Devices" | cut -f2 -d":"` -gt 0 ] ; then
 				CONNECTEDMONITOR=`LD_LIBRARY_PATH=/usr/lib/nvidia-current /usr/lib/nvidia-current/bin/nvidia-xconfig --query-gpu-info | grep "Display Device 0" | cut -f2 -d\( | cut -f1 -d\)`
 			fi
@@ -427,6 +430,7 @@ if [ "$DISTRO" == "UBUNTU" ] ; then
 			echo
 			mv /usr/local/bin/bumblebee-enablecard /usr/local/bin/bumblebee-enablecard.old
 			cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
+			chmod +x /usr/local/bin/bumblebee-enablecard
 		fi
 		if [ ! -f /usr/local/bin/bumblebee-disablecard ]; then
 			# Not installed
@@ -438,9 +442,19 @@ if [ "$DISTRO" == "UBUNTU" ] ; then
 			echo
 			mv /usr/local/bin/bumblebee-disablecard /usr/local/bin/bumblebee-disablecard.old
 			cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
+			chmod +x /usr/local/bin/bumblebee-disablecard
 		fi
 	fi
 fi
+if [ `$LSPCI -v -s $NVIDIABUSIDCUT |grep ! |wc -l` = 0 ]; then
+	if [ -f /usr/local/bin/bumblebee-disablecard ]; then
+		/usr/local/bin/bumblebee-disablecard
+	fi  
+	if [ -f /usr/bin/bumblebee-disablecard ]; then
+		/usr/bin/bumblebee-disablecard
+	fi
+fi
+                                                                                                                                
 if [ "$DISTRO" == "OPENSUSE" ] ; then
 	#
 	#	Setup new scripts
