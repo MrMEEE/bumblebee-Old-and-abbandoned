@@ -44,6 +44,7 @@ source /etc/default/bumblebee
 VGL_DRIVER="/usr/lib/nvidia-current"
 get_compression='0'
 get_display='0'
+NVIDIABUSID=`grep BusID /etc/X11/xorg.conf.nvidia | sed -e "s/[ \t]*BusID[ \t]*\"\(.*\)\"/\1/g" |cut -d: -f2,3`
 
 #READ ARGUMENTS
 #echo "$@"
@@ -125,9 +126,11 @@ display=${display%%.*}
 
 # test if Bumblebee's X server is running
 if [ ! -f /tmp/.X${display}-lock ]; then
- if ! sudo /etc/init.d/bumblebee enable; then
-  echo "bumblebee could not be started - optirun cannot be executed."
-  exit 1
+ if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 1 ]; then
+  if ! sudo /etc/init.d/bumblebee enable; then
+   echo "bumblebee could not be started - optirun cannot be executed."
+   exit 1
+  fi
  fi
 fi
 
@@ -159,7 +162,9 @@ if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
    break
   fi
  done
- sudo /etc/init.d/bumblebee disable
+ if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 0 ]; then
+  sudo /etc/init.d/bumblebee disable
+ fi
 fi
 
 }
