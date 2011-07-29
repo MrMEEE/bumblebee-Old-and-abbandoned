@@ -155,9 +155,11 @@ if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
   elif lsof -n -w "/usr/lib/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
    show_msg
    sleep 1
-  elif lsof -n -w "/usr/lib32/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
-   show_msg
-   sleep 1
+  elif [ -f /usr/lib32/nvidia-current/libnvidia-glcore.so ]; then 
+   if lsof -n -w "/usr/lib32/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
+    show_msg
+    sleep 1
+   fi
   else
    break
   fi
