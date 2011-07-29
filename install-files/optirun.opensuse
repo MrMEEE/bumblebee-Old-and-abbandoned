@@ -223,12 +223,12 @@ if [ "$POWER_STATE" == "1" ] || [ "$ECO_MODE" == "0" ] ; then
 	export VGL_LOG
 	vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY "$@"
 
+	#
+	#	The end...
+	#
+	terminate
+
 else
 	echo "ECO mode active, bumblebee is not started because you are on battery power"
 	$@
 fi
-
-#
-#	The end...
-#
-terminate
