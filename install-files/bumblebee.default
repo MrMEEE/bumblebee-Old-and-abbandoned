@@ -23,4 +23,4 @@ VGL_LOG=/dev/null
 # ECO Mode
 # 1 :	ECO mode active, do not run bumblebee on battery power
 # 0 :	ECO mode disabled
-ECO_MODE='0'
+ECO_MODE='1'
