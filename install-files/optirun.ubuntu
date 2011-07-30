@@ -165,7 +165,10 @@ if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
   fi
  done
  if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 0 ]; then
-  sudo /etc/init.d/bumblebee disable
+ 	sudo /etc/init.d/bumblebee disable
+ fi
+ if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 0 ]; then
+ 	sudo /usr/local/bin/bumblebee-disablecard
  fi
 fi
 

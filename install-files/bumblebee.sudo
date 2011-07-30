@@ -1,1 +1,3 @@
 %bumblebee      ALL=(ALL:ALL) NOPASSWD: /etc/init.d/bumblebee
+%bumblebee      ALL=(ALL:ALL) NOPASSWD: /usr/local/bin/bumblebee-enablecard
+%bumblebee      ALL=(ALL:ALL) NOPASSWD: /usr/local/bin/bumblebee-disablecard
