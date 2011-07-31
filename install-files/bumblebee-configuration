@@ -118,8 +118,11 @@ if [ "$DISTRO" == "UBUNTU" ] ; then
 	fi
 	# remove a legacy link which was not used anyway
 	rm -rf /etc/alternatives/xorg_extra_modules-bumblebee
+	rm -rf /etc/alternatives/_xorg_extra_modules
 
-	# fix appeared in commit 68a75db4df628a910886, it should remove an excess symlink
+	# fix appeared in commit 68a75db4df628a910886, it should remove an excess
+	# symlink; /usr/lib/xorg/extra-modules ->
+	# /etc/alternatives/{_,}xorg_extra_modules -> /usr/lib/nvidia-current/xorg
 	rm -f /usr/lib/nvidia-current/xorg/xorg
 
 	# Refresh the dynamic loader search path so /etc/ld.so.conf.d/GL.conf ->
