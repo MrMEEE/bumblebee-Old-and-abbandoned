@@ -1,10 +1,30 @@
 #! /bin/sh
 #
-# Author: Arnaud Dupuis <a.dupuis@infinityperl.org>
+# Author: Maxime Rijnders <ximi_github@hotmail.com>
+#         Arnaud Dupuis <a.dupuis@infinityperl.org>
 #
 # /etc/init.d/bumblebee
 #
+
+### BEGIN LICENSE
 #
+#    This file is part of bumblebee.
+#
+#    bumblebee is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    bumblebee is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
+#
+### END LICENSE
+
 ### BEGIN INIT INFO
 # Provides: bumblebee
 # Required-Start: $remote_fs
@@ -18,12 +38,6 @@
 . /etc/rc.status
 
 [ -r /etc/default/bumblebee ] && . /etc/default/bumblebee
-
-#
-#	Get the display
-#
-BEE_DISPLAY=${VGL_DISPLAY##*:}
-BEE_DISPLAY=${BEE_DISPLAY%%.*}
 
 #
 #	Get the architecture
@@ -50,7 +64,8 @@ fi
 #
 #	Bumblebee X server start
 #
-start() {
+start()
+{
 	check_3D_hack
 	valid_lock
 	if [ ! -f $LOCKFILE ] ; then
@@ -60,7 +75,7 @@ start() {
 	if [ -f $LOCKFILE ] ; then
 		echo
 		echo "Bumblebee server already running"
-		exit 1
+		exit 0
 	fi
 	if [ -f /usr/bin/nvidia-xconfig ] ; then
 		if [ "$ARCH" == "x86_64" ] ; then
@@ -97,13 +112,14 @@ start() {
 #
 #	Bumblebee X server stop
 #
-stop() {
+stop()
+{
 	check_3D_hack
 	echo -n "Stopping bumblebee X server: "
 	if [ ! -f $LOCKFILE ] ; then
 		echo
 		echo "Bumblebee server not running"
-		exit 1
+		exit 0
 	fi
 	PID_X=`cat $LOCKFILE`
 	kill $PID_X
@@ -127,7 +143,8 @@ stop() {
 #
 #	Restart bumblebee
 #
-restart() {
+restart()
+{
 	stop
 	start
 }
@@ -135,7 +152,8 @@ restart() {
 #
 #	Valid lock files ?
 #
-valid_lock() {
+valid_lock()
+{
 	if [ -f $LOCKFILE ] && [ ! -f /tmp/.X$BEE_DISPLAY-lock ] ; then
 		#
 		#	There is a lock file but no X server running
@@ -158,7 +176,8 @@ valid_lock() {
 #
 #	Check the 3D repository setup
 #
-check_3D_hack() {
+check_3D_hack()
+{
 	if [ -f /usr/bin/nvidia-xconfig ] ; then
 		if [ -f /usr/lib/xorg/modules/updates/drivers/nvidia_drv.so ] ; then
 			#
@@ -205,9 +224,70 @@ check_3D_hack() {
 }
 
 #
+#	Main
+#
+COMMAND=$1
+
+FORCE_VGL_DISPLAY="NO"
+shift
+for arg in "$@" ; do
+	case $arg in
+		-d)
+			#
+			#	Force new VGL display
+			#
+			FORCE_VGL_DISPLAY="YES"
+			shift
+			;;
+		:*)
+			if [ "$FORCE_VGL_DISPLAY" == "YES" ] ; then
+				#
+				#	Get the new display number
+				#
+				NEW_VGL_DISPLAY=$arg
+				#
+				#	Is bumblebee already running ?
+				#
+				FOUND=`ps axwwww | grep /usr/bin/X | grep vt9`
+				if [ "$FOUND" != "" ] ; then
+					USED_VGL_DISPLAY=`echo $FOUND | sed -e "s/.*\(:.*\) vt9/\1/"`
+					if [ "$USED_VGL_DISPLAY" != "$NEW_VGL_DISPLAY" ] ; then
+						echo "Trying to use display $NEW_VGL_DISPLAY,"
+						echo "but already using display $USED_VGL_DISPLAY"
+						exit 2
+					fi
+				fi
+				if [ "$NEW_VGL_DISPLAY" != "$VGL_DISPLAY" ] ; then
+					VGL_DISPLAY=$NEW_VGL_DISPLAY
+					echo "Bumblebee is using display $VGL_DISPLAY"
+				fi
+				shift
+				FORCE_VGL_DISPLAY="NO"
+			else
+				echo "The value :0, :1, ... ,:n for a display must be preceeded by the -d option"
+				exit 2
+			fi
+			;;
+		*)
+			#
+			#	Unknown option
+			#
+			echo "Unknown option: $arg"
+			shift
+			;;
+	esac
+done
+
+#
+#	Get the display
+#
+BEE_DISPLAY=${VGL_DISPLAY##*:}
+BEE_DISPLAY=${BEE_DISPLAY%%.*}
+
+#
 #	Script commands
 #
-case "$1" in
+case "$COMMAND" in
 	start)
 		$DISABLECARD
 		# Remember status and be verbose
@@ -247,15 +327,18 @@ case "$1" in
                 ;;
 	status)
 		if [ -f $LOCKFILE ] ; then
-			echo $"Bumblebee X Server is running."
+			echo "Bumblebee X Server is running."
 			RETVAL=0
 		else
-			echo $"Bumblebee X Server is not running."
+			echo "Bumblebee X Server is not running."
 			RETVAL=3
 		fi
 		;;
-	*)
-		echo $"Usage: $0 {start|stop|enable|disable|status|restart|force-reload|reload}"
+	*|-h|--help)
+		echo "Usage: $0 { start | stop | enable | disable | status | restart | force-reload | reload } [ OPTION ]"
+		echo "  -h, --help  print this help and exit"
+		echo "  -d          display to use for the X server"
+
 		exit 1
 esac
 
