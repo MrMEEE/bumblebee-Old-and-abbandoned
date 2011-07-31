@@ -61,7 +61,7 @@ for arg in "$@"
 			shift ;;
 		-d)	get_display='1'
 			shift ;;
-		jpeg|proxy|rgb|yuv|xv) 
+		jpeg|proxy|rgb|yuv|xv)
 			if [ "$get_compression" -eq "1" ]; then
 				VGL_COMPRESS=$arg
 				echo "Bumblebee is used with the compression : " $VGL_COMPRESS
@@ -82,8 +82,8 @@ for arg in "$@"
 				exit 2	
 			fi
 			;;
-		*)	
-			if [ "$get_compression" -eq "1" ]; then 
+		*)
+			if [ "$get_compression" -eq "1" ]; then
 				echo "The argument -c must be followed by one of this compression value : jpeg, proxy, rgb, xv or xuv."
 				exit 1
 			elif [ "$get_display" -eq "1" ]; then
@@ -91,7 +91,7 @@ for arg in "$@"
 				exit 2
 			else
 				break
-			fi			
+			fi
 			;;
 	esac
 	done
@@ -100,7 +100,7 @@ for arg in "$@"
 #echo "Eco mode:" $ECO_MODE
 #echo "32 bits mode:" $lib32_mode
 #echo "Compression mode:" $VGL_COMPRESS
-#echo "Display:" $VGL_DISPLAY 
+#echo "Display:" $VGL_DISPLAY
 
 # if executed from a symlink named optirun32, use the 32b path
 
@@ -117,60 +117,59 @@ show_msg()
 }
 
 #OPTIRUN
-function optirun_launcher 
-{
-# Remove colon and everything before it: :1.0 -> 1.0
-display=${VGL_DISPLAY##*:}
-# Remove dot and everything after it: 1.0 -> 0
-display=${display%%.*}
+optirun_launcher() {
+	# Remove colon and everything before it: :1.0 -> 1.0
+	display=${VGL_DISPLAY##*:}
+	# Remove dot and everything after it: 1.0 -> 0
+	display=${display%%.*}
 
-# test if Bumblebee's X server is running
-if [ ! -f /tmp/.X${display}-lock ]; then
- if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 1 ]; then
-  if ! sudo /etc/init.d/bumblebee enable; then
-   echo "bumblebee could not be started - optirun cannot be executed."
-   exit 1
-  fi
- fi
-fi
+	# test if Bumblebee's X server is running
+	if [ ! -f /tmp/.X${display}-lock ]; then
+		if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 1 ]; then
+			if ! sudo /etc/init.d/bumblebee enable; then
+				echo "bumblebee could not be started - optirun cannot be executed."
+				exit 1
+			fi
+		fi
+	fi
 
-trap "echo 'Caught Ctrl+C'" INT
+	trap "echo 'Caught Ctrl+C'" INT
 
-######MODIFICATION######Comment : source /etc/default/bumblebee
+	######MODIFICATION######Comment : source /etc/default/bumblebee
 
-export VGL_READBACK
-export VGL_LOG
-######MODIFICATION######Replace : /usr/lib/nvidia-current with $VGL_DRIVER
-vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld $VGL_DRIVER "$@"
+	export VGL_READBACK
+	export VGL_LOG
+	######MODIFICATION######Replace : /usr/lib/nvidia-current with $VGL_DRIVER
+	vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld $VGL_DRIVER "$@"
 
-msg_shown=false
+	msg_shown=false
 
-if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
- OPTIRUNS="/usr/bin/optirun /usr/bin/optirun32 /usr/bin/optirun64"
- while :; do
-  # there is a space separating PIDs if multiple optirun instances are running
-  if pidof -x $OPTIRUNS | grep -q ' '; then
-   show_msg
-   exit 0
-  elif lsof -n -w "/usr/lib/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
-   show_msg
-   sleep 1
-  elif [ -f /usr/lib32/nvidia-current/libnvidia-glcore.so ]; then 
-   if lsof -n -w "/usr/lib32/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
-    show_msg
-    sleep 1
-   fi
-  else
-   break
-  fi
- done
- if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 0 ]; then
- 	sudo /etc/init.d/bumblebee disable
- fi
- if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 0 ]; then
- 	sudo /usr/local/bin/bumblebee-disablecard
- fi
-fi
+	if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
+		OPTIRUNS="/usr/bin/optirun /usr/bin/optirun32 /usr/bin/optirun64"
+		while :; do
+			# there is a space separating PIDs if multiple optirun instances are running
+			if pidof -x $OPTIRUNS | grep -q ' '; then
+				show_msg
+				exit 0
+			elif lsof -n -w "/usr/lib/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
+				show_msg
+				sleep 1
+			elif [ -f /usr/lib32/nvidia-current/libnvidia-glcore.so ]; then
+				if lsof -n -w "/usr/lib32/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
+					show_msg
+					sleep 1
+				fi
+			else
+				break
+			fi
+		done
+		if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 0 ]; then
+			sudo /etc/init.d/bumblebee disable
+		fi
+		if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 0 ]; then
+			sudo /usr/local/bin/bumblebee-disablecard
+		fi
+	fi
 
 }
 
