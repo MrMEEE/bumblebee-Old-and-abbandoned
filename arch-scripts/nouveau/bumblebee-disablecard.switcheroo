@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# This script should contain the command(s) necessary to switch off the
+# nVidia card on (hopefully) any vga-switcheroo capable laptop.
+# 
+# This script uses the vga-switcheroo module. To enable it you must mount
+# debugfs filesystem in /sys/kernel/debug/ and load the nouveau kernel module
+# See https://wiki.archlinux.org/index.php/Bumblebee for details.
+
+# Check for display 1 X server lock file. If present something is running, maybe.
+if [ -e /tmp/.X1-lock ]; then
+    echo "Error: nouveau module might be in use by display 1"
+    exit 1
+fi
+
+# Check for nouveau driver present
+if ! lsmod | grep -q nouveau; then
+    echo "Error: nouveau module not inserted. Insert nouveau driver and try again"
+    exit 1
+fi
+
+if [ ! -e /sys/kernel/debug/vgaswitcheroo/switch ]; then
+  echo "Error: Debug filesystem is not present. Can't access vga-switcheroo file"
+  exit 2
+fi
+
+if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Pwr; then
+     echo IGD > /sys/kernel/debug/vgaswitcheroo/switch #Make sure the IGD is plugged in
+     echo OFF > /sys/kernel/debug/vgaswitcheroo/switch
+     RET_VAL=$?
+     if [ $RET_VAL ]; then
+          echo "Switch OFF successfull"
+     else
+          echo "Error: exit $?"
+          exit $RET_VAL
+     fi
+else
+     echo 'Card is already OFF'
+fi
+

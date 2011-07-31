@@ -1,3 +1,4 @@
+
 _replace_busid() {
    if [ `lspci |grep VGA |wc -l` -eq 2 ]; then 
       NVIDIABUSID=`echo "PCI:"\`lspci |grep VGA |grep nVidia |cut -f1 -d:\`":"\`lspci |grep VGA |grep nVidia |cut -f2 -d: |cut -f1 -d.\`":"\`lspci |grep VGA |grep nVidia |cut -f2 -d. |cut -f1 -d" "\``
