@@ -31,6 +31,7 @@ do
    # While 'optirun' is running
    while pidof -x optirun 
    do
+      # Will need another way to determine card state
       if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Off; then
          $HANDLER cardon
       fi
