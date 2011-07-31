@@ -1,79 +1,56 @@
 #!/bin/bash
 
+# This daemon will turn on the nvidia card when needed and turn 
+# it back off when not used
+
+# source rc.conf and functions for nice output
 . /etc/rc.conf
 . /etc/rc.d/functions
-. /etc/bumblebee/bumblebee.conf
 
-DAEMON=bumblebee
+NAME=bumblebee
 XDAEMON=/usr/bin/X
-XDAEMON_ARGS="-ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-bumblebee/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset :1 vt9"
+XDAEMON_ARGS="-ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-bumblebee/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset"
+HANDLER=/etc/rc.d/$NAME
+REFRESH=1 # Refresh time in seconds
+
+# default display and PIDFILE, may be overidden in conf file
+VGL_DISPLAY=:1
 PIDFILE=/tmp/.X1-lock
 
-# Check /etc/bumblebee/bumblebee.conf
-enable_card() {
-     $ENABLECARD
-}
+[ -r /etc/bumblebee/bumblebee.conf ] && . /etc/bumblebee/bumblebee.conf
 
-disable_card() {
-     $DISABLECARD
-}
+DAEMON_ARGS="$DAEMON_ARGS $VGL_DISPLAY"
+# assume that the display always looks like :1
+BEE_DISPLAY=${VGL_DISPLAY##*:}
+BEE_DISPLAY=${BEE_DISPLAY%%.*}
+PIDFILE=/tmp/.X${BEE_DISPLAY}-lock
+#X_LOG=/var/log/Xorg.${BEE_DISPLAY}.log
 
-#TODO Check different exit status for appropriate feedback
-start() {
-     stat_busy "Starting up bumblebee Daemon"
-     PID=$(cat $PIDFILE 2>/dev/null)
-     if [ -z "$PID" ]; then
-          LD_LIBRARY_PATH=/usr/lib/nvidia-bumblebee $XDAEMON $XDAEMON_ARGS &>/dev/null &
-     fi
-     i=1
-     while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
-          sleep 1
-          i=`expr $i + 1`
-          if [ $i -gt 10 ]; then
-               stat_fail "Bumblebee server failed to start"
-               exit 1
-          fi 
-     done
-      add_daemon $DAEMON
-      stat_done
-}
-
-#TODO Check different exit status for appropriate feedback
-stop() {
-     stat_busy "Stopping bumblebee Daemon"
-     kill `cat $PIDFILE 2>&1` > /dev/null 2>&1
-     while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -ne 1 ]; do
-          sleep 1
-          i=`expr $i + 1`
-          if [ $i -gt 10 ]; then
-               stat_fail "Bumblebee server failed to stop"
-               exit 1
-          fi
-     done
-     rm -f $PIDFILE
-     rm_daemon $DAEMON
-     stat_done
-}
-
-restart() {
-  stop
-  sleep 1
-  start
-}
-
-case "$1" in
-  start)
-    start
-    ;;
-  stop)
-    stop
-    ;;
-  restart)
-    restart
-    ;;
-  status)
-    ck_status bumblebee
-  ;;
-  *)
-    echo "usage: $0 {start|stop|restart|status}"  
-esac
+while :
+do
+   # While 'optirun' is running
+   while pidof -x optirun 
+   do
+      if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Off; then
+         $HANDLER cardon
+      fi
+      if [ ! -e $PIDFILE ]; then
+         $XDAEMON $XDAEMON_ARGS &>/dev/null &
+      fi
+      sleep $REFRESH
+   done
+   
+   # While 'optirun' is not running
+   while ! pidof -x optirun 
+   do
+      if [ -e $PIDFILE ]; then
+         kill -TERM `cat $PIDFILE 2>&1`
+         rm -f $PIDFILE
+      fi
+      if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Pwr; then
+         $HANDLER cardoff
+      fi
+      sleep $REFRESH
+   done
+   sleep 1
+done
