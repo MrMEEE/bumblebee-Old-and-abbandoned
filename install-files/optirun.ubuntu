@@ -32,9 +32,9 @@
 #This is a optirun script which takes arguments: compression, architecture, display (just for testing purpose).
 #If the force argument is omitted, the script will not launch the app with bumblebee if the computer is on battery
 #Usage :
-#	ecoptirun -f -32 -c <compression_value> -d <display value>
+#	optirun -f -32 -c <compression_value> -d <display value>
 # -f : Force optirun : force the app to be run with bumblebee if on battery
-# -32 : 32Bits library : use the 32bits Nvidia driver (ecoptirun -32 is equivalent to optirun32)
+# -32 : 32Bits library : use the 32bits Nvidia driver (optirun -32 is equivalent to optirun32)
 # -c <compression_value> : Compression : -c must be followed by jpeg, proxy, rgb, yuv or xv argument (See the VGL doc)
 # -d <display_value> : -d must be followed by :0, :1 or :2 argument (See the VGL doc)
 ### END COMMENT
@@ -52,10 +52,10 @@ for arg in "$@"
 	do
 	case $arg in
 		-f) 	ECO_MODE='0'
-			echo "ECOPTIRUN : The application will be run with Bumblebee also if the computer is not plugged to a power supply"
+			echo "The application will be run with Bumblebee also if the computer is not plugged to a power supply"
 			shift ;; #force optirun if on battery
 		-32) 	VGL_DRIVER="/usr/lib32/nvidia-current"
-			echo "ECOPTIRUN : The application will be run with Bumblebee and the 32bits Nvidia driver"
+			echo "The application will be run with Bumblebee and the 32bits Nvidia driver"
 			shift ;; #launch vglrun with 32 bits nvidia driver
 		-c) 	get_compression='1'
 			shift ;;
@@ -64,7 +64,7 @@ for arg in "$@"
 		jpeg|proxy|rgb|yuv|xv) 
 			if [ "$get_compression" -eq "1" ]; then
 				VGL_COMPRESS=$arg
-				echo "ECOPTIRUN : Bumblebee is used with the compression : " $VGL_COMPRESS
+				echo "Bumblebee is used with the compression : " $VGL_COMPRESS
 				shift
 				get_compression='0'
 			else echo "The value jpeg, proxy, rgb, xv or xuv for the compression must be preceeded by the -c argument"
@@ -75,7 +75,7 @@ for arg in "$@"
 			if [ "$get_display" -eq "1" ]; then
 				VGL_DISPLAY=$arg
 				VGL_DISPLAY=:1
-				echo "ECOPTIRUN : Bumblebee is used with the display : " $VGL_DISPLAY
+				echo "Bumblebee is used with the display : " $VGL_DISPLAY
 				shift
 				get_display='0'
 			else echo "The value :0, :1: ,:2 for a display must be preceeded by the -d argument"
