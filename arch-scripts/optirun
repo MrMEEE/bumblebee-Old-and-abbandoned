@@ -159,7 +159,7 @@ trap "echo 'Caught Ctrl+C'" INT
 export VGL_READBACK
 export VGL_LOG
 ######MODIFICATION######Replace : /usr/lib/nvidia-current with $VGL_DRIVER
-vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld $VGL_DRIVER "$@"
+bumblerun "-c $VGL_COMPRESS -d $VGL_DISPLAY -ld $VGL_DRIVER $@"
 
 #msg_shown=false
 

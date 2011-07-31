@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Daemon for bumblebee using nouveau driver
+# Bumblebee daemon handler script
 
 . /etc/rc.conf
 . /etc/rc.d/functions

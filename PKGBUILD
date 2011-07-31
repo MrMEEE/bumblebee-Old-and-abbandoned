@@ -23,13 +23,24 @@ source=("https://github.com/downloads/Samsagax/bumblebee/${pkgname}-${pkgver}-${
 package() {
 # Installing Bumblebee scripts
   cd $srcdir/
+  # Config files
   install -D -m644 bumblebee/xorg.conf.nvidia $pkgdir/etc/X11/xorg.conf.nvidia
   install -D -m644 bumblebee/bumblebee.conf $pkgdir/etc/bumblebee/bumblebee.conf
+  # Executables
   install -D -m755 bumblebee/bumblebee.handler $pkgdir/etc/rc.d/bumblebee
-  #install -D -m755 bumblebee/bumblebee.daemon $pkgdir/usr/bin/bumblebeed
+  install -D -m755 bumblebee/bumblebee.daemon $pkgdir/usr/bin/bumblebeed
+  install -D -m755 bumblebee/optirun $pkgdir/usr/bin/optirun
+  install -D -m755 bumblebee/bumblerun $pkgdir/usr/bin/bumblerun
+  
   install -D -m755 bumblebee/bumblebee-bugreport $pkgdir/usr/share/bumblebee/bumblebee-bugreport
   install -D -m755 bumblebee/bumblebee-submitsystem $pkgdir/usr/share/bumblebee/bumblebee-submitsystem
-  install -D -m755 bumblebee/optirun $pkgdir/usr/bin/optirun
+  #Power management
+  install -D -m755 bumblebee/bumblebee.pm $pkgdir/usr/lib/pm-utils/power.d/bumblebee
+  install -D -m755 bumblebee/bumblebee.sleep.pm $pkgdir/usr/lib/pm-utils/sleep.d/10-bumblebee
+  install -D -m755 bumblebee/bumblebee-disablecard.template $pkgdir/usr/bin/bumblebee-disablecard
+  install -D -m755 bumblebee/bumblebee-enablecard.template $pkgdir/usr/bin/bumblebee-enablecard
+
+# This won't be needed anymore
   #if [ "$CARCH" = "x86_64" ]; then
   # install -D -m755 bumblebee/optirun32 $pkgdir/usr/bin/optirun32
   #fi

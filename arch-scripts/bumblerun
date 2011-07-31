@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Optirun helper, performance profile.
+# Still dirty with parameters
+
+vglrun "$@"
+

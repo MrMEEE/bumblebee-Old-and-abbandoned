@@ -28,8 +28,8 @@ PIDFILE=/tmp/.X${BEE_DISPLAY}-lock
 
 while :
 do
-   # While 'optirun' is running
-   while pidof -x optirun 
+   # While 'bumblerun' is running
+   while pidof -x bumblerun 
    do
       # Will need another way to determine card state
       if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Off; then
@@ -41,8 +41,8 @@ do
       sleep $REFRESH
    done
    
-   # While 'optirun' is not running
-   while ! pidof -x optirun 
+   # While 'bumblerun' is not running
+   while ! pidof -x bumblerun 
    do
       if [ -e $PIDFILE ]; then
          kill -TERM `cat $PIDFILE 2>&1`

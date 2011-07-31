@@ -18,6 +18,7 @@ _backup() {
 }
 
 pre_upgrade() {
+   rc.d stop bumblebee
    # Backup old config files if they exist
    if [ ! -f /etc/X11/xorg.conf.nvidia ]; then
       _backup() /etc/X11/xorg.conf.nvidia
@@ -29,6 +30,7 @@ pre_upgrade() {
 
 post_upgrade() {
    post_install
+   _replace_busid /etc/X11/xorg.conf.nvidia
 }
 
 post_install() {
