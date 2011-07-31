@@ -42,78 +42,77 @@
 #DEFAULT VALUE
 source /etc/default/bumblebee
 VGL_DRIVER="/usr/lib/nvidia-current"
-get_compression='0'
-get_display='0'
 NVIDIABUSID=`grep BusID /etc/X11/xorg.conf.nvidia | sed -e "s/[ \t]*BusID[ \t]*\"\(.*\)\"/\1/g" |cut -d: -f2,3`
 
 #READ ARGUMENTS
-#echo "$@"
-for arg in "$@"
-	do
-	case $arg in
-		-f) 	ECO_MODE='0'
-			echo "The application will be run with Bumblebee also if the computer is not plugged to a power supply"
-			shift ;; #force optirun if on battery
-		-32) 	VGL_DRIVER="/usr/lib32/nvidia-current"
-			echo "The application will be run with Bumblebee and the 32bits Nvidia driver"
-			shift ;; #launch vglrun with 32 bits nvidia driver
-		-c) 	get_compression='1'
-			shift ;;
-		-d)	get_display='1'
-			shift ;;
-		jpeg|proxy|rgb|yuv|xv)
-			if [ "$get_compression" -eq "1" ]; then
-				VGL_COMPRESS=$arg
-				echo "Bumblebee is used with the compression : " $VGL_COMPRESS
-				shift
-				get_compression='0'
-			else echo "The value jpeg, proxy, rgb, xv or xuv for the compression must be preceeded by the -c argument"
-				exit 1
-			fi
+#echo "$*"
+while :; do
+	case "$1" in
+	  -f)
+		ECO_MODE='0'
+		echo "The application will be run with Bumblebee even if it's not connected to a power supply (e.g. running on battery)"
+		;; #force optirun if on battery
+	  -32)
+		VGL_DRIVER="/usr/lib32/nvidia-current"
+		echo "If the application is run with Bumblebee, the 32-bit driver will be used"
+		;; #launch vglrun with 32 bits nvidia driver
+	  -c)
+		shift
+		case "$1" in
+		  jpeg|proxy|rgb|yuv|xv)
+			VGL_COMPRESS=$arg
+			echo "Bumblebee will transfer graphics using compression: $VGL_COMPRESS"
 			;;
-		:0|:1|:2)
-			if [ "$get_display" -eq "1" ]; then
-				VGL_DISPLAY=$arg
-				VGL_DISPLAY=:1
-				echo "Bumblebee is used with the display : " $VGL_DISPLAY
-				shift
-				get_display='0'
-			else echo "The value :0, :1: ,:2 for a display must be preceeded by the -d argument"
-				exit 2	
-			fi
+		  *)
+			echo "The compression parameter -c must be preceded by jpeg, proxy, rgb, yuv or xv."
+			exit 1
 			;;
-		*)
-			if [ "$get_compression" -eq "1" ]; then
-				echo "The argument -c must be followed by one of this compression value : jpeg, proxy, rgb, xv or xuv."
-				exit 1
-			elif [ "$get_display" -eq "1" ]; then
-				echo "The argument -d must be followed by one of this common display value : :0, :1, :2."
-				exit 2
-			else
-				break
-			fi
-			;;
+		esac
+		;;
+	  -d)
+		shift
+		if ! [[ $1 =~ ^:[0-9]+$ ]]; then
+			VGL_DISPLAY=$1
+			echo "Bumblebee will use the next display for rendering: $VGL_DISPLAY"
+		else
+			echo "The display parameter -d must be preceded by a colon followed by digits like :8"
+			exit 2
+		fi
+		;;
+	  --)
+		# commonly found in parameters, usage: optirun -- -not -recognised -as -param
+		break
+		;;
+	  -*)
+		echo "Unknown parameter: $1"
+		exit 3
+		;;
+	  *)
+		# begin of a command, assuming no optirun parameters after this one
+		break
+		;;
 	esac
-	done
+	# move to the next option in the command
+	shift
+done
 
-#echo "Arguments for the application:""$@"
+#echo "Arguments for the application: $*"
 #echo "Eco mode:" $ECO_MODE
 #echo "32 bits mode:" $lib32_mode
 #echo "Compression mode:" $VGL_COMPRESS
 #echo "Display:" $VGL_DISPLAY
 
-# if executed from a symlink named optirun32, use the 32b path
-
-if [ "${0##*/}" = "optirun32" -a -d /usr/lib32 ]; then
- VGL_DRIVER=/usr/lib32/nvidia-current
+# if executed from a symlink named optirun32, use the 32b path if exist
+if [ "${0##*/}" = "optirun32" -a -d /usr/lib32/nvidia-current ]; then
+	VGL_DRIVER=/usr/lib32/nvidia-current
 fi
 
-show_msg()
-{
- if ! $msg_shown; then
-  echo "Another bumblebee powered application is running, keeping bumblebee alive."
-  msg_shown=true
- fi
+msg_shown=false
+show_msg() {
+	if ! $msg_shown; then
+		echo "Another bumblebee powered application is running, keeping bumblebee alive."
+		msg_shown=true
+	fi
 }
 
 #OPTIRUN
@@ -140,9 +139,7 @@ optirun_launcher() {
 	export VGL_READBACK
 	export VGL_LOG
 	######MODIFICATION######Replace : /usr/lib/nvidia-current with $VGL_DRIVER
-	vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld $VGL_DRIVER "$@"
-
-	msg_shown=false
+	vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY -ld "$VGL_DRIVER" "$@"
 
 	if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
 		OPTIRUNS="/usr/bin/optirun /usr/bin/optirun32 /usr/bin/optirun64"
@@ -151,14 +148,9 @@ optirun_launcher() {
 			if pidof -x $OPTIRUNS | grep -q ' '; then
 				show_msg
 				exit 0
-			elif lsof -n -w "/usr/lib/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
+			elif lsof -n -w /usr/lib*/nvidia-current/libnvidia-glcore.so* >/dev/null; then
 				show_msg
 				sleep 1
-			elif [ -f /usr/lib32/nvidia-current/libnvidia-glcore.so ]; then
-				if lsof -n -w "/usr/lib32/nvidia-current/libnvidia-glcore.so"* >/dev/null; then
-					show_msg
-					sleep 1
-				fi
 			else
 				break
 			fi
@@ -184,8 +176,8 @@ done
 if [ "$POWER_STATE" -eq "1" ] || [ "$ECO_MODE" -eq "0" ]; then
 	optirun_launcher $@
 elif [ "$POWER_STATE" -eq "0" ]; then
-	$@
+	"$@"
 else
-	$@
+	"$@"
 fi
 
