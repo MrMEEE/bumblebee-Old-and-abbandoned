@@ -65,7 +65,7 @@ while :; do
 			;;
 		  *)
 			echo "The compression parameter -c must be preceded by jpeg, proxy, rgb, yuv or xv."
-			exit 1
+			exit 3
 			;;
 		esac
 		;;
@@ -124,11 +124,11 @@ optirun_launcher() {
 
 	# test if Bumblebee's X server is running
 	if [ ! -f /tmp/.X${display}-lock ]; then
-		if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 1 ]; then
-			if ! sudo /etc/init.d/bumblebee enable; then
-				echo "bumblebee could not be started - optirun cannot be executed."
-				exit 1
-			fi
+		# Bumblebee starts the X server on its own. If it was already running,
+		# it still returns 0 so no need for checking if the card is enabled or not
+		if ! sudo /etc/init.d/bumblebee enable; then
+			echo "bumblebee could not be started - optirun cannot be executed."
+			exit 1
 		fi
 	fi
 
@@ -155,11 +155,14 @@ optirun_launcher() {
 				break
 			fi
 		done
-		if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 0 ]; then
+		if ! lspci -v -s $NVIDIABUSID | grep -q !; then
 			sudo /etc/init.d/bumblebee disable
 		fi
-		if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 0 ]; then
-			sudo /usr/local/bin/bumblebee-disablecard
+		# are you sure? disable the card even if X could not be stopped? Needs rethinking
+		if ! spci -v -s $NVIDIABUSID | -1 grep !; then
+			if [ -x /usr/local/bin/bumblebee-disablecard ]; then
+				sudo /usr/local/bin/bumblebee-disablecard
+			fi
 		fi
 	fi
 
