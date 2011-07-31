@@ -3,5 +3,25 @@
 # Optirun helper, performance profile.
 # Still dirty with parameters
 
+. /etc/rc.d/functions
+. /etc/rc.conf
+
+##### Wait for the server to be ready
+stat_busy "Starting Bumblebee server"
+i=1
+while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
+   sleep 1
+   i=`expr $i + 1`
+   if [ $i -gt 10 ]; then
+      stat_fail "Bumblebee server failed to start"
+      exit 1
+   fi 
+done
+stat_done
+
+#echo "Arguments: $@"
+
+trap "echo 'Caught Ctrl+C'" INT
+
 vglrun "$@"
 

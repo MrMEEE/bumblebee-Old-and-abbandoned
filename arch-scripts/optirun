@@ -141,18 +141,6 @@ display=${display%%.*}
 # fi
 #fi
 
-##### Wait for the server to be ready
-i=1
-while  [ `ps aux |grep xorg.conf.nvidia |wc -l` -eq 1 ]; do
-   sleep 1
-   i=`expr $i + 1`
-   if [ $i -gt 10 ]; then
-      stat_fail "Bumblebee server failed to start"
-      exit 1
-   fi 
-done
-
-trap "echo 'Caught Ctrl+C'" INT
 
 ######MODIFICATION######Comment : source /etc/default/bumblebee
 
