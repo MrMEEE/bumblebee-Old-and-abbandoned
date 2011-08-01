@@ -1,9 +1,0 @@
-#!/bin/bash
-
-. /etc/bumblebee/bumblebee.conf
-
-# This script disables nVidia card if no optirun is running.
-
-if [  `ps aux |grep optirun|wc -l` -lt 2 ]; then
-	$DISABLECARD
-fi

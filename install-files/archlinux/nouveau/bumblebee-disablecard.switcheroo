@@ -8,6 +8,7 @@
 # See https://wiki.archlinux.org/index.php/Bumblebee for details.
 
 # Check for display 1 X server lock file. If present something is running, maybe.
+# Won't be needed in the daemon model
 if [ -e /tmp/.X1-lock ]; then
     echo "Error: nouveau module might be in use by display 1"
     exit 1

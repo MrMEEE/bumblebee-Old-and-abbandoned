@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Daemon for bumblebee using nouveau driver
+# Bumblebee daemon handler script
 
 . /etc/rc.conf
 . /etc/rc.d/functions
@@ -26,7 +26,7 @@ enable_card()
 #TODO Check different exit status for appropriate feedback
 start() {
    stat_busy "Starting up Bumblebee:"
-   
+   # This may not be needed as the daemon will do it anyway
    disable_card
    if [ $? ]; then
       stat_append "Nvidia card OFF"
@@ -67,7 +67,7 @@ stop() {
    
    kill `cat $LOCKFILE 2>&1`
    rm -f $LOCKFILE
-   enable_card
+   enable_card    # This is needed for shutdown sake
    if [ $? ]; then
       stat_append "Nvidia card ON"
    else

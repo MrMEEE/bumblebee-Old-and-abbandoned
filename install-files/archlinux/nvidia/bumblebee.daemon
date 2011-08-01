@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# This daemon will turn on the nvidia card when needed and turn 
+# it back off when not used
+
+# source rc.conf and functions for nice output
+. /etc/rc.conf
+. /etc/rc.d/functions
+
+NAME=bumblebee
+XDAEMON=/usr/bin/X
+XDAEMON_ARGS="-ac -config /etc/X11/xorg.conf.nvidia -sharevts -modulepath /usr/lib/nvidia-bumblebee/xorg,/usr/lib/xorg/modules -nolisten tcp -noreset"
+HANDLER=/etc/rc.d/$NAME
+REFRESH=1 # Refresh time in seconds
+
+# default display and PIDFILE, may be overidden in conf file
+VGL_DISPLAY=:1
+PIDFILE=/tmp/.X1-lock
+
+[ -r /etc/bumblebee/bumblebee.conf ] && . /etc/bumblebee/bumblebee.conf
+
+XDAEMON_ARGS="$XDAEMON_ARGS $VGL_DISPLAY"
+# assume that the display always looks like :1
+BEE_DISPLAY=${VGL_DISPLAY##*:}
+BEE_DISPLAY=${BEE_DISPLAY%%.*}
+PIDFILE=/tmp/.X${BEE_DISPLAY}-lock
+#X_LOG=/var/log/Xorg.${BEE_DISPLAY}.log
+
+
+#This is a bad approach, try signals, permission issues though..
+while :
+do
+   # While 'bumblerun' is running
+   while pidof -x bumblerun 
+   do
+      #echo "Runing..."
+      # Will need another way to determine card state
+      if ! lspci -v |grep VGA |grep -i nvidia |grep -q 'prog-if 00'; then
+      echo "try to turn on..."
+         $HANDLER cardon
+      fi
+      if [ ! -e $PIDFILE ]; then
+      echo "try to start server..."
+         LD_LIBRARY_PATH=/usr/lib/nvidia-bumblebee $XDAEMON $XDAEMON_ARGS &>/dev/null &
+      fi
+      sleep $REFRESH
+   done
+   
+   # While 'bumblerun' is not running
+   while ! pidof -x bumblerun 
+   do
+      #echo "Sleeping..."
+      if [ -e $PIDFILE ]; then
+         echo "try to stop server..."
+         kill -TERM `cat $PIDFILE 2>&1` &
+         wait
+         rm -f $PIDFILE
+      fi
+      if lspci -v |grep VGA |grep -i nvidia |grep -q 'prog-if 00'; then
+         echo "try to turn off..."
+         $HANDLER cardoff
+      fi
+      sleep $REFRESH
+   done
+   sleep 1
+done
