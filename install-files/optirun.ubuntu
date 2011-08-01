@@ -126,7 +126,7 @@ display=${display%%.*}
 
 # test if Bumblebee's X server is running
 if [ ! -f /tmp/.X${display}-lock ]; then
- if [ `lspci -v -s $NVIDIABUSID |grep ! |wc -l` -eq 1 ]; then
+ if lspci -v -s $NVIDIABUSID |grep ! > /dev/null; then
   if ! sudo /etc/init.d/bumblebee enable; then
    echo "bumblebee could not be started - optirun cannot be executed."
    exit 1
