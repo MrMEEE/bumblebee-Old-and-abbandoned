@@ -131,6 +131,14 @@ optirun_launcher() {
 			exit 1
 		fi
 	fi
+	# If for some reason the card is still disabled, enable it. This should
+	# never happen though!
+	if lspci -v -s $NVIDIABUSID | grep -q !; then
+		if [ -x /usr/local/bin/bumblebee-enablecard ]; then
+			echo "Something strange is going on. The card was still disabled even though X started without issues. Please report this"
+			sudo /usr/local/bin/bumblebee-enablecard
+		fi
+	fi
 
 	trap "echo 'Caught Ctrl+C'" INT
 
@@ -158,12 +166,13 @@ optirun_launcher() {
 		if ! lspci -v -s $NVIDIABUSID | grep -q !; then
 			sudo /etc/init.d/bumblebee disable
 		fi
-		# are you sure? disable the card even if X could not be stopped? Needs rethinking
-		if ! spci -v -s $NVIDIABUSID | -1 grep !; then
-			if [ -x /usr/local/bin/bumblebee-disablecard ]; then
-				sudo /usr/local/bin/bumblebee-disablecard
-			fi
-		fi
+		# BAD idea, do not disable the card if X is running! Trust me. Better
+		# keep it running than breaking the system.
+		#if ! lspci -v -s $NVIDIABUSID | -1 grep !; then
+		#	if [ -x /usr/local/bin/bumblebee-disablecard ]; then
+		#		sudo /usr/local/bin/bumblebee-disablecard
+		#	fi
+		#fi
 	fi
 
 }
