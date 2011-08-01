@@ -121,6 +121,8 @@ if [ "$DISTRO" == "UBUNTU" ] ; then
 	# symlink; /usr/lib/xorg/extra-modules ->
 	# /etc/alternatives/{_,}xorg_extra_modules -> /usr/lib/nvidia-current/xorg
 	rm -f /usr/lib/nvidia-current/xorg/xorg
+	# if /etc/alternatives/xorg_extra_modules pointed to extra-modules...
+	rm -f /usr/lib/xorg/extra-modules/xorg
 
 	# Refresh the dynamic loader search path so /etc/ld.so.conf.d/GL.conf ->
 	# /etc/alternatives/gl_conf -> /usr/lib/mesa/ld.so.conf
