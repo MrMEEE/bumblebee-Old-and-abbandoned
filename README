@@ -71,8 +71,7 @@ or just use Yast to add the repositories and packages.
 # "THE BEER-WARE LICENSE" (Revision 42):
 # <mj@casalogic.dk> wrote this file. As long as you retain this notice you
 # can do whatever you want with this stuff. If we meet some day, and you
-# think
-# this stuff is worth it, you can buy me a beer in return Martin Juhl
+# think this stuff is worth it, you can buy me a beer in return Martin Juhl
 # ----------------------------------------------------------------------------
 #
 
@@ -92,7 +91,7 @@ or just use Yast to add the repositories and packages.
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-This project is containing bumblebee (Formerly known as prime-ng)..
+This project is containing bumblebee (formerly known as prime-ng)..
 
 bumblebee is Optimus support for Linux, with real offloading, and not
 switchable graphics.. More important.. it works on Optimus Laptops without a
@@ -152,15 +151,8 @@ the thougher applications with the command "optirun32 <application>" or
 So now we just need somebody to write an application for automatically
 balance which applications should be run on which card.. 
 
-Support for automatically shutting down and starting up the nVidia card has
-been added in version 1.4.20 for Ubuntu. Other distributions are in
-progress.
-
-The nVidia card WILL be draining battery unless the two scripts:
-/usr/local/bin/bumblebee-enablecard and /usr/local/bin/bumblebee-disablecard
-are configured correctly..."
-
-But still I think it is a good step forward...
+Support for automatically shutting down and starting up the nVidia card is
+in developpement.
 
 There are several ways to start using bumblebee:
 
@@ -180,65 +172,51 @@ I left the old releases up there in the old/ folder.. if someone needs it..
 
 Machines Confirmed Working:
 
-Machine					User			Distro
-Alienware M11X R1			Joseph Livecchi
-Alienware M11X R2			Martin Juhl		Ubuntu 11.04
-Acer Aspire 5742G			Dardan
-Acer Aspire 5745PG			Miguel Belmonte
-Acer Aspire 8951G			Paul Hinds
-Asus EeePC 1015PN			Aurelgadjo		Ubuntu 11.04 (i686/x86_64)
-Asus EeePC 1215N			Ellington Santos
-Asus EeePC 1215N			Fedor Indutny
-Asus K52Jc				beta992
-Asus K53Sv (X53Sv)			rom251
-Asus N53Sv				theshadow124
-Asus N53Sv/N53Sn			Ximi1970		openSuSE 11.4 (i686/x86_64)
-Asus N61Jv (X64Jv)			Ted
-Asus N73Jn				Sasin91
-Asus N82Jv				André Ventura
-Asus P31Jg				ouafnico
-Asus P52Jc				Paszcza
-Asus U30J				Gianni Borghesan
-Asus U30Jc				paralocatucalva
-Asus U30Jc				Julien-Charles		Ubuntu 10.10
-Asus U31Jg				kedazo
-Asus U35J				EselSaft
-Asus U35Jc				Martin Yrjölä
-Asus U36Jc				DeeKey
-Asus U43Jc				csdaniels1221
-Asus U43Jc				ArchangeGabriel		Ubuntu 11.04
-Asus U53Jc				Sven Bettscheider
-Asus UL30Vt				Akta
-Asus UL80Vt                             Maegras			Ubuntu 11.04
-Asus X52Jc				Fiox
-CLEVO W150HNQ				Nix Vitae
-Dell Latitude E6420			Scotchy49
-Dell Vostro 3300			Peter Liedler
-Dell Vostro 3400			Sunil Mujumdar
-Dell Vostro 3500			Carlos
-Dell Vostro 3700			andresrommier
-Dell XPS 15 (L501x)			matthew85		Ubuntu 11.04
-Dell XPS 15 (L502x)			Sunil Mujumdar
-Dell XPS 17 L701x			Samuel Leal
-Dell XPS 17 L702x			Stephen Brooks
-Lenovo T410				innoscopio		Linux Mint 11
-MSI-FX700                               Mrssheep
-Samsung QX310				BenjaminEvenson
-Samsung QX410 J01			Ben Sanders
-Samsung RF511				Chuong
-Samsung RF711				Tomasz Karczmarski
-Toshiba Satellite M645-SP4132L		Leonard Camacho
-
-Machines working with automatic power management of the nVidia card:
-
-Machine					User
-Alienware M11X R2                       Martin Juhl
-Asus EeePC 1215n			BarzantMD
-Asus P31JG                              ouafnico
-Asus U43Jc				ArchangeGabriel
-Dell Vostro 3500			pauloxnet
-Dell XPS 15 (L501x)			matthew85
-Dell XPS 15 (L502x)			rockorequin
+Machine					Distro
+Alienware M11X R1			
+Alienware M11X R2			Ubuntu 11.04
+Acer Aspire 5742G			
+Acer Aspire 5745PG			
+Acer Aspire 8951G			
+Asus EeePC 1015PN			Ubuntu 11.04 (i686/x86_64)
+Asus EeePC 1215N			
+Asus K52Jc				
+Asus K53Sv (X53Sv)			
+Asus N53Sv				
+Asus N53Sv/N53Sn			openSuSE 11.4 (i686/x86_64)
+Asus N61Jv (X64Jv)			
+Asus N73Jn				
+Asus N82Jv				
+Asus P31Jg				
+Asus P52Jc				
+Asus U30J				
+Asus U30Jc				Ubuntu 10.10
+Asus U31Jg				
+Asus U35J				
+Asus U35Jc				
+Asus U36Jc				
+Asus U43Jc				Ubuntu 11.04
+Asus U53Jc				
+Asus UL30Vt				
+Asus UL80Vt                             Ubuntu 11.04
+Asus X52Jc				
+CLEVO W150HNQ				
+Dell Latitude E6420			
+Dell Vostro 3300			
+Dell Vostro 3400			
+Dell Vostro 3500			
+Dell Vostro 3700			
+Dell XPS 15 (L501x)			Ubuntu 11.04
+Dell XPS 15 (L502x)			
+Dell XPS 17 L701x			
+Dell XPS 17 L702x			
+Lenovo T410				Linux Mint 11
+MSI-FX700                               
+Samsung QX310				
+Samsung QX410 J01			
+Samsung RF511				
+Samsung RF711				
+Toshiba Satellite M645-SP4132L		
 
 Status updates can be found here: http://www.martin-juhl.dk or on twitter:
 http://twitter.com/martinjuhl
