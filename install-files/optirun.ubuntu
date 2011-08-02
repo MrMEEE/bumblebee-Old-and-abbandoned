@@ -29,13 +29,13 @@
 
 
 ### COMMENT
-#This is a optirun script which takes arguments: compression, architecture, display (just for testing purpose).
+#This is a optirun script which takes arguments: frame transfer, architecture, display (just for testing purpose).
 #If the force argument is omitted, the script will not launch the app with bumblebee if the computer is on battery
 #Usage :
-#	optirun -f -32 -c <compression_value> -d <display value>
+#	optirun -f -32 -c <frame_transfer_value> -d <display value>
 # -f : Force optirun : force the app to be run with bumblebee if on battery
 # -32 : 32Bits library : use the 32bits Nvidia driver (optirun -32 is equivalent to optirun32)
-# -c <compression_value> : Compression : -c must be followed by jpeg, proxy, rgb, yuv or xv argument (See the VGL doc)
+# -c <frame_transfer_value> : Frame transfer : -c must be followed by jpeg, proxy, rgb, yuv or xv argument (See the VGL doc)
 # -d <display_value> : -d must be followed by :0, :1 or :2 argument (See the VGL doc)
 ### END COMMENT
 
@@ -54,17 +54,17 @@ while :; do
 		;; #force optirun if on battery
 	  -32)
 		VGL_DRIVER="/usr/lib32/nvidia-current"
-		echo "If the application is run with Bumblebee, the 32-bit driver will be used"
+		echo "The 32-bit nVidia driver will be used"
 		;; #launch vglrun with 32 bits nvidia driver
 	  -c)
 		shift
 		case "$1" in
 		  jpeg|proxy|rgb|yuv|xv)
 			VGL_COMPRESS=$arg
-			echo "Bumblebee will transfer graphics using compression: $VGL_COMPRESS"
+			echo "Bumblebee will transfer frames using : $VGL_COMPRESS"
 			;;
-		  *)
-			echo "The compression parameter -c must be preceded by jpeg, proxy, rgb, yuv or xv."
+		*)
+			echo "The frame transfer parameter -c must be followed by jpeg, proxy, rgb, yuv or xv."
 			exit 3
 			;;
 		esac
@@ -73,9 +73,9 @@ while :; do
 		shift
 		if ! [[ $1 =~ ^:[0-9]+$ ]]; then
 			VGL_DISPLAY=$1
-			echo "Bumblebee will use the next display for rendering: $VGL_DISPLAY"
+			echo "Bumblebee will use the $VGL_DISPLAY display for rendering"
 		else
-			echo "The display parameter -d must be preceded by a colon followed by digits like :8"
+			echo "The display parameter -d must be followed by a colon and digits like :8"
 			exit 2
 		fi
 		;;
@@ -119,7 +119,7 @@ show_msg() {
 optirun_launcher() {
 	# Remove colon and everything before it: :1.0 -> 1.0
 	display=${VGL_DISPLAY##*:}
-	# Remove dot and everything after it: 1.0 -> 0
+	# Remove dot and everything after it: 1.0 -> 1
 	display=${display%%.*}
 
 	# test if Bumblebee's X server is running

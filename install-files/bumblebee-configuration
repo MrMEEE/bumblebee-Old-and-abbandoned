@@ -341,14 +341,15 @@ sed -i "s/\([ \t]*BusID[ \t]*\)\".*\"/\1\"$NVIDIABUSID\"/g" /etc/X11/xorg.conf.n
 if [ "$DISTRO" == "OPENSUSE" ] ; then
 	sed -i "s/\([ \t]*BusID[ \t]*\)\".*\"/\1\"$NVIDIABUSID\"/g" /etc/X11/xorg.conf.nouveau
 fi
+NVIDIABUSIDCUT=`echo $NVIDIABUSID | cut -d: -f2,3`
 
 if [ "$CONFIGMODE" == "MANUAL" ]; then
 	CONNECTEDMONITOR="UNKNOWN"
-	if [ `$LSPCI -v -s $NVIDIABUSIDCUT |grep ! |wc -l` = 1 ]; then
-		if [ -x /usr/local/bin/bumblebee-enablecard ]; then
+	if $LSPCI -v -s $NVIDIABUSIDCUT | grep -q ! ; then
+		if [ -x /usr/local/bin/bumblebee-enablecard ] ; then
 			/usr/local/bin/bumblebee-enablecard
 		fi
-		if [ -x /usr/bin/bumblebee-enablecard ]; then
+		if [ -x /usr/bin/bumblebee-enablecard ] ; then
 			/usr/bin/bumblebee-enablecard
 		fi
 	fi
@@ -374,10 +375,10 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 		${MODPROBE} -r nvidia 2>&1 >/dev/null
 	fi
 	if ! $LSPCI -v -s $NVIDIABUSIDCUT | grep -q ! ; then
-		if [ -x /usr/local/bin/bumblebee-disablecard ]; then
+		if [ -x /usr/local/bin/bumblebee-disablecard ] ; then
 			/usr/local/bin/bumblebee-disablecard
 		fi
-		if [ -x /usr/bin/bumblebee-disablecard ]; then
+		if [ -x /usr/bin/bumblebee-disablecard ] ; then
 			/usr/bin/bumblebee-disablecard
 		fi
 	fi
@@ -581,6 +582,7 @@ fi
 if grep -q '^%bumblebee ' /etc/sudoers; then
 	sed '/^%bumblebee /d' -i /etc/sudoers
 fi
+
 #
 #	That's all folks
 #

@@ -1,20 +1,165 @@
 #!/bin/bash
+#
+#
+
+### BEGIN LICENSE
+#
+#    This file is part of bumblebee.
+#
+#    bumblebee is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    bumblebee is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
+#
+### END LICENSE
+
+#
+#	Initialize vars
+#
+STOP_SERVICE_ON_EXIT="YES"
+VGL_DISPLAY=":8"
+VGL_COMPRESS="xv"
+VGL_READBACK="pbo"
+VGL_LOG="/dev/null"
+ECO_MODE="0"
+
+#
+#	Get the architecture
+#
+ARCH=`uname -m`
 
 #
 #	Get the defaults
 #
-source /etc/default/bumblebee
+[ -r /etc/default/bumblebee ] && . /etc/default/bumblebee
+
+#
+#	Handle options
+#
+HELP=""
+if [ $# -eq 0 ] ; then
+	HELP="-h"
+fi
+
+FORCE_32="NO"
+FORCE_COMPRESS="NO"
+FORCE_VGL_DISPLAY="NO"
+
+for arg in "$@" $HELP ; do
+	case $arg in
+		-f)
+			#
+			#	Force to run if on battery
+			#
+			ECO_MODE="0"
+			shift
+			;;
+		-32)
+			#
+			#	Force 32 bit mode
+			#
+			FORCE_32="YES"
+			shift
+			;;
+		-c)
+			#
+			#	Change the compression
+			#
+			FORCE_COMPRESS="YES"
+			shift
+			;;
+		proxy|jpeg|rgb|xv|yuv)
+			#
+			#	Get compressopn type
+			#
+			if [ "$FORCE_COMPRESS" == "YES" ] ; then
+				VGL_COMPRESS=$arg
+				echo "Using compression: $VGL_COMPRESS"
+				shift
+				FORCE_COMPRESS="NO"
+			else
+				echo "The value proxy, jpeg, rgb, xv or yuv for the compression must be preceded by the -c option"
+				exit 1
+			fi
+			;;
+		-d)
+			#
+			#	Force new VGL display
+			#
+			FORCE_VGL_DISPLAY="YES"
+			shift
+			;;
+		:*)
+			if [ "$FORCE_VGL_DISPLAY" == "YES" ] ; then
+				VGL_DISPLAY=$arg
+				shift
+				FORCE_VGL_DISPLAY="NO"
+			else
+				echo "The value :0, :1, ... ,:n for a display must be preceded by the -d option"
+				exit 2
+			fi
+			;;
+		-l)
+			#
+			#	List all settings
+			#
+			if [ "$ECO_MODE" == "0" ] ; then
+				echo "ECO mode: off"
+			else
+				echo "ECO mode: on"
+			fi
+			if [ "$ARCH" == "x86_64" ] ; then
+				if [ "$FORCE_32" == "NO" ] ; then
+					echo "Application mode: 64 bit"
+				else
+					echo "Application mode: 32 bit"
+				fi
+			fi
+			echo "VGL display: $VGL_DISPLAY"
+			echo "VGL compression: $VGL_COMPRESS"
+
+			exit 0
+			;;
+		-h|--help)
+			#
+			#	Help
+			#
+			echo "Usage: ${0##*/} [ OPTION ]... FILE"
+			echo "  -h, --help  print this help and exit"
+			echo "  -l          list default settings"
+			echo "  -f          disable ECO mode, always start the application"
+			if [ "$ARCH" == "x86_64" ] ; then
+			echo "  -32         force 32 bit mode"
+			fi
+			echo
+			echo "  -c { proxy | jpeg | rgb | xv | yuv }  VGL compression type"
+			echo "  -d { :0 | :1 | ... | :n }             VGL display"
+			echo
+
+			exit 1
+			;;
+		*)
+			#
+			#	Start the application
+			#
+			break
+			;;
+	esac
+done
 
 #
 #	Get the display
 #
 BEE_DISPLAY=${VGL_DISPLAY##*:}
 BEE_DISPLAY=${BEE_DISPLAY%%.*}
-
-#
-#	Get the architecture
-#
-ARCH=`uname -m`
 
 #
 #	Terminate
@@ -24,9 +169,9 @@ terminate()
 	#
 	#	Can we disable bumblebee ?
 	#
-	if [ "$STOP_SERVICE_ON_EXIT" != "NO" ]; then
-		if [ `ps -e |grep optirun | wc -l` -gt 2 ]; then
-			echo "Another bumblebee powered application is running, keeping bumblebee alive."
+	if [ "$STOP_SERVICE_ON_EXIT" != "NO" ] ; then
+		if [ `pidof -x optirun optirun32 optirun64 | wc -w` -gt 2 ] ; then
+			echo "Another bumblebee powered application is running, keeping bumblebee alive"
 			exit 0
 		fi
 
@@ -38,40 +183,62 @@ terminate()
 }
 
 #
-#	Enable bumblebee
+#	Battery power ?
 #
-sudo /etc/init.d/bumblebee enable
+#	Take the first power supply in the list...
+#
+POWER_STATE=0
+for state in /sys/class/power_supply/*/online ; do
+	POWER_STATE=$(( POWER_STATE || `cat $state` ))
+done
 
 #
-#	Intercept Ctrl-C, run terminate
+#	Start the application
 #
-trap "terminate" INT
+if [ "$POWER_STATE" == "1" ] || [ "$ECO_MODE" == "0" ] ; then
+	#
+	#	Intercept Ctrl-C, run terminate
+	#
+	trap "terminate" INT
 
-#
-#	Set the library path
-#
-if [ -f /usr/bin/nvidia-xconfig ] ; then
-	if [ "$ARCH" == "x86_64" ] ; then
-		if [ "${0##*/}" == "optirun32" ] ;then
-			LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:/usr/X11R6/lib64-nvidia:$LD_LIBRARY_PATH
-		else
-			LD_LIBRARY_PATH=/usr/X11R6/lib64-nvidia:/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
-		fi
-	else
-		LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+	#
+	#	Enable bumblebee
+	#
+	sudo /etc/init.d/bumblebee enable -d $VGL_DISPLAY
+	if [ $? -ne 0 ] ; then
+		exit 1
 	fi
 
-	export LD_LIBRARY_PATH
+	#
+	#	Set the library path
+	#
+	if [ -f /usr/bin/nvidia-xconfig ] ; then
+		if [ "$ARCH" == "x86_64" ] ; then
+			if [ "${0##*/}" == "optirun32" ] || [ "$FORCE_32" == "YES" ] ; then
+				LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:/usr/X11R6/lib64-nvidia:$LD_LIBRARY_PATH
+			else
+				LD_LIBRARY_PATH=/usr/X11R6/lib64-nvidia:/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+			fi
+		else
+			LD_LIBRARY_PATH=/usr/X11R6/lib-nvidia:$LD_LIBRARY_PATH
+		fi
+
+		export LD_LIBRARY_PATH
+	fi
+
+	#
+	#	Run the command
+	#
+	export VGL_READBACK
+	export VGL_LOG
+	vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY "$@"
+
+	#
+	#	The end...
+	#
+	terminate
+
+else
+	echo "ECO mode active, bumblebee is not started because you are on battery power"
+	$@
 fi
-
-#
-#	Run the command
-#
-export VGL_READBACK
-export VGL_LOG
-vglrun -c $VGL_COMPRESS -d $VGL_DISPLAY "$@"
-
-#
-#	The end...
-#
-terminate
