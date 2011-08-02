@@ -68,11 +68,8 @@ NVIDIABUSIDCUT=`grep BusID /etc/X11/xorg.conf.nvidia | sed -e "s/[ \t]*BusID[ \t
 
 if [ -f "$DEFAULT_FILE" ] ; then
 	whiptail --yesno \
-"Bumblebee Configuration.\n\n"\
-"Do you want to reconfigure bumblebee????" $LINES $COLUMNS
-	if [ $? -eq 1 ]; then
-		exit 0
-	fi
+	"Bumblebee Configuration.\n\n"\
+	"Do you want to reconfigure bumblebee????" $LINES $COLUMNS || exit 0
 else
 	# -f to prevent error messages should the file not exist
 	rm -f $DEFAULT_FILE
