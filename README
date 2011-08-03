@@ -8,7 +8,7 @@ https://launchpad.net/~mj-casalogic/+archive/bumblebee/
 
 This will probably be the most up-to-date version for Ubuntu from now on...
 
-For people currently running the script/git version please do:
+For people currently running the script/git version please do :
 
 sudo bumblebee-uninstall
 sudo apt-get install ppa-purge
@@ -18,16 +18,13 @@ sudo apt-add-repository ppa:mj-casalogic/bumblebee
 sudo apt-get update
 sudo apt-get install bumblebee
 
-
 openSuSE Users:
 
-Bumblebee has been ported to the openSuSE Build Service repository.
+Bumblebee has been ported to the openSuSE Build Service repository :
 
 http://download.opensuse.org/repositories/home:/Ximi1970:/bumblebee/openSUSE_11.4/
 
-For people currently running the script/git version please do:
-
-Cleanup your system:
+For people currently running the script/git version please do :
 
 sudo bumblebee-uninstall
 
@@ -39,9 +36,6 @@ rpm -e x11-video-nvidiaG02
 rpm -e nvidia-computeG02
 rpm -e nvidia-gfxG02-kmp
 zypper rr "nVidia Graphics Drivers (local mirror)"
-
-
-Start using the bumblebee repository:
 
 Install the nVidia repository and packages if you do not want to
 use the nouveau driver:
@@ -148,13 +142,10 @@ The Intel card is running the Desktop and the nVidia card can be used for
 the thougher applications with the command "optirun32 <application>" or
 "optirun64 <application>"...
 
-So now we just need somebody to write an application for automatically
-balance which applications should be run on which card.. 
-
 Support for automatically shutting down and starting up the nVidia card is
 in developpement.
 
-There are several ways to start using bumblebee:
+There are several ways to start using bumblebee :
 
 Download the .zip or .tar.gz by clicking the 'Downloads' button on the
 'Source' page to a directory of your liking. Unzip or untar and run the install
@@ -167,56 +158,6 @@ Go to the directory of your liking and:
 
 (The second method makes it easier to regularly update bumblebee if you're
 willing to invest a little bit of time in working with git.)
-
-I left the old releases up there in the old/ folder.. if someone needs it..
-
-Machines Confirmed Working:
-
-Machine					Distro
-Alienware M11X R1			
-Alienware M11X R2			Ubuntu 11.04
-Acer Aspire 5742G			
-Acer Aspire 5745PG			
-Acer Aspire 8951G			
-Asus EeePC 1015PN			Ubuntu 11.04 (i686/x86_64)
-Asus EeePC 1215N			
-Asus K52Jc				
-Asus K53Sv (X53Sv)			
-Asus N53Sv				
-Asus N53Sv/N53Sn			openSuSE 11.4 (i686/x86_64)
-Asus N61Jv (X64Jv)			
-Asus N73Jn				
-Asus N82Jv				
-Asus P31Jg				
-Asus P52Jc				
-Asus U30J				
-Asus U30Jc				Ubuntu 10.10
-Asus U31Jg				
-Asus U35J				
-Asus U35Jc				
-Asus U36Jc				
-Asus U43Jc				Ubuntu 11.04
-Asus U53Jc				
-Asus UL30Vt				
-Asus UL80Vt                             Ubuntu 11.04
-Asus X52Jc				
-CLEVO W150HNQ				
-Dell Latitude E6420			
-Dell Vostro 3300			
-Dell Vostro 3400			
-Dell Vostro 3500			
-Dell Vostro 3700			
-Dell XPS 15 (L501x)			Ubuntu 11.04
-Dell XPS 15 (L502x)			
-Dell XPS 17 L701x			
-Dell XPS 17 L702x			
-Lenovo T410				Linux Mint 11
-MSI-FX700                               
-Samsung QX310				
-Samsung QX410 J01			
-Samsung RF511				
-Samsung RF711				
-Toshiba Satellite M645-SP4132L		
 
 Status updates can be found here: http://www.martin-juhl.dk or on twitter:
 http://twitter.com/martinjuhl
