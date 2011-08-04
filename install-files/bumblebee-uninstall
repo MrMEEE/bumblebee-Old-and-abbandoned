@@ -132,19 +132,6 @@ elif [ $DISTRO = OPENSUSE ]; then
       /usr/local/bin/bumblebee-enablecard
     fi
 
-#    FOUND=`rpm -qa|grep x11-video-nvidia`
-#    if [ "$FOUND" != "" ] || ( [ -d /usr/X11R6/lib-nvidia ] && [ ! -d /usr/X11R6/nvidia ] ) ; then
-#	if [ -f /usr/local/bin/bumblebee-check ] ; then
-	  #
-	  #	Cleanup 3D hack for the repository
-	  #
-	  #	Do not cleanup. It will kill the Intel 3D and put the Intel X server image upside down
-	  # if the nVidia driver is not removed.
-	  #
-#	  /usr/local/bin/bumblebee-check -restore
-#	fi
-#    fi
-
     if [ -f /usr/bin/nvidia-uninstall ] ; then
 
 	echo "Uninstalling nVidia package"
