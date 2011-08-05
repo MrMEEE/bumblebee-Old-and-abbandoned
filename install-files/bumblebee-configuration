@@ -569,18 +569,27 @@ sed -i 's/VGL_COMPRESS.*/VGL_COMPRESS='$IMAGETRANSPORT'/' "$DEFAULT_FILE"
 if ! grep -q '^bumblebee:' /etc/group; then
 	groupadd bumblebee
 fi
-if [ "$DISTRO" == "UBUNTU" ] && [ -n "$SUDO_USER" ]; then
-	gpasswd -a "$SUDO_USER" bumblebee
+if [ "$DISTRO" == "UBUNTU" ] ; then
+	if [ -n "$SUDO_USER" ] ; then
+		gpasswd -a "$SUDO_USER" bumblebee
+	fi
+	# Bumblebee creates a file in /etc/sudoers.d, do not do an unnecessary write
+	if grep -q '^%bumblebee ' /etc/sudoers; then
+		sed '/^%bumblebee /d' -i /etc/sudoers
+	fi
 fi
 if [ "$DISTRO" == "OPENSUSE" ] ; then
 	if [ "$SUDO_USER" != "" ] ; then
 		groupmod -A `env | grep SUDO_USER | cut -f2 -d=` bumblebee
 	fi
-fi
-
-# Bumblebee creates a file in /etc/sudoers.d, do not do an unnecessary write
-if grep -q '^%bumblebee ' /etc/sudoers; then
-	sed '/^%bumblebee /d' -i /etc/sudoers
+	if [ -f /etc/sudoers ] ; then
+		# Cleanup sudoers
+		sed '/^%bumblebee /d' -i /etc/sudoers
+		# Add new permissions
+		echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /etc/init.d/bumblebee" >> /etc/sudoers
+		echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /usr/bin/bumblebee-enablecard" >> /etc/sudoers
+		echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /usr/bin/bumblebee-disablecard" >> /etc/sudoers
+	fi
 fi
 
 #
