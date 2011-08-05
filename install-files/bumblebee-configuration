@@ -579,7 +579,7 @@ if [ "$DISTRO" == "UBUNTU" ] ; then
 	fi
 fi
 if [ "$DISTRO" == "OPENSUSE" ] ; then
-	if [ "$SUDO_USER" != "" ] ; then
+	if [ -n "$SUDO_USER" ] ; then
 		groupmod -A `env | grep SUDO_USER | cut -f2 -d=` bumblebee
 	fi
 	if [ -f /etc/sudoers ] ; then
