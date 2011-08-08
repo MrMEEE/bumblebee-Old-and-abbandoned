@@ -37,7 +37,7 @@ elif grep -iqE 'Ubuntu|Linux Mint|Backtrack 5' /etc/issue; then
 elif grep -iq OpenSUSE /etc/issue; then
 	DISTRO=OPENSUSE
 	DEFAULT_FILE=/etc/default/bumblebee
-	if [ -n "$SUDO_USER" ] ; then
+	if [ "$SUDO_USER" != "" ] ; then
 		HOME=$(grep "$SUDO_USER" /etc/passwd | cut -f6 -d':')
 	fi
 else
@@ -570,7 +570,7 @@ if ! grep -q '^bumblebee:' /etc/group; then
 	groupadd bumblebee
 fi
 if [ "$DISTRO" == "UBUNTU" ] ; then
-	if [ -n "$SUDO_USER" ] ; then
+	if [ "$SUDO_USER" != "" ] ; then
 		gpasswd -a "$SUDO_USER" bumblebee
 	fi
 	# Bumblebee creates a file in /etc/sudoers.d, do not do an unnecessary write
@@ -579,7 +579,7 @@ if [ "$DISTRO" == "UBUNTU" ] ; then
 	fi
 fi
 if [ "$DISTRO" == "OPENSUSE" ] ; then
-	if [ -n "$SUDO_USER" ] ; then
+	if [ "$SUDO_USER" != "" ] ; then
 		groupmod -A `env | grep SUDO_USER | cut -f2 -d=` bumblebee
 	fi
 	if [ -f /etc/sudoers ] ; then
