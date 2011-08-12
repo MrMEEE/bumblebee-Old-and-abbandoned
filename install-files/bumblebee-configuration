@@ -63,9 +63,6 @@ MODPROBE=`which modprobe`
 LINES=`stty size | cut -f1 -d' '`
 COLUMNS=`stty size | cut -f2 -d' '`
 
-# NVIDIABUSID without PCI:
-NVIDIABUSIDCUT=`grep BusID /etc/X11/xorg.conf.nvidia | sed -e "s/[ \t]*BusID[ \t]*\"\(.*\)\"/\1/g" |cut -d: -f2,3`
-
 if [ -f "$DEFAULT_FILE" ] ; then
 	whiptail --yesno \
 "Bumblebee Configuration.\n\n"\
@@ -451,15 +448,6 @@ if [ "$DISTRO" == "UBUNTU" ] ; then
 		chmod +x /usr/local/bin/bumblebee-disablecard
 	fi
 fi
-if ! $LSPCI -v -s $NVIDIABUSIDCUT | grep -q !; then
-	if [ -f /usr/local/bin/bumblebee-disablecard ]; then
-		/usr/local/bin/bumblebee-disablecard
-	fi
-	if [ -f /usr/bin/bumblebee-disablecard ]; then
-		/usr/bin/bumblebee-disablecard
-	fi
-fi
-                                                                                                                                
 if [ "$DISTRO" == "OPENSUSE" ] ; then
 	#
 	#	Setup new scripts
@@ -520,6 +508,14 @@ if [ "$DISTRO" == "OPENSUSE" ] ; then
 			sed -i 's?modprobe -r nvidia?modprobe -r nouveau >/dev/null 2>\&1\nif lsmod | grep -q nouveau; then\n\techo \"Error: could not unload nouveau module, leaving card turned on\"\n\texit\nfi\nmodprobe -r nvidia >/dev/null 2>\&1?g' $SCRIPT_PATH/bumblebee-disablecard
 			chmod +x $SCRIPT_PATH/bumblebee*
 		fi
+	fi
+fi
+if ! $LSPCI -v -s $NVIDIABUSIDCUT | grep -q !; then
+	if [ -f /usr/local/bin/bumblebee-disablecard ]; then
+		/usr/local/bin/bumblebee-disablecard
+	fi
+	if [ -f /usr/bin/bumblebee-disablecard ]; then
+		/usr/bin/bumblebee-disablecard
 	fi
 fi
 
