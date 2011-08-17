@@ -34,6 +34,15 @@
 #    You should have received a copy of the GNU General Public License
 #    along with bumblebee.  If not, see <http://www.gnu.org/licenses/>.
 #
+
+echo "** This Bumblebee version is outdated **"
+echo "Development for Bumblebee has continued by the Bumblebee Project:"
+echo "https://github.com/Bumblebee-Project/Bumblebee"
+echo "https://twitter.com/Team_Bumblebee"
+echo
+read -p "Would you like to continue using this outdated version? (y/N)" yn
+[[ $yn == [Yy]* ]] || exit 0
+
 BUMBLEBEEVERSION=1.7.10
 
 source stages/determinedistro
