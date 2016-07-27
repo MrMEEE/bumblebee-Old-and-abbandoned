@@ -1,0 +1,101 @@
+#!/bin/bash
+ROOT_UID=0
+
+if [ `cat /etc/issue | grep -nir fedora | wc -l` -gt 0 ] ; then
+ DISTRO=FEDORA
+elif [ `cat /etc/issue | grep -nir ubuntu | wc -l` -gt 0 ] ; then
+ DISTRO=UBUNTU
+elif [ `cat /etc/issue |grep -nir opensuse |wc -l` -gt 0 ] ; then
+ DISTRO=OPENSUSE
+ if [ "$SUDO_USER" != "" ] ; then
+  HOME=`cat /etc/passwd | grep $SUDO_USER | cut -f6 -d':'`
+ fi
+elif [ `cat /etc/issue | grep -nir debian | wc -l` -gt 0 ] ; then
+ DISTRO=DEBIAN
+fi
+
+if [ $UID != $ROOT_UID ] ; then
+    echo "You don't have sufficient privileges to run this script."
+    echo
+    echo "Please run the script with: sudo bumblebee-submitsystem"
+    exit 1
+fi
+
+if [ "$HOME" = "/root" ] && [ "$DISTRO" != OPENSUSE ] ; then
+    echo "Do not run this script as the root user"
+    echo
+    echo "Please run the script with: sudo bumblebee-submitsystem"
+    exit 2
+fi
+
+echo
+echo "This program will submit your system information to the bumblebee"
+echo "database. Please ONLY submit systems that actually works.."
+echo 
+echo "Please enter your name to continue."
+echo
+read CONFIRMINGUSER
+
+DISTRO=$(cat /etc/issue | cut -f1 -d\\)
+MANUFACTURER=`dmidecode --string system-manufacturer`
+MODEL=`dmidecode --string system-product-name`
+CONNECTEDMONITOR=`cat /etc/X11/xorg.conf.nvidia |grep ConnectedMonitor |cut -f4 -d\"`
+INTELBUSID=`cat /etc/X11/xorg.conf |grep BusID |cut -f2 -d\"`
+NVIDIABUSID=`cat /etc/X11/xorg.conf.nvidia |grep BusID |cut -f2 -d\"`
+if [ `cat /usr/local/bin/bumblebee-enablecard |grep \$\(acpi |wc -l` -gt 0  ]; then
+ STARTUP=`xxd -p /usr/local/bin/bumblebee-enablecard | sed -e ':a;N;$!ba;s/\n//g'`
+ SHUTDOWN=`xxd -p /usr/local/bin/bumblebee-disablecard | sed -e ':a;N;$!ba;s/\n//g'`
+ STARTUPSTATUS=AVAILABLE
+ SHUTDOWNSTATUS=AVAILABLE
+else
+ STARTUP=UNAVAILABLE
+ SHUTDOWN=UNAVAILABLE
+ STARTUPSTATUS=UNAVAILABLE
+ SHUTDOWNSTATUS=UNAVAILABLE
+fi
+DMIPRODUCT=`dmidecode --string system-product-name`
+clear
+echo
+echo "Distribution: $DISTRO"
+echo "Manufacturer: $MANUFACTURER"
+echo "Model: $MODEL"
+echo "Connected Monitor: $CONNECTEDMONITOR"
+echo "Intel Card BusID: $INTELBUSID"
+echo "nVidia Card BusID: $NVIDIABUSID"
+echo "nVidia Startup acpi_call command(s): $STARTUPSTATUS"
+echo "nVidia Shutdown acpi_call command(s): $SHUTDOWNSTATUS"
+echo "DMI Product: $DMIPRODUCT"
+echo
+echo "User Reporting: $CONFIRMINGUSER"
+echo
+echo "Are you sure your want to submit this system? (y/n)"
+echo
+
+read answer
+
+case "$answer" in
+
+y | Y )
+;;
+
+*)
+
+echo
+echo "System NOT submitted.."
+echo
+
+exit 0
+esac
+
+wget -O /tmp/systemsubmitted "http://www.martin-juhl.dk/bumblebee/?manufacturer=$MANUFACTURER&model=$MODEL&monitor=$CONNECTEDMONITOR&intelbusid=$INTELBUSID&nvidiabusid=$NVIDIABUSID&start=$STARTUP&shutdown=$SHUTDOWN&dmiproduct=$DMIPRODUCT&user=$CONFIRMINGUSER&distro=$DISTRO&addmachine=1" 1>/dev/null 2>/dev/null
+
+if [ `cat /tmp/systemsubmitted | grep "System Added" |wc -l` -gt 0 ];then
+  echo
+  echo "System added succesfully. Thanks."
+  echo
+else
+  echo
+  echo "System not added, make sure you have internet access and try again. Thanks."
+  echo
+fi
+

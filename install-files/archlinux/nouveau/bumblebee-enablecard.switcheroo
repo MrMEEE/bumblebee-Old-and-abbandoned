@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# This script should contain the command(s) necessary to switch on the
+# nVidia card on (hopefully) any vga-switcheroo capable laptop.
+# 
+# This script uses the vga-switcheroo module. To enable it you must mount
+# debugfs filesystem in /sys/kernel/debug/ and load the nouveau kernel module
+# See https://wiki.archlinux.org/index.php/Bumblebee for details.
+
+if ! lsmod | grep -q nouveau; then
+ echo "Warning: nouveau module not present. Switch ON may fail."
+fi
+
+if grep DIS /sys/kernel/debug/vgaswitcheroo/switch | grep -q Off; then
+     echo ON > /sys/kernel/debug/vgaswitcheroo/switch
+     RET_VAL=$?
+     if [ $RET_VAL ] ; then
+          echo "Switch ON successfull"
+     else
+          echo "Error: exit $?"
+          exit $RET_VAL
+     fi
+else
+     echo 'Card is already ON'
+fi
+
