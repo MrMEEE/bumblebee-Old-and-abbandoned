@@ -37,7 +37,7 @@ elif grep -iqE 'Ubuntu|Linux Mint|Backtrack 5' /etc/issue; then
 elif grep -iq OpenSUSE /etc/issue; then
 	DISTRO=OPENSUSE
 	DEFAULT_FILE=/etc/default/bumblebee
-	if [ -n "$SUDO_USER" ] ; then
+	if [ "$SUDO_USER" != "" ] ; then
 		HOME=$(grep "$SUDO_USER" /etc/passwd | cut -f6 -d':')
 	fi
 else
@@ -62,9 +62,6 @@ MODPROBE=`which modprobe`
 # Get terminal size
 LINES=`stty size | cut -f1 -d' '`
 COLUMNS=`stty size | cut -f2 -d' '`
-
-# NVIDIABUSID without PCI:
-NVIDIABUSIDCUT=`grep BusID /etc/X11/xorg.conf.nvidia | sed -e "s/[ \t]*BusID[ \t]*\"\(.*\)\"/\1/g" |cut -d: -f2,3`
 
 if [ -f "$DEFAULT_FILE" ] ; then
 	whiptail --yesno \
@@ -314,6 +311,9 @@ while [ "$CONFIGMODE" != "MANUAL" ] && [ "$CONFIGMODE" != "DONE" ] ; do
 	fi
 done
 
+#
+# Get the nVidia Bus ID
+#
 if [ "$CONFIGMODE" == "MANUAL" ]; then
 	POWERON="UNAVAILABLE"
 	if [ `${LSPCI} |grep VGA |wc -l` -eq 2 ]; then
@@ -325,14 +325,18 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 			whiptail --msgbox \
 " The BusID of the nVidia card can't be determined.\n"\
 "You must correct this manually in /etc/X11/xorg.conf.nvidia and /etc/X11/xorg.conf.nouveau\n"\
-"Please report this problem..\n\n"\
+"Please report this problem.\n"\
+"Bumblebee has NOT been configured, and probably won't work.\n\n"\
 "Press Any Key to continue." $LINES $COLUMNS
+			exit 1
 		else
 			whiptail --msgbox \
 " The BusID of the nVidia card can't be determined.\n"\
 "You must correct this manually in /etc/X11/xorg.conf.nvidia\n"\
-"Please report this problem..\n\n"\
+"Please report this problem..\n"\
+"Bumblebee has NOT been configured, and probably won't work.\n\n"\
 "Press Any Key to continue." $LINES $COLUMNS
+			exit 1
 		fi
 	fi
 fi
@@ -343,16 +347,23 @@ if [ "$DISTRO" == "OPENSUSE" ] ; then
 fi
 NVIDIABUSIDCUT=`echo $NVIDIABUSID | cut -d: -f2,3`
 
+#
+# Always try to enable the card before modifying the setup
+#
+if $LSPCI -v -s $NVIDIABUSIDCUT | grep -q !; then
+	if [ -f /usr/local/bin/bumblebee-enablecard ] ; then
+		/usr/local/bin/bumblebee-enablecard
+	fi
+	if [ -f /usr/bin/bumblebee-enablecard ] ; then
+		/usr/bin/bumblebee-enablecard
+	fi
+fi
+
+#
+# Try to find the connected monitor
+#
 if [ "$CONFIGMODE" == "MANUAL" ]; then
 	CONNECTEDMONITOR="UNKNOWN"
-	if $LSPCI -v -s $NVIDIABUSIDCUT | grep -q ! ; then
-		if [ -x /usr/local/bin/bumblebee-enablecard ] ; then
-			/usr/local/bin/bumblebee-enablecard
-		fi
-		if [ -x /usr/bin/bumblebee-enablecard ] ; then
-			/usr/bin/bumblebee-enablecard
-		fi
-	fi
 	if [ "$DISTRO" == "UBUNTU" ] ; then
 		${MODPROBE} nvidia-current
 		if [ `$LSPCI -v -s $NVIDIABUSIDCUT |grep ! |wc -l` = 0 ] ; then
@@ -374,14 +385,6 @@ if [ "$CONFIGMODE" == "MANUAL" ]; then
 		fi
 		${MODPROBE} -r nvidia 2>&1 >/dev/null
 	fi
-	if ! $LSPCI -v -s $NVIDIABUSIDCUT | grep -q ! ; then
-		if [ -x /usr/local/bin/bumblebee-disablecard ] ; then
-			/usr/local/bin/bumblebee-disablecard
-		fi
-		if [ -x /usr/bin/bumblebee-disablecard ] ; then
-			/usr/bin/bumblebee-disablecard
-		fi
-	fi
 	if [ "$CONNECTEDMONITOR" != "CRT-0" ] && [ "$CONNECTEDMONITOR" != "DFP-0" ];then
 		LIST_SIZE=$(($LINES - 10))
 choice=$(whiptail --nocancel --menu \
@@ -390,13 +393,13 @@ choice=$(whiptail --nocancel --menu \
 		case "$choice" in
 		1)
 			CONNECTEDMONITOR="CRT-0"
-		;;
+			;;
 		2)
 			CONNECTEDMONITOR="DFP-0"
-		;;
+			;;
 		3)
 			CONNECTEDMONITOR=$(whiptail --inputbox " Enter the nVidia connected monitor:" $LINES $COLUMNS 3>&1 1>&2 2>&3)
-		;;
+			;;
 		esac
 	fi
 fi
@@ -404,16 +407,8 @@ fi
 sed -i "s/\([ \t]*Option[ \t]*\"ConnectedMonitor\"[ \t]*\)".*"/\1\"$CONNECTEDMONITOR\"/g" /etc/X11/xorg.conf.nvidia
 
 #
-#	Always try to enable the card before switching scripts
+# Setup the power scripts
 #
-if $LSPCI -v -s $NVIDIABUSIDCUT | grep -q !; then
-	if [ -f /usr/local/bin/bumblebee-enablecard ] ; then
-		/usr/local/bin/bumblebee-enablecard
-	fi
-	if [ -f /usr/bin/bumblebee-enablecard ] ; then
-		/usr/bin/bumblebee-enablecard
-	fi
-fi
 if [ "$DISTRO" == "UBUNTU" ] ; then
 	if [ ! "$POWERON" == "UNAVAILABLE" ] ; then
 		echo "$POWERON" | xxd -r -p > /usr/local/bin/bumblebee-enablecard
@@ -426,10 +421,14 @@ if [ "$DISTRO" == "UBUNTU" ] ; then
 "Some examples are available in /usr/share/doc/bumblebee/.\n\n"\
 "Press any key to continue..." $LINES $COLUMNS
 		if [ ! -f /usr/local/bin/bumblebee-enablecard ] ; then
+			#
 			# Not installed
+			#
 			cp /usr/share/doc/bumblebee/bumblebee-enablecard.template /usr/local/bin/bumblebee-enablecard
 		else
+			#
 			# Already Exists
+			#
 			echo
 			echo "nVidia card enable-script: /usr/local/bin/bumblebee-enablecard exists moving old script to /usr/local/bin/bumblebee-enablecard.old."
 			echo
@@ -438,10 +437,14 @@ if [ "$DISTRO" == "UBUNTU" ] ; then
 		fi
 		chmod +x /usr/local/bin/bumblebee-enablecard
 		if [ ! -f /usr/local/bin/bumblebee-disablecard ]; then
+			#
 			# Not installed
+			#
 			cp /usr/share/doc/bumblebee/bumblebee-disablecard.template /usr/local/bin/bumblebee-disablecard
 		else
+			#
 			# Already Exists
+			#
 			echo
 			echo "nVidia card disable-script: /usr/local/bin/bumblebee-disablecard exists, moving old script to /usr/local/bin/bumblebee-disablecard.old."
 			echo
@@ -451,18 +454,9 @@ if [ "$DISTRO" == "UBUNTU" ] ; then
 		chmod +x /usr/local/bin/bumblebee-disablecard
 	fi
 fi
-if ! $LSPCI -v -s $NVIDIABUSIDCUT | grep -q !; then
-	if [ -f /usr/local/bin/bumblebee-disablecard ]; then
-		/usr/local/bin/bumblebee-disablecard
-	fi
-	if [ -f /usr/bin/bumblebee-disablecard ]; then
-		/usr/bin/bumblebee-disablecard
-	fi
-fi
-                                                                                                                                
 if [ "$DISTRO" == "OPENSUSE" ] ; then
 	#
-	#	Setup new scripts
+	# Setup new scripts
 	#
 	if [ -f /usr/local/bin/optirun ] ; then
 		SCRIPT_PATH=/usr/local/bin
@@ -474,7 +468,7 @@ if [ "$DISTRO" == "OPENSUSE" ] ; then
 	if [ "$SCRIPT_PATH" != "" ] ; then
 		if [ ! "$POWERON" == "UNAVAILABLE" ] ; then
 			#
-			#	Power scripts found
+			# Power scripts found
 			#
 			echo $POWERON | xxd -r -p > $SCRIPT_PATH/bumblebee-enablecard
 			echo $POWEROFF | xxd -r -p > $SCRIPT_PATH/bumblebee-disablecard
@@ -483,7 +477,7 @@ if [ "$DISTRO" == "OPENSUSE" ] ; then
 			sed -i 's?modprobe -r nvidia?modprobe -r nouveau >/dev/null 2>\&1\nif lsmod | grep -q nouveau; then\n\techo \"Error: could not unload nouveau module, leaving card turned on\"\n\texit\nfi\nmodprobe -r nvidia >/dev/null 2>\&1?g' $SCRIPT_PATH/bumblebee-disablecard
 		else
 			#
-			#	No power script found
+			# No power script found
 			#
 			whiptail --msgbox \
 "No power-on/off configuration has been reported for your machine,\n"\
@@ -492,10 +486,14 @@ if [ "$DISTRO" == "OPENSUSE" ] ; then
 "Some examples are available in /usr/share/doc/packages/bumblebee/examples/.\n\n"\
 "Press any key to continue..." $LINES $COLUMNS
 			if [ ! -f $SCRIPT_PATH/bumblebee-enablecard ] ; then
+				#
 				# Not installed
+				#
 				cp /usr/share/doc/packages/bumblebee/examples/bumblebee-enablecard.template $SCRIPT_PATH/bumblebee-enablecard
 			else
+				#
 				# Already Exists
+				#
 				echo
 				echo "nVidia card enable-script: $SCRIPT_PATH/bumblebee-enablecard exists moving old script to $SCRIPT_PATH/bumblebee-enablecard.old."
 				echo
@@ -506,10 +504,14 @@ if [ "$DISTRO" == "OPENSUSE" ] ; then
 			sed -i 's?modprobe nvidia?if \[ -f /usr/bin/nvidia-xconfig \] ; then\n\tmodprobe nvidia\nelse\n\tmodprobe nouveau\nfi?g' $SCRIPT_PATH/bumblebee-enablecard
 
 			if [ ! -f $SCRIPT_PATH/bumblebee-disablecard ] ; then
+				#
 				# Not installed
+				#
 				cp /usr/share/doc/packages/bumblebee/examples/bumblebee-disablecard.template $SCRIPT_PATH/bumblebee-disablecard
 			else
+				#
 				# Already Exists
+				#
 				echo
 				echo "nVidia card disable-script: $SCRIPT_PATH/bumblebee-disablecard exists, moving old script to $SCRIPT_PATH/bumblebee-disablecard.old."
 				echo
@@ -523,7 +525,21 @@ if [ "$DISTRO" == "OPENSUSE" ] ; then
 	fi
 fi
 
+#
+# Try to disable the nVidia card again
+#
+if ! $LSPCI -v -s $NVIDIABUSIDCUT | grep -q !; then
+	if [ -f /usr/local/bin/bumblebee-disablecard ]; then
+		/usr/local/bin/bumblebee-disablecard
+	fi
+	if [ -f /usr/bin/bumblebee-disablecard ]; then
+		/usr/bin/bumblebee-disablecard
+	fi
+fi
 
+#
+# Update Ubuntu stuff
+#
 if [ "$DISTRO" == "UBUNTU" ] ; then
 	chmod +x /usr/local/bin/bumblebee*
 	update-rc.d bumblebee defaults
@@ -564,27 +580,42 @@ esac
 sed -i 's/VGL_COMPRESS.*/VGL_COMPRESS='$IMAGETRANSPORT'/' "$DEFAULT_FILE"
 
 #
-#	Set userrights
+# Set userrights
 #
 if ! grep -q '^bumblebee:' /etc/group; then
 	groupadd bumblebee
 fi
-if [ "$DISTRO" == "UBUNTU" ] && [ -n "$SUDO_USER" ]; then
-	gpasswd -a "$SUDO_USER" bumblebee
+if [ "$DISTRO" == "UBUNTU" ] ; then
+	if [ "$SUDO_USER" != "" ] ; then
+		gpasswd -a "$SUDO_USER" bumblebee
+	fi
+	#
+	# Bumblebee creates a file in /etc/sudoers.d, do not do an unnecessary write
+	#
+	if grep -q '^%bumblebee ' /etc/sudoers; then
+		sed '/^%bumblebee /d' -i /etc/sudoers
+	fi
 fi
 if [ "$DISTRO" == "OPENSUSE" ] ; then
 	if [ "$SUDO_USER" != "" ] ; then
 		groupmod -A `env | grep SUDO_USER | cut -f2 -d=` bumblebee
 	fi
-fi
-
-# Bumblebee creates a file in /etc/sudoers.d, do not do an unnecessary write
-if grep -q '^%bumblebee ' /etc/sudoers; then
-	sed '/^%bumblebee /d' -i /etc/sudoers
+	if [ -f /etc/sudoers ] ; then
+		#
+		# Cleanup sudoers
+		#
+		sed '/^%bumblebee /d' -i /etc/sudoers
+		#
+		# Add new permissions
+		#
+		echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /etc/init.d/bumblebee" >> /etc/sudoers
+		echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /usr/bin/bumblebee-enablecard" >> /etc/sudoers
+		echo "%bumblebee      ALL=(ALL:ALL) NOPASSWD: /usr/bin/bumblebee-disablecard" >> /etc/sudoers
+	fi
 fi
 
 #
-#	That's all folks
+# That's all folks
 #
 whiptail --msgbox \
 " Bumblebee is now configured.\n\n"\
